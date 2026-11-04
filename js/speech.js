@@ -1,10 +1,13 @@
 /*
  * speech.js — 英語音声の再生
  *
- * 音声の種類（ボタンに表示して区別する）
+ * 音声の種類（画面に表示して区別する）
  *   録音   … 人が読んだ録音ファイル（単語ごとに URL を登録できる）
- *   高品質 … あらかじめ作っておいた高品質な音声ファイル（音声パック。js/audio-pack.js があるとき）
+ *   AI音声 … あらかじめ作った高品質な音声（音声パック js/audio-pack.js。Kokoro・アメリカ英語）
  *   端末   … 端末のブラウザの読み上げ機能（合成音声）
+ *
+ * 音声パックは単語ごとの1本のファイルに入っているので、Web Audio で必要な部分だけを切り出して鳴らす。
+ * （iPhone ではマナーモードでも鳴るように audioSession を playback にする）
  *
  * 端末の読み上げでは、アメリカ英語（en-US）の声を最優先し、その中でも
  * Premium / Enhanced / Natural など高品質な声を選ぶ。
@@ -96,6 +99,9 @@
       selectVoice,
       speak,
       play,
+      playClip,
+      preload,
+      packFailed: false,
       stop,
       voiceLabel,
       currentLabel,
@@ -103,6 +109,147 @@
     let token = 0;
     let audioEl = null;
     let timer = null;
+    let actx = null;
+    let curSrc = null;
+    let rafId = 0;
+    const decoded = new Map();
+
+    /** Web Audio を準備する（最初はボタンを押したときに呼ぶ） */
+    function audioCtx(create) {
+      if (actx) {
+        if (actx.state === 'suspended') { try { actx.resume(); } catch (e) { /* noop */ } }
+        return actx;
+      }
+      if (!create) return null;
+      const AC = win.AudioContext || win.webkitAudioContext;
+      if (!AC) return null;
+      try {
+        if (win.navigator && win.navigator.audioSession) win.navigator.audioSession.type = 'playback';
+      } catch (e) { /* noop */ }
+      try {
+        actx = new AC();
+        // 古い iOS 向け：無音を一度鳴らして、音を出せる状態にする
+        const b = actx.createBuffer(1, 1, 22050);
+        const src = actx.createBufferSource();
+        src.buffer = b;
+        src.connect(actx.destination);
+        src.start(0);
+        if (actx.state === 'suspended') actx.resume();
+      } catch (e) {
+        actx = null;
+      }
+      return actx;
+    }
+
+    function loadBuffer(url) {
+      if (decoded.has(url)) {
+        const p = decoded.get(url);
+        decoded.delete(url);
+        decoded.set(url, p);
+        return p;
+      }
+      const p = win.fetch(url)
+        .then((r) => {
+          if (!r.ok) throw new Error('http ' + r.status);
+          return r.arrayBuffer();
+        })
+        .then((ab) => new Promise((res, rej) => {
+          const q = actx.decodeAudioData(ab, res, rej);
+          if (q && q.then) q.then(res, rej);
+        }));
+      p.catch(() => decoded.delete(url));
+      decoded.set(url, p);
+      while (decoded.size > 12) decoded.delete(decoded.keys().next().value);
+      return p;
+    }
+
+    /**
+     * 次に使いそうなファイルを先に読み込む。
+     * 一度ボタンを押したあと（Web Audio の準備ができたあと）は、音として使える形にまでしておく。
+     * それまではファイルを取ってくるだけ（ブラウザのキャッシュに入れておく）。
+     */
+    const warmed = new Set();
+    function preload(url) {
+      if (!url || !win.fetch || api.packFailed) return;
+      if (actx) {
+        loadBuffer(url).catch(() => {});
+        return;
+      }
+      if (warmed.has(url)) return;
+      warmed.add(url);
+      try { win.fetch(url).catch(() => {}); } catch (e) { /* noop */ }
+    }
+
+    /** 音声パックの一部分（start〜end 秒）を鳴らす */
+    function playClip(url, start, end, opts) {
+      const o = opts || {};
+      const cb = o.onState || function () {};
+      stop();
+      const my = ++token;
+      const ctx = audioCtx(true);
+      if (!ctx || !win.fetch) return playFragment(url, start, end, cb, my);
+      loadBuffer(url).then((buf) => {
+        if (my !== token) return;
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.onended = () => {
+          if (my === token) {
+            curSrc = null;
+            cb('ended');
+          }
+        };
+        curSrc = src;
+        src.start(0, start, Math.max(0.05, end - start));
+        cb('playing');
+      }).catch(() => {
+        if (my === token) playFragment(url, start, end, cb, my);
+      });
+      return true;
+    }
+
+    /** Web Audio が使えないときの予備：audio 要素で一部分だけ鳴らす */
+    function playFragment(url, start, end, cb, my) {
+      let a;
+      try {
+        a = new win.Audio(url + '#t=' + start.toFixed(2) + ',' + end.toFixed(2));
+      } catch (e) {
+        api.packFailed = true;
+        cb('error', 'pack');
+        return false;
+      }
+      audioEl = a;
+      const guard = () => {
+        if (my !== token || !audioEl) return;
+        if (a.currentTime >= end - 0.02) {
+          a.pause();
+          cb('ended');
+          return;
+        }
+        rafId = (win.requestAnimationFrame || setTimeout)(guard, 16);
+      };
+      a.onplaying = () => {
+        if (my !== token) return;
+        if (a.currentTime < start - 0.05) {
+          try { a.currentTime = start; } catch (e) { /* noop */ }
+        }
+        cb('playing');
+        guard();
+      };
+      a.onended = () => my === token && cb('ended');
+      a.onerror = () => {
+        if (my !== token) return;
+        api.packFailed = true;
+        cb('error', 'pack');
+      };
+      const p = a.play();
+      if (p && p.catch) p.catch(() => {
+        if (my !== token) return;
+        api.packFailed = true;
+        cb('error', 'pack');
+      });
+      return true;
+    }
 
     function emit() {
       listeners.forEach((fn) => {
@@ -152,6 +299,11 @@
     function stop() {
       token += 1;
       clearTimeout(timer);
+      try { (win.cancelAnimationFrame || clearTimeout)(rafId); } catch (e) { /* noop */ }
+      if (curSrc) {
+        try { curSrc.stop(); } catch (e) { /* noop */ }
+        curSrc = null;
+      }
       try { if (synth) synth.cancel(); } catch (e) { /* noop */ }
       if (audioEl) {
         try { audioEl.pause(); } catch (e) { /* noop */ }

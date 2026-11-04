@@ -52,6 +52,7 @@
     dailyGoal: 10,
     accent: 'us',
     autoplay: false,
+    studyMode: 'fwd',
   };
 
   /* ---------- 保存先 ---------- */
@@ -554,6 +555,7 @@
     out.dailyGoal = [10, 20, 30, 40].includes(Number(s.dailyGoal)) ? Number(s.dailyGoal) : DEFAULT_SETTINGS.dailyGoal;
     out.accent = s.accent === 'uk' ? 'uk' : 'us';
     out.autoplay = !!s.autoplay;
+    out.studyMode = s.studyMode === 'rev' ? 'rev' : 'fwd';
     return out;
   }
 

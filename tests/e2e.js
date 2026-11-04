@@ -25,6 +25,17 @@ function speechMock(kind) {
   return `
   (() => {
     window.__spoken = [];
+    window.__clips = [];
+    try {
+      const P = window.AudioBufferSourceNode && window.AudioBufferSourceNode.prototype;
+      if (P) {
+        const orig = P.start;
+        P.start = function (when, offset, duration) {
+          if (offset !== undefined) window.__clips.push({ offset, duration });
+          return orig.apply(this, arguments);
+        };
+      }
+    } catch (e) {}
     const off = Number(localStorage.getItem('__test_offset') || 0);
     if (off) { const real = Date.now.bind(Date); Date.now = () => real() + off; }
     const kind = ${JSON.stringify(kind)};
@@ -103,6 +114,16 @@ const ls = (page, key) => page.evaluate((k) => JSON.parse(localStorage.getItem('
 const current = async (page) => (await ls(page, 'session')).queue[0];
 const spoken = (page) => page.evaluate(() => window.__spoken.slice());
 const remainText = (page) => page.textContent('.remain b');
+const clips = (page) => page.evaluate(() => window.__clips.slice());
+const packOf = (page, text, slow) => page.evaluate(([t, sl]) => window.CIF.audioPack.clips[(sl ? 's|' : 'n|') + t], [text, !!slow]);
+const waitClips = (page, n) => page.waitForFunction((k) => window.__clips.length >= k, n, { timeout: 8000 });
+/** 鳴らした区間が、音声パックの「その英語」の区間と一致するか */
+async function sameClip(page, played, text, slow) {
+  const c = await packOf(page, text, slow);
+  ok(c, '音声パックにない: ' + text);
+  ok(Math.abs(played.offset - c[1]) < 0.002 && Math.abs(played.duration - (c[2] - c[1])) < 0.002, (slow ? 'ゆっくり ' : '') + text + ' の区間: ' + JSON.stringify(played) + ' / ' + JSON.stringify(c));
+}
+const capOf = (page, sel) => page.textContent(sel + ' .audio-cap');
 
 async function flipAndRate(page, r) {
   await page.click('.card-front .tap-hint');
@@ -138,9 +159,9 @@ async function noHScroll(page, label) {
     await page.click('.card-front .headword');
     await page.waitForSelector('.card-back');
     const labels = await page.$$eval('.card-back .sec-label', (els) => els.map((e) => e.textContent));
-    eq(labels, ['一言ニュアンス', '頭に浮かべる場面', '意味と、文の中での役割', '例文']);
+    eq(labels, ['一言ニュアンス', '頭に浮かべる場面', '意味と文の中での役割', '例文']);
     ok((await page.textContent('.card-back .nuance-text')).endsWith('って感じ'));
-    ok((await page.textContent('.card-back .sec.scene .scene-text')).length > 5, '頭に浮かべる場面');
+    ok((await page.textContent('.card-back .scene-text')).length > 5, '頭に浮かべる場面');
     ok(/（(形容詞|副詞|名詞|動詞|前置詞|間投詞|代名詞|助動詞|フレーズ)）/.test(await page.textContent('.card-back .role-line')), '品詞の名前');
     const exJa = await page.$$eval('.card-back .ex', (els) => els.map((e) => [!!e.querySelector('.ex-en'), !!e.querySelector('.ex-ja')]));
     ok(exJa.length >= 1 && exJa.every(([a, b]) => a && b), '例文は英語と日本語訳が別の行');
@@ -153,59 +174,113 @@ async function noHScroll(page, label) {
     await ctx.close();
   });
 
-  await test('音声: 単語・ゆっくり・フレーズ・例文を英語だけ再生し、カードは裏返らない', async () => {
+  await test('音声: 単語・ゆっくり・フレーズ・例文を AI音声（アメリカ英語）で再生し、カードは裏返らない', async () => {
     const { ctx, page } = await newPage();
     await page.click('[data-action="start"][data-mode="fwd"]');
-    await page.waitForSelector('.card-front .audio-btn:not([disabled])');
+    await page.waitForSelector('.card-front .audio button:not([disabled])');
     const sid = await current(page);
     const word = await page.textContent('.card-front .headword');
-    const btns = await page.$$('.card-front .audio-btn');
+    eq(await capOf(page, '.card-front'), 'AI音声・アメリカ英語', '音声の種類を表示');
+    const btns = await page.$$('.card-front .audio button');
+    eq(await Promise.all(btns.map((b) => b.textContent())), ['再生', 'ゆっくり']);
     await btns[0].click();
+    await waitClips(page, 1);
     await btns[1].click();
-    await page.click('.card-front .cue-box .audio-btn');
-    await page.waitForTimeout(50);
+    await waitClips(page, 2);
+    const cue = await page.textContent('.card-front .cue');
+    await page.click('.card-front .cue-line .speak-one');
+    await waitClips(page, 3);
     ok(await page.$('.card-front'), '音声ボタンでは裏返らない');
     ok(!(await page.$('.card-back')));
-    let sp = await spoken(page);
-    eq(sp[0].text, word, '単語');
-    eq(sp[0].rate, 0.95, '通常速度');
-    eq(sp[1].rate, 0.5, 'ゆっくり（1語は 0.5 倍）');
-    eq(sp[2].text, await page.textContent('.card-front .cue'), 'フレーズ');
-    ok(sp.every((x) => x.voice === 'Samantha' && x.lang === 'en-US'), '英語の声（日本語の声や効果音の声は選ばない）');
-    await page.waitForSelector('.audio-btn.playing', { timeout: 1000 }).catch(() => {});
+    let cs = await clips(page);
+    await sameClip(page, cs[0], word, false);
+    await sameClip(page, cs[1], word, true);
+    await sameClip(page, cs[2], cue, false);
+    const n = await packOf(page, word, false);
+    const sl = await packOf(page, word, true);
+    ok((sl[2] - sl[1]) / (n[2] - n[1]) > 1.5, 'ゆっくりは、はっきり長い: ' + (n[2] - n[1]).toFixed(2) + '秒 → ' + (sl[2] - sl[1]).toFixed(2) + '秒');
+    eq((await spoken(page)).length, 0, 'AI音声があるときは端末の読み上げを使わない');
     await page.click('.card-front .tap-hint');
     await page.waitForSelector('.card-back');
-    await page.click('.card-back .ex .audio-btn');
-    await page.click('.card-back .ex .audio-btn.slow');
-    sp = await spoken(page);
     const exEn = await page.textContent('.card-back .ex .ex-en');
-    eq(sp[3].text, exEn, '例文（[ ] なし）');
-    const words = exEn.split(' ');
-    eq([sp[4].text, sp[4].rate], [words[0], 0.55], 'ゆっくりは1語ずつ・0.55 倍');
-    await page.waitForFunction((n) => window.__spoken.length >= n, 4 + words.length, { timeout: 8000 });
-    sp = await spoken(page);
-    eq(sp.slice(4).map((x) => x.text), words, '例文を1語ずつ区切って最後まで読む');
-    ok(sp.every((x) => !JA.test(x.text) && !x.text.includes('[')), '日本語は読み上げない');
+    await page.click('.card-back .ex .audio button[data-slow="0"]');
+    await waitClips(page, 4);
+    await page.click('.card-back .ex .audio button[data-slow="1"]');
+    await waitClips(page, 5);
+    cs = await clips(page);
+    await sameClip(page, cs[3], exEn, false);
+    await sameClip(page, cs[4], exEn, true);
+    const texts = await page.$$eval('[data-action="speak"]', (els) => els.map((e) => e.dataset.text));
+    ok(texts.length > 3 && texts.every((t) => t && !JA.test(t) && !t.includes('[')), '日本語は読み上げない・[ ] は読まない');
+    ok(!(await page.$('.card-back .ex .audio-cap')), '例文は AI音声なので、種類の表示をくり返さない');
     ok(await page.$('.card-back'), '裏面のまま');
     eq(await current(page), sid, '音声ボタンで回答扱いにならない');
-    ok((await page.textContent('.card-back .audio-btn .src-tag')) === '端末', '端末の読み上げと表示');
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('AI音声がない英語（自分で追加した単語）は端末の読み上げ。ゆっくりは1語ずつ', async () => {
+    const { ctx, page } = await newPage();
+    await page.evaluate(() => {
+      const words = JSON.parse(localStorage.getItem('cif.v1.words'));
+      words.push({ id: 'w-zz', headword: 'borrow', status: 'unverified', senses: [{ id: 's-zz', pos: 'verb', role: 'action', meaning: '借りる', cue: 'borrow a pen',
+        examples: [{ en: 'Can I [borrow] your pen?', ja: 'ペンを借りてもいい？' }] }] });
+      localStorage.setItem('cif.v1.words', JSON.stringify(words));
+    });
+    await page.reload();
+    await page.goto(URL0 + '#word-w-zz');
+    await page.waitForSelector('.detail-head .audio button:not([disabled])');
+    eq(await capOf(page, '.detail-head'), '端末の読み上げ', '端末の読み上げと表示');
+    await page.click('.detail-head .audio button[data-slow="0"]');
+    await page.click('.detail-head .audio button[data-slow="1"]');
+    let sp = await spoken(page);
+    eq([sp[0].text, sp[0].rate], ['borrow', 0.95], '通常速度');
+    eq(sp[1].rate, 0.5, 'ゆっくり（1語は 0.5 倍）');
+    ok(sp.every((x) => x.voice === 'Samantha' && x.lang === 'en-US'), '英語の声（日本語の声や効果音の声は選ばない）');
+    eq(await capOf(page, '.ex'), '端末の読み上げ', '例文も端末の読み上げと表示');
+    await page.click('.ex .audio button[data-slow="1"]');
+    const words = ['Can', 'I', 'borrow', 'your', 'pen?'];
+    await page.waitForFunction((k) => window.__spoken.length >= k, 2 + words.length, { timeout: 8000 });
+    sp = await spoken(page);
+    eq([sp[2].text, sp[2].rate], [words[0], 0.55], 'ゆっくりは1語ずつ・0.55 倍');
+    eq(sp.slice(2).map((x) => x.text), words, '例文を1語ずつ区切って最後まで読む');
+    eq((await clips(page)).length, 0);
     await ctx.close();
   });
 
   await test('発音: 品詞で発音が変わる語は、その用法の読み上げ（record / live）', async () => {
     const { ctx, page } = await newPage();
+    const wordTexts = async (id) => {
+      await page.goto(URL0 + '#word-' + id);
+      await page.waitForSelector('.sense-card');
+      const out = [];
+      for (const card of await page.$$('.sense-card')) {
+        const b = await card.$('.audio button[data-slow="0"]');
+        out.push([await b.getAttribute('data-text'), await b.getAttribute('data-kind')]);
+        const n = (await clips(page)).length;
+        await b.click();
+        await waitClips(page, n + 1); // 新しく押すと前の音は止まるので、鳴り始めてから次へ
+      }
+      return out;
+    };
     await page.goto(URL0 + '#word-w-record');
     await page.waitForSelector('.sense-card');
-    const cards = await page.$$('.sense-card');
-    await (await cards[0].$('.audio-row .audio-btn')).click();
-    await (await cards[1].$('.audio-row .audio-btn')).click();
-    await page.goto(URL0 + '#word-w-live');
-    await page.waitForSelector('.sense-card');
-    const lv = await page.$$('.sense-card');
-    await (await lv[0].$('.audio-row .audio-btn')).click();
-    await (await lv[1].$('.audio-row .audio-btn')).click();
-    const texts = (await spoken(page)).map((x) => x.text);
-    eq(texts, ['a record', 'to record', 'to live', 'live music'], 'record（名詞・動詞）と live（動詞・形容詞）');
+    const two = await page.$$('.sense-card .audio button[data-slow="0"]');
+    await two[0].click();
+    await two[1].click();
+    await waitClips(page, 1);
+    await page.waitForTimeout(300);
+    eq((await clips(page)).length, 1, '続けて押すと、あとから押した音だけが鳴る（重ならない）');
+    await page.evaluate(() => { window.__clips.length = 0; });
+    const rec = await wordTexts('w-record');
+    const live = await wordTexts('w-live');
+    eq(rec.concat(live), [['a record', 'pack'], ['to record', 'pack'], ['to live', 'pack'], ['live music', 'pack']], 'record（名詞・動詞）と live（動詞・形容詞）');
+    await waitClips(page, 4);
+    const cs = await clips(page);
+    await sameClip(page, cs[0], 'a record');
+    await sameClip(page, cs[1], 'to record');
+    await sameClip(page, cs[2], 'to live');
+    await sameClip(page, cs[3], 'live music');
     await page.goto(URL0 + '#word-w-record');
     await page.waitForSelector('.sense-card');
     const detail = await page.textContent('.word-detail');
@@ -213,35 +288,50 @@ async function noHScroll(page, label) {
     await ctx.close();
   });
 
-  await test('音声が使えない端末: ボタンを無効にして理由を表示（押しても何も起きない状態にしない）', async () => {
+  await test('端末の読み上げが使えない端末: AI音声は使え、AI音声がない英語はボタンを無効にして理由を表示', async () => {
     for (const kind of ['none', 'unsupported']) {
       const { ctx, page } = await newPage({ speech: kind });
+      await page.evaluate(() => {
+        const words = JSON.parse(localStorage.getItem('cif.v1.words'));
+        words.push({ id: 'w-zz', headword: 'borrow', status: 'unverified', senses: [{ id: 's-zz', pos: 'verb', meaning: '借りる', examples: [] }] });
+        localStorage.setItem('cif.v1.words', JSON.stringify(words));
+      });
+      await page.reload();
+      await page.waitForSelector('.home');
       await page.click('[data-action="start"][data-mode="fwd"]');
       await page.waitForSelector('.card-front');
-      await page.waitForFunction(() => document.querySelector('.card-front .audio-btn .src-tag').textContent === '音声なし', null, { timeout: 5000 });
-      ok(await page.$eval('.card-front .audio-btn', (b) => b.disabled), '無効');
-      const tag = await page.textContent('.card-front .audio-btn .src-tag');
-      eq(tag, '音声なし');
-      const banner = await page.textContent('[data-speech-banner]');
-      ok(kind === 'none' ? banner.includes('英語の音声が見つかりません') : banner.includes('対応していません'), banner);
-      await page.click('.card-front .audio-btn', { force: true });
-      ok(await page.$('.card-front'), '無効ボタンで裏返らない');
+      ok(!(await page.$eval('.card-front .audio button', (b) => b.disabled)), 'AI音声のボタンは使える');
+      eq(await capOf(page, '.card-front'), 'AI音声・アメリカ英語');
+      await page.goto(URL0 + '#word-w-zz');
+      await page.waitForFunction(() => {
+        const c = document.querySelector('.detail-head .audio-cap');
+        return c && c.textContent === 'この端末では再生できません';
+      }, null, { timeout: 5000 });
+      ok(await page.$eval('.detail-head .audio button', (b) => b.disabled), '無効');
+      ok(await page.$('.detail-head .audio.off'), '無効の見た目');
+      await page.goto(URL0 + '#options');
+      await page.waitForSelector('#device-voice');
+      const msg = await page.textContent('#device-voice', { timeout: 3000 });
+      ok(kind === 'none' ? msg.includes('英語の音声が見つかりません') : msg.includes('対応していません'), msg);
       await ctx.close();
     }
   });
 
-  await test('この環境の実際のブラウザ音声でも、状態を正しく表示する', async () => {
+  await test('この環境の実際のブラウザで、AI音声のファイルを読み込んで最後まで鳴らせる', async () => {
     const { ctx, page } = await newPage({ speech: 'real' });
     await page.click('[data-action="start"][data-mode="fwd"]');
-    await page.waitForTimeout(3000);
-    const state = await page.evaluate(() => {
-      const b = document.querySelector('.card-front .audio-btn');
-      const has = !!(window.speechSynthesis && speechSynthesis.getVoices().some((v) => /^en/i.test(v.lang)));
-      return { has, disabled: b.disabled, tag: b.querySelector('.src-tag').textContent };
-    });
-    if (state.has) eq([state.disabled, state.tag], [false, '端末']);
-    else eq([state.disabled, state.tag], [true, '音声なし']);
-    console.log('      （この環境の英語音声: ' + (state.has ? 'あり' : 'なし → ボタン無効と案内を確認') + '）');
+    await page.waitForSelector('.card-front .audio button');
+    await page.click('.card-front .audio button[data-slow="0"]');
+    await page.waitForSelector('.card-front .audio button.playing', { timeout: 8000 });
+    await page.waitForFunction(() => !document.querySelector('.card-front .audio button.playing'), null, { timeout: 8000 });
+    await page.click('.card-front .audio button[data-slow="1"]');
+    await page.waitForSelector('.card-front .audio button[data-slow="1"].playing', { timeout: 8000 });
+    await page.waitForFunction(() => !document.querySelector('.audio button.playing'), null, { timeout: 8000 });
+    const t = await page.textContent('#toast');
+    ok(!t || !t.includes('読み込めません'), '読み込みに失敗しない: ' + t);
+    eq(page.errors, []);
+    const has = await page.evaluate(() => !!(window.speechSynthesis && speechSynthesis.getVoices().some((v) => /^en/i.test(v.lang))));
+    console.log('      （AI音声：再生できた／この環境の端末の英語音声: ' + (has ? 'あり' : 'なし') + '）');
     await ctx.close();
   });
 
@@ -261,7 +351,7 @@ async function noHScroll(page, label) {
     const d = await current(page);
     await flipAndRate(page, 'good');
     eq(await current(page), a, '3枚後に「思い出せなかった」カード');
-    ok(await page.isVisible('.chip.again-chip'), '「もう一度」と表示');
+    eq(await page.textContent('.card-meta .chip.accent'), 'もう一度', '「もう一度」と表示');
     ok((await page.textContent('[data-r="good"] .rate-next').catch(() => '')) === '' || true);
     await flipAndRate(page, 'good');
     const seen = [];
@@ -289,9 +379,9 @@ async function noHScroll(page, label) {
     await page.waitForSelector('#result-title');
     eq(await page.textContent('#result-title'), 'セット完了');
     ok(await page.isVisible('.done-mark'), '達成の演出');
-    const tally = await page.$$eval('.tally b', (els) => els.map((e) => e.textContent));
+    const tally = await page.$$eval('.result .stats .stat-num', (els) => els.map((e) => e.textContent));
     eq(tally, ['9', '0', '1']);
-    const nexts = await page.$$eval('.rl-next', (els) => els.map((e) => e.textContent));
+    const nexts = await page.$$eval('.rl-next > span:first-child', (els) => els.map((e) => e.textContent));
     eq(nexts.length, 10);
     ok(nexts.filter((t) => t === '明日').length === 9 && nexts.some((t) => t === '10分後'), nexts.join(','));
     ok(await page.isVisible('text=今日の目標を達成しました'));
@@ -301,12 +391,12 @@ async function noHScroll(page, label) {
     await page.waitForSelector('#result-title');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    const stats = await page.$$eval('.sum-num', (els) => els.map((e) => e.textContent));
+    const stats = await page.$$eval('.home .stats .stat-num', (els) => els.map((e) => e.textContent));
     ok(stats[0].startsWith('1'), '連続学習 1日: ' + stats[0]);
-    ok(stats[1].startsWith(String(pts)), 'ポイント');
-    ok(stats[2].startsWith('10'), '今日 10枚');
+    ok(stats[1].startsWith('10'), '今日 10枚');
+    ok(stats[2].startsWith(String(pts)), 'ポイント');
     ok(await page.isVisible('text=今日の目標・達成'));
-    const sched = await page.$$eval('.sched-list b', (els) => els.map((e) => e.textContent));
+    const sched = await page.$$eval('.home .facts dd', (els) => els.map((e) => e.textContent));
     eq(sched[1], '9枚', '明日の予定');
 
     // 翌日にする → 復習カードを優先
@@ -314,10 +404,10 @@ async function noHScroll(page, label) {
     await page.evaluate((ms) => localStorage.setItem('__test_offset', String(ms)), DAY);
     await page.reload();
     await page.waitForSelector('.home');
-    const counts = await page.$$eval('.home .block .counts', (els) => Array.from(els[0].querySelectorAll('b')).map((e) => e.textContent));
+    const counts = await page.$$eval('.home .counts', (els) => Array.from(els[0].querySelectorAll('b')).map((e) => e.textContent));
     eq(counts.slice(0, 2), ['10', String(TOTAL - 10)], '翌日: 復習10枚・残りは新しいカード');
-    const stats2 = await page.$$eval('.sum-num', (els) => els.map((e) => e.textContent));
-    ok(stats2[0].startsWith('1') && (await page.isVisible('text=日連続（今日まだ）')), '翌日はまだ学習していない表示');
+    const stats2 = await page.$$eval('.home .stats .stat-num', (els) => els.map((e) => e.textContent));
+    ok(stats2[0].startsWith('1') && (await page.isVisible('text=連続学習・今日まだ')), '翌日はまだ学習していない表示');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
     const set = await ls(page, 'session');
@@ -326,7 +416,7 @@ async function noHScroll(page, label) {
     await finishSet(page, 'good');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    const stats3 = await page.$$eval('.sum-num', (els) => els.map((e) => e.textContent));
+    const stats3 = await page.$$eval('.home .stats .stat-num', (els) => els.map((e) => e.textContent));
     ok(stats3[0].startsWith('2'), '連続学習 2日: ' + stats3[0]);
     const p2 = await ls(page, 'progress');
     const someId = set.cards.find((id) => p2[id].fwd.history.length >= 2 && p2[id].fwd.history.every((h) => h.r === 'good'));
@@ -351,8 +441,8 @@ async function noHScroll(page, label) {
     await page.click('[data-action="quit"]');
     await page.waitForSelector('.home');
     await page.reload();
-    await page.waitForSelector('.resume');
-    ok((await page.textContent('.resume')).includes('残り 8枚'));
+    await page.waitForSelector('[data-action="resume"]');
+    ok((await page.textContent('[data-action="resume"]')).includes('残り 8枚'));
     await page.click('[data-action="resume"]');
     await page.waitForSelector('.card-front');
     eq(await current(page), cur);
@@ -368,7 +458,7 @@ async function noHScroll(page, label) {
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.modal');
     await page.click('.modal [data-action="modal-cancel"]');
-    ok(await page.$('.resume'), 'やめると途中のセットはそのまま');
+    ok(await page.$('[data-action="resume"]'), 'やめると途中のセットはそのまま');
     await ctx.close();
   });
 
@@ -387,13 +477,20 @@ async function noHScroll(page, label) {
 
   await test('場面 → 英語: 単語を隠して場面と穴あき例文を出し、ヒントで最初の文字', async () => {
     const { ctx, page } = await newPage();
+    eq(await page.$$eval('.home .seg button', (els) => els.map((e) => e.textContent + ':' + e.getAttribute('aria-pressed'))), ['英語 → 場面:true', '場面 → 英語:false'], '出題のしかたは切り替えで選ぶ');
+    await page.click('[data-action="set-mode"][data-v="rev"]');
     ok(await page.$eval('[data-action="start"][data-mode="rev"]', (b) => b.disabled), '最初は押せない（案内だけ）');
     ok(await page.isVisible('text=「英語 → 場面」で一度学習したカードから出ます'), '案内');
+    await page.click('[data-action="set-mode"][data-v="fwd"]');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
     await finishSet(page, 'good');
     await page.goto(URL0 + '#home');
-    await page.waitForSelector('[data-action="start"][data-mode="rev"]');
+    await page.waitForSelector('.home');
+    await page.click('[data-action="set-mode"][data-v="rev"]');
+    await page.reload();
+    await page.waitForSelector('[data-action="start"][data-mode="rev"]:not([disabled])');
+    ok(true, '選んだ出題のしかたは保存される');
     await page.click('[data-action="start"][data-mode="rev"]');
     await page.waitForSelector('.card-front.rev');
     const sid = await current(page);
@@ -402,7 +499,7 @@ async function noHScroll(page, label) {
     ok(!new RegExp('\\b' + word + '\\b', 'i').test(text.replace(/[぀-ヿ一-鿿]/g, ' ')), '表面に答えの単語を出さない: ' + word);
     ok(await page.$('.card-front.rev .blank'), '例文は空欄');
     ok(await page.$('.card-front.rev .scene-text'), '場面の説明');
-    ok(!(await page.$('.card-front.rev .audio-btn')), '表面で英語を読み上げない（答えが分かってしまう）');
+    ok(!(await page.$('.card-front.rev .audio')) && !(await page.$('.card-front.rev .speak-one')), '表面で英語を読み上げない（答えが分かってしまう）');
     await page.click('[data-action="hint"]');
     const hint = await page.textContent('.hint');
     ok(hint.startsWith(word[0]), 'ヒント: ' + hint);
@@ -446,7 +543,7 @@ async function noHScroll(page, label) {
     await page.click('[data-action="save-word"]');
     await page.waitForSelector('.word-detail');
     eq(await page.textContent('.detail-head .headword'), 'borrow');
-    ok((await page.textContent('.detail-head .badge')) === '確認済み');
+    ok((await page.textContent('.word-detail')).includes('確認済み'));
     ok((await page.textContent('.word-detail')).includes('lend'));
     // 編集
     await page.click('a[href^="#edit-"]');
@@ -475,15 +572,15 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.word-detail');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    const counts = await page.$$eval('.home .block .counts', (els) => Array.from(els[0].querySelectorAll('b')).map((e) => e.textContent));
+    const counts = await page.$$eval('.home .counts', (els) => Array.from(els[0].querySelectorAll('b')).map((e) => e.textContent));
     eq(counts.slice(0, 2), ['0', String(TOTAL + 1)], '追加した borrow は出題、要確認は出題しない');
     await page.goto(URL0 + '#words');
     await page.waitForSelector('.word-list');
-    await page.click('[data-action="filter"][data-f="review"]');
-    eq(await page.$$eval('.word-row .wr-head', (els) => els.map((e) => e.textContent)), REVIEW_WORDS.concat(['かりる']));
-    await page.click('[data-action="filter"][data-f="all"]');
+    await page.selectOption('#status-filter', 'review');
+    eq(await page.$$eval('.word-row .r-title b', (els) => els.map((e) => e.textContent)), REVIEW_WORDS.concat(['かりる']));
+    await page.selectOption('#status-filter', 'all');
     await page.fill('#word-search', '借り');
-    eq((await page.$$eval('.word-row .wr-head', (els) => els.map((e) => e.textContent))).sort(), ['borrow', 'かりる']);
+    eq((await page.$$eval('.word-row .r-title b', (els) => els.map((e) => e.textContent))).sort(), ['borrow', 'かりる']);
     // borrow を学習に出す
     const words = await ls(page, 'words');
     const borrow = words.find((w) => w.headword === 'borrow');
@@ -504,10 +601,11 @@ async function noHScroll(page, label) {
     const { ctx, page } = await newPage();
     await page.goto(URL0 + '#word-w-well');
     await page.waitForSelector('.word-detail');
-    eq(await page.$$eval('.g-key', (els) => els.map((e) => e.textContent)), ['A', 'B']);
+    const titles = await page.$$eval('.section-title', (els) => els.map((e) => e.textContent));
+    ok(titles[0].startsWith('グループ A') && titles[1].startsWith('グループ B'), titles.join(','));
     ok((await page.textContent('.group-note')).includes('無理に一つのイメージにまとめなくて大丈夫'));
     eq((await page.$$('.sense-card')).length, 3);
-    ok((await page.textContent('.sources')).includes('確認方法'), '確認状況');
+    ok((await page.textContent('.word-detail')).includes('確認方法'), '確認状況');
     ok((await page.$$('.source-list a')).length >= 2, '出典リンク');
     await page.goto(URL0 + '#word-w-pretty');
     await page.waitForSelector('.word-detail');
@@ -563,22 +661,28 @@ async function noHScroll(page, label) {
     await ctx.close();
   });
 
-  await test('音声の設定: 声の選択・速さが保存され、再読み込み後も使われる', async () => {
+  await test('音声の設定: 端末の読み上げの声・速さが保存され、再読み込み後も使われる', async () => {
     const { ctx, page } = await newPage();
     await page.goto(URL0 + '#options');
+    await page.waitForSelector('#voice-section');
+    ok((await page.textContent('#voice-section')).includes('AI音声（アメリカ英語）'), 'いま使っている音声の説明');
+    ok(!(await page.$eval('#device-voice', (d) => d.open)), '端末の読み上げの設定は、たたんでおく');
+    await page.click('#device-voice > summary');
     await page.waitForSelector('#voice-select:not([disabled])');
     const opts = await page.$$eval('#voice-select option', (els) => els.map((e) => e.textContent));
     ok(opts.length === 2 && /アメリカ英語/.test(opts[0]) && /en-GB/.test(opts[1]), '英語の声だけ・アメリカ英語が先: ' + opts.join(','));
     await page.selectOption('#voice-select', 'daniel');
     await page.$eval('#slow-rate', (el) => { el.value = '0.5'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+    ok(await page.$eval('#device-voice', (d) => d.open), '変更しても開いたまま');
     await page.reload();
-    await page.waitForSelector('#voice-select');
+    await page.waitForSelector('#voice-select', { state: 'attached' });
+    await page.click('#device-voice > summary');
     eq(await page.inputValue('#voice-select'), 'daniel');
-    await page.click('#voice-section .audio-btn.slow');
+    await page.click('#device-voice .audio button[data-slow="1"]');
     const sp = await spoken(page);
     eq([sp[0].voice, sp[0].rate, sp[0].lang], ['Daniel', 0.5, 'en-GB']);
-    ok((await page.textContent('#voice-section')).includes('Daniel'));
-    ok((await page.textContent('#voice-section')).includes('選んでいる声はアメリカ英語ではありません'), 'アメリカ英語でない声を選ぶと案内する');
+    ok((await page.textContent('#device-voice')).includes('Daniel'));
+    ok((await page.textContent('#device-voice')).includes('選んでいる声はアメリカ英語ではありません'), 'アメリカ英語でない声を選ぶと案内する');
     await ctx.close();
   });
 
@@ -591,15 +695,15 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.home');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
-    await page.waitForTimeout(50);
     const head = await page.textContent('.card-front .headword');
-    let sp = await spoken(page);
-    eq(sp.map((x) => x.text), [head], '最初のカード');
+    await waitClips(page, 1);
+    await sameClip(page, (await clips(page))[0], head);
     await flipAndRate(page, 'good');
-    await page.waitForTimeout(50);
-    sp = await spoken(page);
-    eq(sp.length, 2, '次のカードでも読み上げ');
-    ok(!sp.some((x) => JA.test(x.text)));
+    await page.waitForSelector('.card-front');
+    const head2 = await page.textContent('.card-front .headword');
+    await waitClips(page, 2);
+    await sameClip(page, (await clips(page))[1], head2, false);
+    eq((await clips(page)).length, 2, '1枚につき1回');
     await ctx.close();
   });
 
@@ -610,13 +714,13 @@ async function noHScroll(page, label) {
     await page.fill('#f-senses-0-audio-word', 'audio/not-found.mp3');
     await page.click('[data-action="save-word"]');
     await page.waitForSelector('.word-detail');
-    const tags = await page.$$eval('.detail-head .audio-btn .src-tag', (els) => els.map((e) => e.textContent));
-    eq(tags, ['録音', '録音'], '単語ボタンは録音');
-    const exTag = await page.textContent('.ex .audio-btn .src-tag');
-    eq(exTag, '端末', '録音がない例文は端末の読み上げ');
-    await page.click('.detail-head .audio-btn');
-    await page.waitForFunction(() => document.getElementById('toast').textContent.includes('音声ファイルを再生できませんでした'), null, { timeout: 5000 });
+    eq(await capOf(page, '.detail-head'), '録音（人の声）', '単語ボタンは録音');
+    eq(await page.$$eval('.detail-head .audio button', (els) => els.map((e) => e.dataset.kind)), ['rec', 'rec']);
+    eq(await page.getAttribute('.ex .audio', 'data-kind'), 'pack', '録音がない例文は AI音声');
+    await page.click('.detail-head .audio button[data-slow="0"]');
+    await page.waitForFunction(() => document.getElementById('toast').textContent.includes('録音を再生できませんでした'), null, { timeout: 5000 });
     eq((await spoken(page)).length, 0, '録音があるときは合成音声を使わない');
+    eq((await clips(page)).length, 0, '録音があるときは AI音声を使わない');
     await ctx.close();
   });
 
@@ -640,9 +744,18 @@ async function noHScroll(page, label) {
     await page.goto(URL0 + '#word-w-excuse');
     await page.waitForSelector('.sense-card');
     const cards = await page.$$('.sense-card');
-    await (await cards[0].$('.audio-row .audio-btn')).click();
-    await (await cards[1].$('.audio-row .audio-btn')).click();
-    eq((await spoken(page)).map((x) => x.text), ['Excuse me.', 'an excuse'], 'excuse は用法ごとの発音で読み上げ');
+    const ex = [];
+    for (const c of cards.slice(0, 2)) {
+      const b = await c.$('.audio button[data-slow="0"]');
+      ex.push(await b.getAttribute('data-text'));
+      const n = (await clips(page)).length;
+      await b.click();
+      await waitClips(page, n + 1);
+    }
+    eq(ex, ['Excuse me.', 'an excuse'], 'excuse は用法ごとの発音で読み上げ');
+    await waitClips(page, 2);
+    await sameClip(page, (await clips(page))[0], 'Excuse me.');
+    await sameClip(page, (await clips(page))[1], 'an excuse');
     await page.goto(URL0 + '#word-w-north');
     await page.waitForSelector('.word-detail .dg');
     ok((await page.getAttribute('.word-detail .dg', 'aria-label')).includes('北'), '方角の図');
@@ -679,10 +792,10 @@ async function noHScroll(page, label) {
     });
     await page.reload();
     await page.waitForSelector('.home');
-    ok((await page.textContent('.round-list')).includes('第1回'), 'ホームに第1回');
+    ok((await page.textContent('.home .list')).includes('第1回'), 'ホームに第1回');
     await page.goto(URL0 + '#round-r-mini');
     await page.waitForSelector('.round');
-    ok((await page.textContent('.round')).includes('内容理解（4択）3問・文章作成（並べ替え）3問'));
+    ok((await page.textContent('.round')).includes('内容理解（4択）3問と、文章作成（並べ替え）3問'));
     await page.click('[data-action="start-test"]');
     await page.waitForSelector('.qcard');
 
@@ -760,7 +873,7 @@ async function noHScroll(page, label) {
     await page.goto(URL0 + '#misses');
     await page.waitForSelector('.misses');
     eq((await page.$$('.miss-list li')).length, 0, 'まだ覚えていない問題は0件');
-    await page.click('[data-action="miss-status"][data-f="all"]');
+    await page.click('[data-action="miss-status"][data-v="all"]');
     eq((await page.$$('.miss-list li.solved')).length, 2, '克服した問題も記録に残る');
 
     // 2回目：全問正解 → 満点。「2回目で満点」
@@ -776,12 +889,13 @@ async function noHScroll(page, label) {
     eq(await page.textContent('.score-num b'), '100');
     ok((await page.textContent('.score-hero')).includes('2回目で満点を取りました'));
     await page.goto(URL0 + '#round-r-mini');
-    await page.waitForSelector('.scores');
-    ok((await page.textContent('.facts')).includes('2回目で達成'));
-    eq((await page.$$('.scores tbody tr')).length, 2, 'テストの記録が2回分');
+    await page.waitForSelector('a.row[href^="#score-"]');
+    ok((await page.textContent('.facts')).includes('満点2回目'), '何回目で満点か: ' + (await page.textContent('.facts')));
+    eq((await page.$$('a.row[href^="#score-"]')).length, 2, 'テストの記録が2回分');
+    ok((await page.textContent('a.row[href^="#score-"]')).includes('100点'), '新しい順');
     await page.reload();
-    await page.waitForSelector('.scores');
-    eq((await page.$$('.scores tbody tr')).length, 2, '再読み込み後も記録が残る');
+    await page.waitForSelector('a.row[href^="#score-"]');
+    eq((await page.$$('a.row[href^="#score-"]')).length, 2, '再読み込み後も記録が残る');
     eq(page.errors, []);
     await ctx.close();
   });
@@ -792,7 +906,7 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.round');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
-    ok((await page.textContent('.card-top')).includes('第1回'));
+    ok((await page.textContent('.topbar .t-label')).includes('第1回'));
     const set = await ls(page, 'session');
     const r1 = SEED.rounds[0].wordIds;
     const ws = await ls(page, 'words');
@@ -820,6 +934,57 @@ async function noHScroll(page, label) {
       await noHScroll(page, h);
     }
     eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('ボタンの形をそろえる（古い形のボタンが残っていない）・メインの青いボタンは まとまりごとに1つ', async () => {
+    const { ctx, page } = await newPage();
+    const OLD = ['audio-btn', 'src-tag', 'ghost', 'danger-ghost', 'filter', 'block-head', 'btn-row', 'panel', 'sum-num', 'resume', 'cue-box', 'rate-mark', 'ch-no'];
+    const check = async (label) => {
+      const bad = await page.evaluate((old) => old.filter((c) => document.querySelector('#app .' + c)), OLD);
+      eq(bad, [], label + ' に古い形の部品');
+      const many = await page.evaluate(() => Array.from(document.querySelectorAll('#app .group, #app .answer-bar, #app .modal')).filter((g) => g.querySelectorAll('.btn.primary').length > 1).length);
+      eq(many, 0, label + ' で青いボタンが2つ以上並ぶまとまり');
+    };
+    await check('ホーム');
+    for (const h of ['round-r1', 'words', 'word-w-well', 'misses', 'options', 'edit-w-light']) {
+      await page.goto(URL0 + '#' + h);
+      await page.waitForTimeout(120);
+      await check(h);
+    }
+    await page.goto(URL0 + '#home');
+    await page.click('[data-action="start"][data-mode="fwd"]');
+    await page.waitForSelector('.card-front');
+    await check('表面');
+    await page.click('.card-front .tap-hint');
+    await check('裏面');
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('iPhone のホーム画面に追加できる（説明・アイコン・全画面表示の設定）', async () => {
+    const { ctx, page } = await newPage();
+    await page.goto(URL0 + '#options');
+    await page.waitForSelector('#home-screen');
+    const t = await page.textContent('#home-screen');
+    ok(t.includes('Safari') && t.includes('ホーム画面に追加') && t.includes('共有'), '手順: ' + t.slice(0, 80));
+    eq(await page.$$eval('#home-screen .howto-list li', (els) => els.length), 4, '4つの手順');
+    const meta = await page.evaluate(() => ({
+      capable: document.querySelector('meta[name="apple-mobile-web-app-capable"]') && document.querySelector('meta[name="apple-mobile-web-app-capable"]').content,
+      title: document.querySelector('meta[name="apple-mobile-web-app-title"]') && document.querySelector('meta[name="apple-mobile-web-app-title"]').content,
+      icon: document.querySelector('link[rel="apple-touch-icon"]') && document.querySelector('link[rel="apple-touch-icon"]').getAttribute('href'),
+      manifest: document.querySelector('link[rel="manifest"]') && document.querySelector('link[rel="manifest"]').getAttribute('href'),
+      viewport: document.querySelector('meta[name="viewport"]').content,
+    }));
+    eq(meta.capable, 'yes');
+    ok(meta.title && meta.title.length <= 12, 'ホーム画面の名前: ' + meta.title);
+    ok(/viewport-fit=cover/.test(meta.viewport), '画面の端（ノッチ）まで使う');
+    const icon = await page.evaluate(async (u) => { const r = await fetch(u); const b = await r.blob(); return [r.status, b.type, b.size]; }, meta.icon);
+    ok(icon[0] === 200 && /png/.test(icon[1]) && icon[2] > 1000, 'ホーム画面のアイコン: ' + icon.join(','));
+    const man = await page.evaluate(async (u) => (await fetch(u)).json(), meta.manifest);
+    eq(man.display, 'standalone');
+    ok(man.icons.some((i) => i.sizes === '192x192') && man.icons.some((i) => i.sizes === '512x512'), 'アプリのアイコン');
+    ok(man.start_url && man.name && man.short_name, 'アプリの名前と開くページ');
     await ctx.close();
   });
 

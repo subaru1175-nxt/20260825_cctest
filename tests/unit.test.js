@@ -485,3 +485,79 @@ test('音声: アメリカ英語の高品質な声を最優先し、ゆっくり
   assert.ok(SP.isHighQuality(list[2]) && SP.isHighQuality(list[3]) && !SP.isHighQuality(list[1]));
   assert.deepEqual(SP.slowChunks("I'm pretty tired today."), ["I'm", 'pretty', 'tired', 'today.']);
 });
+
+/* ---------- AI音声（音声パック） ---------- */
+
+function loadPack() {
+  const root = {};
+  const src = require('fs').readFileSync(require('path').join(__dirname, '..', 'js', 'audio-pack.js'), 'utf8');
+  new Function('root', src.replace(/\}\)\(this\);\s*$/, '})(root);'))(root);
+  return root.CIF.audioPack;
+}
+
+test('AI音声: アプリで読み上げる英語は、すべて通常とゆっくりの音声がある', () => {
+  const pack = loadPack();
+  assert.equal(pack.accent, 'en-US');
+  const need = new Set(['Hello! This is how I sound.']);
+  seed.words.forEach((w) => {
+    if (w.status === 'needs_review') return;
+    w.senses.forEach((s) => {
+      if (s.status === 'needs_review') return;
+      need.add(s.speak || w.headword);
+      if (s.cue) need.add(s.cue);
+      (s.examples || []).forEach((e) => need.add(util.plainSentence(e.en)));
+      if (s.test) need.add(util.plainSentence(s.test.en));
+    });
+  });
+  const missing = [...need].filter((t) => !pack.clips['n|' + t] || !pack.clips['s|' + t]);
+  assert.deepEqual(missing, []);
+  // 日本語は読み上げない
+  assert.ok(Object.keys(pack.clips).every((k) => !/[぀-ヿ一-鿿]/.test(k)));
+});
+
+test('AI音声: ファイルがそろい、区間は正しく、ゆっくりははっきり長い', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const pack = loadPack();
+  const files = new Set();
+  const ratio = { word: [], sentence: [] };
+  Object.keys(pack.clips).forEach((k) => {
+    const [file, a, b] = pack.clips[k];
+    files.add(file);
+    assert.ok(a >= 0 && b > a + 0.2, k);
+    if (k.startsWith('n|')) {
+      const t = k.slice(2);
+      const s = pack.clips['s|' + t];
+      const r = (s[2] - s[1]) / (b - a);
+      (t.split(' ').length === 1 ? ratio.word : ratio.sentence).push(r);
+    }
+  });
+  files.forEach((f) => assert.ok(fs.statSync(path.join(__dirname, '..', pack.base, f + pack.ext)).size > 1000, f));
+  const median = (xs) => xs.slice().sort((x, y) => x - y)[Math.floor(xs.length / 2)];
+  // 前後の無音も含めた長さの比。声の部分だけなら、単語は約2.3倍、文は約1.6倍
+  assert.ok(median(ratio.word) > 1.6, 'word ' + median(ratio.word));
+  assert.ok(median(ratio.sentence) > 1.35, 'sentence ' + median(ratio.sentence));
+  assert.ok(Math.min(...ratio.word) > 1.3);
+});
+
+test('AI音声: 品詞で読みが変わる語は、その用法の発音で作っている', () => {
+  const report = require('fs').readFileSync(require('path').join(__dirname, '..', 'data', 'audio-report.md'), 'utf8');
+  const ph = (text) => {
+    const line = report.split('\n').find((l) => l.startsWith('| ' + text + ' |'));
+    assert.ok(line, text);
+    return line.split('|')[2].trim();
+  };
+  assert.match(ph('a record'), /ɹˈɛkəɹd/); // 名詞 REcord
+  assert.match(ph('to record'), /ɹəkˈɔɹd/); // 動詞 reCORD
+  assert.match(ph('to live'), /lˈɪv/); // 動詞 /lɪv/
+  assert.match(ph('live music'), /lˈIv/); // 形容詞 /laɪv/
+  assert.match(ph('Excuse me.'), /ɪkskjˈuz/); // 動詞 /z/
+  assert.match(ph('an excuse'), /ɪkskjˈus/); // 名詞 /s/
+  assert.match(ph('We read a poem in class.'), /ɹˈɛd/); // 過去形 /red/
+});
+
+test('設定: 出題のしかた（英語→場面／場面→英語）を覚えておく', () => {
+  assert.equal(ST.normalizeSettings({}).studyMode, 'fwd');
+  assert.equal(ST.normalizeSettings({ studyMode: 'rev' }).studyMode, 'rev');
+  assert.equal(ST.normalizeSettings({ studyMode: 'x' }).studyMode, 'fwd');
+});

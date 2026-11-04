@@ -2,8 +2,11 @@
  * 1つのHTMLファイルにまとめる: node scripts/build-single.js
  *   → dist/core-image-cards.html（CSS と JS を埋め込んだ版。ファイルを開くだけで動く）
  *
+ *   AI音声のファイル（audio/）は1つにまとめられないので、この版は端末の読み上げを使う。
+ *
  * node scripts/build-single.js --artifact <出力パス>
  *   → claude.ai の公開ページ（Artifact）用。保存先に公開ページの保存領域を使う。
+ *     AI音声は audio/*.mp3 をページと一緒に公開する（ページから audio/xxx.mp3 で読める）。
  */
 'use strict';
 const fs = require('fs');
@@ -19,8 +22,13 @@ const fontLink = (html.match(/<link rel="stylesheet" href="https:\/\/fonts[^>]+>
 const body = '<div id="app"></div>\n<div id="modal" hidden></div>\n<div id="toast" role="status" aria-live="polite"></div>';
 const inlineJs = (file) => '<script>\n' + read(file).replace(/<\/script/gi, '<\\/script') + '\n</script>';
 
-function scriptTags(extra) {
-  const list = scripts.slice();
+/**
+ * extra: app.js の前に足すスクリプト
+ * noPack: AI音声の目録を入れない（1つのファイルだけで配る版には、音声ファイルが一緒に付かないため）
+ */
+function scriptTags(extra, noPack) {
+  let list = scripts.slice();
+  if (noPack) list = list.filter((f) => f !== 'js/audio-pack.js');
   if (extra) list.splice(list.indexOf('js/app.js'), 0, extra);
   return list.map(inlineJs).join('\n');
 }
@@ -34,7 +42,7 @@ function standalone() {
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
     '<title>コアイメージ単語帳</title>',
-    '<meta name="theme-color" content="#e8edf3">',
+    '<meta name="theme-color" content="#f2f2f4">',
     '<link rel="icon" href="' + icon + '">',
     fontLink,
     '<style>\n' + css + '\n</style>',
@@ -42,7 +50,7 @@ function standalone() {
     '<body>',
     body,
     '<script>window.CIF_NO_SW = true;</script>',
-    scriptTags(),
+    scriptTags(null, true),
     '</body>',
     '</html>',
     '',
