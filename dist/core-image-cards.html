@@ -1,0 +1,4666 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>コアイメージ単語帳</title>
+<meta name="theme-color" content="#e8edf3">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzJiNTlkMSIvPgogIDxnIHRyYW5zZm9ybT0icm90YXRlKC02IDI1NiAyNTYpIj4KICAgIDxyZWN0IHg9Ijk2IiB5PSIxMzIiIHdpZHRoPSIzMjAiIGhlaWdodD0iMjM2IiByeD0iMjgiIGZpbGw9IiNmZmZmZmYiLz4KICAgIDxyZWN0IHg9Ijk2IiB5PSIxOTYiIHdpZHRoPSIzMjAiIGhlaWdodD0iOCIgZmlsbD0iI2UyYTI5YyIvPgogICAgPHJlY3QgeD0iMTI0IiB5PSIyNDgiIHdpZHRoPSIyNjQiIGhlaWdodD0iNSIgcng9IjIuNSIgZmlsbD0iI2RmZThmMyIvPgogICAgPHJlY3QgeD0iMTI0IiB5PSIyOTAiIHdpZHRoPSIyNjQiIGhlaWdodD0iNSIgcng9IjIuNSIgZmlsbD0iI2RmZThmMyIvPgogICAgPHJlY3QgeD0iMTI0IiB5PSIzMzIiIHdpZHRoPSIyMDAiIGhlaWdodD0iNSIgcng9IjIuNSIgZmlsbD0iI2RmZThmMyIvPgogIDwvZz4KICA8Y2lyY2xlIGN4PSIzNTYiIGN5PSIzNTYiIHI9Ijc0IiBmaWxsPSJub25lIiBzdHJva2U9IiNkMjQzM2EiIHN0cm9rZS13aWR0aD0iMjIiLz4KPC9zdmc+Cg==">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&family=Zen+Maru+Gothic:wght@500;700&display=swap">
+<style>
+/*
+ * コアイメージ単語帳 — スタイル
+ * Layout: 1カラム・スマホ縦優先。情報カード（罫線＋赤い見出し線）を机の上に置いたような面構成。
+ */
+:root {
+  --desk: #e8edf3;        /* 背景（机） */
+  --surface: #f6f8fb;     /* パネル */
+  --card: #ffffff;        /* カードの紙 */
+  --rule: #dfe8f3;        /* カードの青い罫線 */
+  --margin-line: #e2a29c; /* カードの赤い見出し線 */
+  --ink: #1b2640;         /* 文字 */
+  --ink-2: #47536d;
+  --ink-3: #7c879d;
+  --line: #d3dae5;
+  --accent: #2b59d1;      /* 青インク */
+  --accent-ink: #ffffff;
+  --accent-soft: #e1e9fb;
+  --hl: #ffe27a;          /* 蛍光ペン */
+  --stamp: #d2433a;       /* 採点の赤丸 */
+  --good: #1b7f52;
+  --good-soft: #def2e8;
+  --hard: #9a610c;
+  --hard-soft: #fbefd8;
+  --again: #bf3434;
+  --again-soft: #fbe3e3;
+  --lv1: #b9cbf3;
+  --lv2: #6f92e6;
+  --lv3: #2b59d1;
+  --sky: #cfe4fa;
+  --night: #27314f;
+  --moon: #f6e6a2;
+  --paper-2: #eef2f7;
+  --shadow: 0 1px 2px rgba(27, 38, 64, 0.07), 0 8px 24px rgba(27, 38, 64, 0.08);
+  --font-en: "Lexend", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-ja: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --font-round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-ipa: "Noto Sans", "Lucida Sans Unicode", "Segoe UI", "Arial Unicode MS", "Gentium Plus", sans-serif;
+  --radius: 16px;
+  --nav-h: 64px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #0f141d;
+    --surface: #161d29;
+    --card: #1a2230;
+    --rule: #222d40;
+    --margin-line: #6b3a3d;
+    --ink: #e7ecf5;
+    --ink-2: #b0bacd;
+    --ink-3: #7e899e;
+    --line: #2c3649;
+    --accent: #86a6ff;
+    --accent-ink: #0d1530;
+    --accent-soft: #1f2b49;
+    --hl: #6a5719;
+    --stamp: #f0736a;
+    --good: #59c995;
+    --good-soft: #14302a;
+    --hard: #e8ad55;
+    --hard-soft: #33280f;
+    --again: #f28383;
+    --again-soft: #3b1d21;
+    --lv1: #34446b;
+    --lv2: #5674bd;
+    --lv3: #86a6ff;
+    --sky: #2c4c70;
+    --night: #070b16;
+    --moon: #f0d97f;
+    --paper-2: #232c3c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --desk: #0f141d;
+  --surface: #161d29;
+  --card: #1a2230;
+  --rule: #222d40;
+  --margin-line: #6b3a3d;
+  --ink: #e7ecf5;
+  --ink-2: #b0bacd;
+  --ink-3: #7e899e;
+  --line: #2c3649;
+  --accent: #86a6ff;
+  --accent-ink: #0d1530;
+  --accent-soft: #1f2b49;
+  --hl: #6a5719;
+  --stamp: #f0736a;
+  --good: #59c995;
+  --good-soft: #14302a;
+  --hard: #e8ad55;
+  --hard-soft: #33280f;
+  --again: #f28383;
+  --again-soft: #3b1d21;
+  --lv1: #34446b;
+  --lv2: #5674bd;
+  --lv3: #86a6ff;
+  --sky: #2c4c70;
+  --night: #070b16;
+  --moon: #f0d97f;
+  --paper-2: #232c3c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+  color-scheme: dark;
+}
+
+/* ---------- 基本 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--font-ja);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-tap-highlight-color: transparent;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--desk);
+  z-index: 30;
+}
+[hidden] { display: none !important; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.35; text-wrap: balance; }
+p { margin: 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+a { color: var(--accent); }
+:lang(en) { font-family: var(--font-en); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.ic { width: 1.25em; height: 1.25em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+.screen {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px calc(var(--nav-h) + 40px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.screen.loading { min-height: 60vh; align-items: center; justify-content: center; color: var(--ink-3); }
+body[data-route="study"] .screen { padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px)); padding-top: 10px; gap: 12px; }
+body[data-route="edit"] .screen, body[data-route="new-word"] .screen { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+body[data-route="result"] .screen { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+
+/* ---------- ボタン ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.08s ease, background-color 0.15s ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.secondary { background: var(--card); color: var(--accent); border-color: var(--accent); }
+.btn.ghost { background: transparent; color: var(--ink-2); border-color: var(--line); }
+.btn.danger { background: var(--again); color: #fff; }
+.btn.danger-ghost { background: transparent; color: var(--again); border-color: color-mix(in srgb, var(--again) 45%, transparent); }
+.btn.big { min-height: 56px; font-size: 1.1rem; }
+.btn.block { width: 100%; }
+.btn.sm { min-height: 40px; padding: 6px 12px; font-size: 0.9rem; }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn-row.end { justify-content: flex-end; }
+.icon-btn {
+  width: 44px; height: 44px; flex: none;
+  display: inline-grid; place-items: center;
+  border-radius: 50%; border: 0;
+  background: transparent; color: var(--ink-2);
+  cursor: pointer;
+}
+.icon-btn .ic { width: 24px; height: 24px; }
+.text-link { font-weight: 700; }
+
+/* 音声ボタン */
+.audio-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.audio-row.center { justify-content: center; }
+.audio-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 6px 14px 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  background: var(--card);
+  color: var(--accent);
+  font-weight: 700; font-size: 0.95rem;
+  cursor: pointer; touch-action: manipulation;
+  position: relative;
+}
+.audio-btn.slow { border-style: dashed; }
+.audio-btn.sm { min-height: 38px; padding: 4px 12px 4px 10px; font-size: 0.85rem; }
+.audio-btn .src-tag {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
+  padding: 1px 6px; border-radius: 6px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.audio-btn.playing { background: var(--accent); color: var(--accent-ink); }
+.audio-btn.playing .src-tag { background: color-mix(in srgb, var(--accent-ink) 25%, transparent); color: var(--accent-ink); }
+.audio-btn.playing::after {
+  content: ""; position: absolute; inset: -5px; border-radius: inherit;
+  border: 2px solid var(--accent); opacity: 0.6;
+  animation: ping 1s ease-out infinite;
+}
+.audio-btn.is-off, .audio-btn[disabled] { border-color: var(--line); color: var(--ink-3); background: var(--surface); cursor: not-allowed; }
+.audio-btn.is-off .src-tag { background: var(--line); color: var(--ink-2); }
+@keyframes ping { from { transform: scale(0.96); opacity: 0.6; } to { transform: scale(1.12); opacity: 0; } }
+
+/* ---------- 共通パーツ ---------- */
+.chip {
+  display: inline-flex; align-items: center; flex: none; white-space: nowrap;
+  min-height: 26px; padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--surface); color: var(--ink-2);
+  border: 1px solid var(--line);
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em;
+}
+.chip.mode { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.chip.ghost { background: transparent; }
+.chip.pos { background: var(--paper-2); }
+.chip.again-chip { background: var(--again-soft); color: var(--again); border-color: transparent; }
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 1px 8px; border-radius: 6px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.st-verified { background: var(--good-soft); color: var(--good); }
+.st-unverified { background: var(--paper-2); color: var(--ink-2); }
+.st-needs_review { background: var(--hard-soft); color: var(--hard); }
+.banner {
+  padding: 12px 14px; border-radius: 12px;
+  font-size: 0.92rem; line-height: 1.6;
+  background: var(--accent-soft); color: var(--ink);
+}
+.banner.warn { background: var(--hard-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--hard) 35%, transparent); }
+.banner.info { background: var(--surface); color: var(--ink-2); }
+.banner ul { list-style: disc; padding-left: 1.2em; margin: 6px 0; }
+#save-banner.banner { max-width: 600px; margin: 10px auto 0; margin-left: max(16px, env(safe-area-inset-left, 0px)); margin-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 632px) { #save-banner.banner { margin-left: auto; margin-right: auto; } }
+.muted { color: var(--ink-3); }
+.fine { font-size: 0.82rem; color: var(--ink-3); line-height: 1.6; }
+.mini-label { font-size: 0.75rem; font-weight: 700; color: var(--ink-3); letter-spacing: 0.04em; }
+.mini-title { font-size: 0.85rem; color: var(--ink-2); margin-top: 6px; }
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.panel-title { font-family: var(--font-round); font-size: 1.1rem; }
+.meter { display: block; height: 8px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
+.meter > span { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 0.4s ease; }
+.page-head { display: flex; align-items: center; gap: 10px; min-height: 48px; }
+.page-head h1 { font-family: var(--font-round); font-size: 1.4rem; flex: 1; min-width: 0; }
+.ph-spacer { flex: 1; }
+
+/* ---------- 下のメニュー ---------- */
+.bottom-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  display: flex; justify-content: center; gap: 4px;
+  padding: 6px max(16px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  border-top: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+.nav-item {
+  flex: 1; max-width: 160px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 52px; border-radius: 12px;
+  color: var(--ink-3); text-decoration: none;
+  font-size: 0.75rem; font-weight: 700;
+}
+.nav-item .ic { width: 24px; height: 24px; }
+.nav-item.is-current { color: var(--accent); background: var(--accent-soft); }
+
+/* ---------- ホーム ---------- */
+.home-head { padding-top: 6px; }
+.app-title { font-family: var(--font-round); font-size: 1.6rem; font-weight: 700; letter-spacing: 0.02em; }
+.tagline { color: var(--ink-2); font-size: 0.92rem; margin-top: 2px; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px 14px;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center;
+  min-width: 0;
+}
+.stat-ic { grid-row: 1 / 3; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; }
+.stat-ic .ic { width: 22px; height: 22px; }
+.stat-ic.flame { background: var(--again-soft); color: var(--stamp); }
+.stat-ic.star { background: var(--hard-soft); color: var(--hard); }
+.stat-ic.target { background: var(--accent-soft); color: var(--accent); }
+.stat-num { font-family: var(--font-en); font-weight: 600; font-size: 1.45rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat-num small { font-family: var(--font-ja); font-size: 0.8rem; font-weight: 700; color: var(--ink-2); margin-left: 2px; }
+.stat-label { font-size: 0.76rem; color: var(--ink-3); font-weight: 700; line-height: 1.4; }
+.stat.goal { grid-column: 1 / -1; grid-template-columns: auto 1fr; }
+.stat.goal .meter { grid-column: 1 / -1; margin-top: 10px; }
+.resume {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 14px 16px; border-radius: var(--radius);
+  background: var(--card); border: 2px solid var(--accent);
+}
+.resume-title { font-weight: 700; }
+.resume-sub { font-size: 0.88rem; color: var(--ink-2); }
+.mode-card {
+  border-radius: var(--radius); padding: 18px 16px;
+  background: var(--card); border: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.mode-card.main-mode { background: var(--accent-soft); border-color: transparent; }
+.mode-head h2 { font-family: var(--font-round); font-size: 1.3rem; }
+.mode-sub { display: block; font-size: 0.88rem; color: var(--ink-2); line-height: 1.55; }
+.mode-counts { display: flex; gap: 16px; font-size: 0.9rem; color: var(--ink-2); }
+.mode-counts b { font-family: var(--font-en); font-size: 1.25rem; color: var(--ink); margin-right: 2px; font-variant-numeric: tabular-nums; }
+.sched-list li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.sched-list li:last-child { border-bottom: 0; }
+.sched-list b { font-variant-numeric: tabular-nums; }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 4px; }
+.day { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.day .dot {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1.5px dashed var(--line);
+  font-family: var(--font-en); font-size: 0.8rem; font-weight: 600; color: var(--accent-ink);
+}
+.day.done .dot { background: var(--accent); border: 0; }
+.day.today .dot { outline: 2px solid var(--accent); outline-offset: 2px; }
+.day .wd { font-size: 0.72rem; color: var(--ink-3); font-weight: 700; }
+.lv-bar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--paper-2); gap: 2px; }
+.lv-seg { display: block; min-width: 6px; }
+.lv-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--ink-2); }
+.lv-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.lv-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--paper-2); border: 1px solid var(--line); }
+.lv-new { background: var(--paper-2); }
+.lv-learning { background: var(--lv1); }
+.lv-reviewing { background: var(--lv2); }
+.lv-settled { background: var(--lv3); }
+.lv-dot.lv-learning, .lv-dot.lv-reviewing, .lv-dot.lv-settled { border-color: transparent; }
+.lv-dot.lv-off { background: transparent; border: 1.5px dashed var(--hard); }
+details.panel > summary, details.more > summary { cursor: pointer; font-weight: 700; }
+.about p { font-size: 0.9rem; color: var(--ink-2); }
+
+/* ---------- カード学習 ---------- */
+.study-bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0; background: var(--desk);
+}
+.progress { flex: 1; height: 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+.progress > span { display: block; height: 100%; background: var(--accent); border-radius: inherit; transition: width 0.35s ease; }
+.remain { font-size: 0.85rem; color: var(--ink-2); white-space: nowrap; }
+.remain b { font-family: var(--font-en); font-size: 1.15rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.card {
+  position: relative;
+  background: var(--card);
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 14px 18px 20px;
+  display: flex; flex-direction: column; gap: 16px;
+  animation: card-in 0.22s ease-out;
+}
+@keyframes card-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.card-top { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 12px; border-bottom: 2px solid var(--margin-line); margin: 0 -2px; }
+.card-front {
+  min-height: clamp(380px, 60vh, 560px);
+  cursor: pointer;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, var(--rule) 35px, var(--rule) 36px);
+  background-position: 0 60px;
+  touch-action: manipulation;
+  user-select: none; -webkit-user-select: none;
+}
+.card-front.rev { background-image: none; }
+.card-front:active { transform: scale(0.995); }
+.front-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.headword {
+  font-family: var(--font-en);
+  font-weight: 600;
+  font-size: clamp(2.8rem, 14vw, 4.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+.headword.sm { font-size: clamp(2rem, 9vw, 2.6rem); }
+.ipa { font-family: var(--font-ipa); color: var(--ink-2); font-size: 1.05rem; }
+.speak-note { font-size: 0.82rem; color: var(--ink-3); }
+.cue-box {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  padding: 10px 14px; border-radius: 14px;
+}
+.cue-box.inline { flex-direction: row; justify-content: space-between; flex-wrap: wrap; align-items: center; background: var(--paper-2); }
+.cue { font-family: var(--font-en); font-size: 1.3rem; font-weight: 500; color: var(--ink); }
+.cue.sm { font-size: 0.95rem; color: var(--ink-2); }
+.tap-hint { text-align: center; font-size: 0.85rem; color: var(--ink-3); font-weight: 700; }
+
+.rev .front-body { gap: 12px; }
+.rev-q { font-family: var(--font-round); font-weight: 700; color: var(--accent); }
+.cloze { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; background: var(--paper-2); border-radius: 12px; width: 100%; }
+.blank { display: inline-block; min-width: 3.2em; border-bottom: 2.5px solid var(--accent); color: transparent; line-height: 1.1; }
+.hint { font-family: var(--font-en); font-size: 1.15rem; letter-spacing: 0.08em; color: var(--accent); font-weight: 600; }
+
+/* 裏面 */
+.back-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.bh-word { min-width: 0; }
+.sec { display: flex; flex-direction: column; gap: 8px; }
+.sec-label { font-size: 0.74rem; font-weight: 700; color: var(--ink-3); letter-spacing: 0.08em; }
+.nuance-text {
+  font-family: var(--font-round);
+  font-weight: 700;
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.sec.nuance .nuance-text span { background: linear-gradient(transparent 62%, var(--hl) 62%); padding: 0 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.rev .nuance-text { font-size: 1.15rem; }
+.scene-art { display: flex; justify-content: center; }
+.scene-art.emoji {
+  width: 76px; height: 76px; margin: 0 auto;
+  border-radius: 50%; background: var(--paper-2);
+  align-items: center; font-size: 2.6rem; line-height: 1;
+}
+.scene-art.emoji.big { width: 96px; height: 96px; font-size: 3.3rem; }
+.scene-art.has-dg { background: var(--surface); border-radius: 14px; padding: 8px; }
+.scene-text { font-size: 1rem; color: var(--ink); }
+.meaning-text { font-size: 1.15rem; font-weight: 700; }
+.role-line { font-size: 0.92rem; color: var(--ink-2); display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.role-chip { display: inline-block; padding: 1px 10px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.role-pos { color: var(--ink-3); }
+.ex { display: flex; flex-direction: column; gap: 4px; padding: 10px 0; border-top: 1px dashed var(--line); }
+.ex:first-of-type { border-top: 0; padding-top: 0; }
+.ex-en { font-family: var(--font-en); font-size: 1.18rem; line-height: 1.5; color: var(--ink); }
+.ex-ja { font-size: 0.93rem; color: var(--ink-2); }
+.ex .audio-row { margin-top: 4px; }
+mark.hit { background: var(--hl); color: inherit; padding: 0 0.12em; border-radius: 4px; }
+details.more { border-top: 2px solid var(--margin-line); padding-top: 12px; }
+details.more > summary {
+  list-style: none; display: flex; flex-direction: column; gap: 2px;
+  min-height: 48px; justify-content: center;
+  padding: 8px 14px; border-radius: 12px; background: var(--paper-2);
+}
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary span { font-size: 0.8rem; font-weight: 500; color: var(--ink-3); }
+details.more[open] > summary { margin-bottom: 12px; }
+.more-body { display: flex; flex-direction: column; gap: 14px; }
+.sub h4 { font-size: 0.85rem; color: var(--ink-2); margin-bottom: 4px; }
+.sub p { font-size: 0.95rem; }
+.contrast li { display: flex; flex-direction: column; padding: 8px 12px; border-radius: 10px; background: var(--paper-2); margin-bottom: 6px; }
+.contrast b { font-size: 1rem; }
+.contrast span { font-size: 0.92rem; color: var(--ink-2); }
+.others li { display: flex; gap: 8px; align-items: center; font-size: 0.93rem; padding: 3px 0; }
+.pron { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.pron li { display: flex; gap: 8px; align-items: baseline; }
+.stress-line { font-size: 0.9rem; color: var(--ink-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.stress { display: inline-flex; gap: 4px; align-items: flex-end; font-family: var(--font-en); }
+.syl { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; font-size: 1rem; color: var(--ink-2); }
+.syl i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.syl.strong { color: var(--ink); font-weight: 600; font-size: 1.15rem; }
+.syl.strong i { width: 14px; height: 14px; background: var(--stamp); }
+
+/* 回答バー */
+.answer-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--desk) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+}
+.answer-bar > * { max-width: 600px; margin-left: auto; margin-right: auto; }
+.rate-q { text-align: center; font-size: 0.82rem; font-weight: 700; color: var(--ink-2); margin-bottom: 6px; }
+.rate-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.rate {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  min-height: 82px; padding: 6px 4px;
+  border-radius: 14px; border: 2px solid transparent;
+  cursor: pointer; touch-action: manipulation;
+  font-weight: 700;
+}
+.rate:active { transform: scale(0.97); }
+.rate-mark { font-family: var(--font-round); font-size: 1.6rem; line-height: 1.1; font-weight: 700; }
+.rate-label { font-size: 0.82rem; line-height: 1.3; text-align: center; word-break: keep-all; overflow-wrap: anywhere; }
+.rate-next { font-size: 0.7rem; font-weight: 500; opacity: 0.85; text-align: center; line-height: 1.3; }
+.r-again { background: var(--again-soft); color: var(--again); border-color: color-mix(in srgb, var(--again) 30%, transparent); }
+.r-hard { background: var(--hard-soft); color: var(--hard); border-color: color-mix(in srgb, var(--hard) 30%, transparent); }
+.r-good { background: var(--good-soft); color: var(--good); border-color: color-mix(in srgb, var(--good) 30%, transparent); }
+
+/* 図 */
+.dg { width: 100%; max-width: 300px; height: auto; display: block; margin: 0 auto; }
+.dg .ln { fill: none; stroke: var(--ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.dg .ln2 { fill: none; stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dg .fl, .dg .fl.ln, .dg .fl.ln2 { fill: var(--paper-2); }
+.dg .ac { fill: var(--accent); }
+.dg .acs { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.dg .ink { fill: var(--ink); }
+.dg .hl { fill: var(--hl); }
+.dg .sky { fill: var(--sky); }
+.dg .night { fill: var(--night); }
+.dg .moon { fill: var(--moon); }
+.dg .dash { stroke-dasharray: 4 5; }
+.dg .frame { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.dg text { font-family: var(--font-ja); font-size: 12px; fill: var(--ink-2); }
+.dg .te { font-family: var(--font-en); }
+.dg .b { font-weight: 700; fill: var(--ink); font-size: 14px; }
+.dg .s { font-size: 11px; }
+.dg .big { font-size: 26px; }
+.dg .on-ac { fill: var(--accent-ink); font-weight: 700; }
+
+/* ---------- 結果 ---------- */
+.result-hero { position: relative; text-align: center; padding: 28px 0 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.stamp {
+  font-family: var(--font-round); font-weight: 700;
+  font-size: 5rem; line-height: 1; color: var(--stamp);
+  animation: stamp 0.5s cubic-bezier(.2,1.6,.4,1) both;
+}
+@keyframes stamp { from { transform: scale(1.8) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+#result-title { font-family: var(--font-round); font-size: 1.7rem; outline: none; }
+.earned { font-family: var(--font-en); font-weight: 600; font-size: 1.6rem; color: var(--hard); }
+.earned small { font-size: 0.9rem; }
+.goal-done { font-weight: 700; color: var(--good); }
+.burst { position: absolute; left: 50%; top: 66px; width: 0; height: 0; }
+.burst i {
+  position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  transform: rotate(calc(var(--i) * 30deg)) translateY(0);
+  animation: burst 0.9s ease-out 0.1s both;
+}
+.burst i:nth-child(3n) { background: var(--hl); }
+.burst i:nth-child(3n+1) { background: var(--good); }
+@keyframes burst {
+  0% { transform: rotate(calc(var(--i) * 30deg)) translateY(0) scale(1); opacity: 1; }
+  100% { transform: rotate(calc(var(--i) * 30deg)) translateY(-86px) scale(0.4); opacity: 0; }
+}
+.tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tally > div { display: flex; flex-direction: column; align-items: center; padding: 12px 4px; border-radius: 14px; font-size: 0.78rem; font-weight: 700; text-align: center; }
+.tally b { font-family: var(--font-en); font-size: 1.6rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.t-good { background: var(--good-soft); color: var(--good); }
+.t-hard { background: var(--hard-soft); color: var(--hard); }
+.t-again { background: var(--again-soft); color: var(--again); }
+.rm-row { display: flex; justify-content: space-between; align-items: baseline; }
+.rm-row b { font-variant-numeric: tabular-nums; }
+.result-list li { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+.result-list li:last-child { border-bottom: 0; }
+.result-list .rate-mark { font-size: 1.3rem; text-align: center; }
+.m-good { color: var(--good); }
+.m-hard { color: var(--hard); }
+.m-again { color: var(--again); }
+.m-none { color: var(--ink-3); }
+.rl-word { display: flex; flex-direction: column; min-width: 0; }
+.rl-word span { font-size: 0.85rem; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rl-next { font-size: 0.82rem; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.result-actions { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---------- 単語一覧 ---------- */
+.search input {
+  width: 100%; min-height: 50px; padding: 10px 14px;
+  border-radius: 12px; border: 1.5px solid var(--line);
+  background: var(--card); font-size: 1rem;
+}
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter {
+  flex: none; min-height: 40px; padding: 4px 14px;
+  border-radius: 999px; border: 1.5px solid var(--line);
+  background: var(--card); color: var(--ink-2);
+  font-weight: 700; font-size: 0.88rem; cursor: pointer;
+}
+.filter b { font-family: var(--font-en); margin-left: 2px; }
+.filter.is-on { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.word-list { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.word-list li + li { border-top: 1px solid var(--line); }
+.word-list .empty { padding: 20px; color: var(--ink-3); text-align: center; }
+.word-row { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; text-decoration: none; color: inherit; min-height: 64px; }
+.word-row:active { background: var(--surface); }
+.wr-main { display: flex; align-items: center; gap: 8px; }
+.wr-head { font-family: var(--font-en); font-weight: 600; font-size: 1.3rem; }
+.wr-meanings { font-size: 0.9rem; color: var(--ink-2); }
+.wr-foot { display: flex; align-items: center; justify-content: space-between; }
+.wr-dots { display: inline-flex; gap: 4px; }
+.wr-count { font-size: 0.75rem; color: var(--ink-3); font-weight: 700; }
+
+/* ---------- 単語詳細 ---------- */
+.detail-head { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.detail-head .headword { font-size: clamp(2.6rem, 12vw, 3.4rem); outline: none; }
+.sense-count { font-weight: 700; color: var(--ink-2); }
+.group-note { font-size: 0.9rem; background: var(--hard-soft); padding: 10px 14px; border-radius: 12px; }
+.group { display: flex; flex-direction: column; gap: 12px; }
+.group-title { display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; font-weight: 700; color: var(--ink-2); }
+.g-key {
+  flex: none; width: 30px; height: 30px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--ink); color: var(--card);
+  font-family: var(--font-en); font-weight: 600;
+}
+.g-label { padding-top: 3px; font-size: 0.9rem; line-height: 1.6; }
+.sense-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px; display: flex; flex-direction: column; gap: 14px;
+}
+.sense-card.is-off { border-style: dashed; border-color: var(--hard); }
+.sense-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.learn { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.learn h4 { font-size: 0.85rem; color: var(--ink-2); }
+.learn-row { display: grid; grid-template-columns: 6.6em auto 1fr; align-items: center; gap: 8px; font-size: 0.86rem; }
+.learn-next { color: var(--ink-2); }
+.level { display: inline-block; padding: 1px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+.level.lv-new { background: var(--paper-2); color: var(--ink-3); }
+.level.lv-learning { background: var(--lv1); color: var(--ink); }
+.level.lv-reviewing { background: var(--lv2); color: #fff; }
+.level.lv-settled { background: var(--lv3); color: var(--accent-ink); }
+.history { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.history li { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 8px; background: var(--paper-2); font-size: 0.74rem; color: var(--ink-2); }
+.history .rate-mark { font-size: 0.95rem; }
+.history li.m-good .rate-mark { color: var(--good); }
+.history li.m-hard .rate-mark { color: var(--hard); }
+.history li.m-again .rate-mark { color: var(--again); }
+.h-mode { color: var(--ink-3); }
+.source-list li { padding: 4px 0; }
+.source-list a, .dict-links a { display: inline-flex; align-items: center; gap: 6px; font-size: 0.92rem; overflow-wrap: anywhere; }
+.dict-links { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.danger-zone { display: flex; justify-content: center; padding-top: 8px; }
+
+/* ---------- 編集 ---------- */
+.ed-sec {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--card); padding: 14px 16px 16px; margin: 0;
+  display: flex; flex-direction: column; gap: 12px; min-width: 0;
+  position: relative;
+}
+.ed-sec legend { font-family: var(--font-round); font-weight: 700; font-size: 1.05rem; padding: 0 6px; }
+.ed-remove { align-self: flex-end; }
+.f { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 100%; }
+.f.half { flex: 1 1 140px; }
+.f-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.f-label { font-size: 0.85rem; font-weight: 700; color: var(--ink-2); }
+.f-label em { font-style: normal; font-size: 0.7rem; color: var(--again); margin-left: 6px; }
+.f-help { font-size: 0.78rem; color: var(--ink-3); line-height: 1.5; }
+.f input[type="text"], .f input[type="search"], .f input:not([type]), .f select, .f textarea {
+  width: 100%; min-height: 46px; padding: 9px 12px;
+  border-radius: 10px; border: 1.5px solid var(--line);
+  background: var(--surface); font-size: 1rem;
+}
+.f textarea { resize: vertical; line-height: 1.6; }
+.f input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 32px; }
+.f input[type="file"] { font-size: 0.9rem; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 0.92rem; cursor: pointer; padding: 4px 0; }
+.check input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--accent); flex: none; }
+.ed-sub { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--paper-2); }
+.ed-item { display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
+.ed-item .btn { align-self: flex-start; }
+.ed-actions {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--desk) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+}
+.ed-actions .btn { flex: 1; max-width: 240px; }
+
+/* ---------- 設定 ---------- */
+.ok-line { font-size: 0.92rem; padding: 10px 12px; border-radius: 10px; background: var(--good-soft); }
+.import-preview { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--accent-soft); }
+.import-preview ul { list-style: disc; padding-left: 1.2em; font-size: 0.92rem; }
+.warn-list { font-size: 0.82rem; color: var(--ink-2); }
+.options textarea#export-text { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.78rem; }
+
+/* ---------- モーダル・トースト ---------- */
+#modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal-back { position: absolute; inset: 0; background: rgba(10, 15, 25, 0.5); }
+.modal {
+  position: relative; width: min(440px, 100%);
+  background: var(--card); color: var(--ink);
+  border-radius: 18px; padding: 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: var(--shadow);
+}
+.modal h2 { font-family: var(--font-round); font-size: 1.15rem; }
+.modal p { color: var(--ink-2); font-size: 0.95rem; }
+#toast {
+  position: fixed; left: 50%; z-index: 60;
+  bottom: calc(var(--nav-h) + 24px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 20px);
+  width: max-content; max-width: min(92vw, 520px);
+  padding: 12px 16px; border-radius: 12px;
+  background: var(--ink); color: var(--card);
+  font-size: 0.92rem; line-height: 1.5; font-weight: 700;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+body[data-route="study"] #toast { bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
+
+@media (min-width: 720px) {
+  .screen { padding-top: 28px; }
+  .stats { grid-template-columns: 1fr 1fr 1.4fr; }
+  .stat.goal { grid-column: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>window.CIF_NO_SW = true;</script>
+<script>
+/*
+ * util.js — 日付・文字列などの小さな共通処理
+ * ブラウザでは window.CIF.util、Node（テスト）では require() で使う。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.util = factory();
+  }
+})(this, function () {
+  'use strict';
+
+  const MINUTE = 60 * 1000;
+  const DAY = 24 * 60 * MINUTE;
+
+  /** その日の 0:00（端末のタイムゾーン）のタイムスタンプ */
+  function startOfDay(ts) {
+    const d = new Date(ts);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }
+
+  /** ts の日の 0:00 から n 日後の 0:00（夏時間でもずれない） */
+  function addDays(ts, n) {
+    const d = new Date(startOfDay(ts));
+    d.setDate(d.getDate() + n);
+    return d.getTime();
+  }
+
+  /** 'YYYY-MM-DD'（端末のタイムゾーン） */
+  function dayKey(ts) {
+    const d = new Date(ts);
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + m + '-' + day;
+  }
+
+  /** 'YYYY-MM-DD' → その日の 0:00 */
+  function parseDayKey(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    return new Date(y, m - 1, d).getTime();
+  }
+
+  /** 2つの日付の「日数の差」（カレンダー上） */
+  function daysBetween(fromTs, toTs) {
+    return Math.round((startOfDay(toTs) - startOfDay(fromTs)) / DAY);
+  }
+
+  /** 復習予定を「今日」「明日」「3日後」「11/12」のように表す */
+  function formatDue(due, now) {
+    if (!due) return '未定';
+    if (due <= now) return '今すぐ';
+    const diffMin = Math.round((due - now) / MINUTE);
+    if (startOfDay(due) === startOfDay(now)) {
+      if (diffMin < 60) return diffMin + '分後';
+      return '今日 ' + Math.round(diffMin / 60) + '時間後';
+    }
+    const days = daysBetween(now, due);
+    if (days === 1) return '明日';
+    if (days < 7) return days + '日後';
+    const d = new Date(due);
+    return (d.getMonth() + 1) + '/' + d.getDate() + '（' + days + '日後）';
+  }
+
+  /** 「11月4日」のような短い日付 */
+  function formatDate(ts) {
+    const d = new Date(ts);
+    return (d.getMonth() + 1) + '月' + d.getDate() + '日';
+  }
+
+  function formatDateTime(ts) {
+    const d = new Date(ts);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + hh + ':' + mm;
+  }
+
+  /** HTML に入れる文字列のエスケープ */
+  function esc(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  /**
+   * 例文の [ ] で囲んだ部分（その用法の単語）を取り出す。
+   * "I'm [pretty] tired." → [{t:"I'm "}, {t:"pretty", hit:true}, {t:" tired."}]
+   */
+  function parseMarked(text) {
+    const parts = [];
+    const re = /\[([^\]]+)\]/g;
+    let last = 0;
+    let m;
+    const s = String(text || '');
+    while ((m = re.exec(s))) {
+      if (m.index > last) parts.push({ t: s.slice(last, m.index) });
+      parts.push({ t: m[1], hit: true });
+      last = re.lastIndex;
+    }
+    if (last < s.length) parts.push({ t: s.slice(last) });
+    return parts;
+  }
+
+  /** 読み上げ用に [ ] を外した文 */
+  function plainSentence(text) {
+    return String(text || '').replace(/\[([^\]]+)\]/g, '$1');
+  }
+
+  /** 例文の [ ] の部分を強調した HTML */
+  function markedHtml(text) {
+    return parseMarked(text)
+      .map((p) => (p.hit ? '<mark class="hit">' + esc(p.t) + '</mark>' : esc(p.t)))
+      .join('');
+  }
+
+  /** 例文の [ ] の部分を空欄にした HTML（場面→英語の練習用） */
+  function clozeHtml(text) {
+    return parseMarked(text)
+      .map((p) => (p.hit ? '<span class="blank" aria-label="空欄">＿＿＿</span>' : esc(p.t)))
+      .join('');
+  }
+
+  /** ID に使える短いランダム文字列 */
+  function randomId(prefix) {
+    const r = Math.random().toString(36).slice(2, 8);
+    const t = Date.now().toString(36).slice(-4);
+    return (prefix || 'id') + '-' + t + r;
+  }
+
+  /** 英単語から ID 用の文字列を作る */
+  function slug(text) {
+    return String(text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 24) || 'word';
+  }
+
+  function clone(obj) {
+    return obj == null ? obj : JSON.parse(JSON.stringify(obj));
+  }
+
+  /** 配列を並べ替えた新しい配列（rng を渡すとテストで再現できる） */
+  function shuffle(arr, rng) {
+    const a = arr.slice();
+    const rand = rng || Math.random;
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  return {
+    MINUTE, DAY, startOfDay, addDays, dayKey, parseDayKey, daysBetween,
+    formatDue, formatDate, formatDateTime, esc, parseMarked, plainSentence,
+    markedHtml, clozeHtml, randomId, slug, clone, shuffle,
+  };
+});
+
+</script>
+<script>
+/*
+ * srs.js — 復習間隔（間隔反復）の計算
+ *
+ * 3段階の自己評価：
+ *   again = 思い出せなかった → 10分後に再出題（セットの中でもすぐもう一度）
+ *   hard  = あいまい         → 間隔を半分に（最短で翌日）
+ *   good  = 思い出せた       → 間隔を広げる（1日 → 3日 → 約8日 → …）
+ *
+ * 1回答えられただけでは「定着」にしない。間隔が21日以上かつ
+ * 3回続けて思い出せたときに、ようやく「定着してきた」と表示する。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('./util.js'));
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.srs = factory(root.CIF.util);
+  }
+})(this, function (util) {
+  'use strict';
+
+  const RATINGS = ['again', 'hard', 'good'];
+  const RATING_LABEL = { again: '思い出せなかった', hard: 'あいまい', good: '思い出せた' };
+  const AGAIN_DELAY = 10 * util.MINUTE;
+  const MAX_INTERVAL = 365;
+  const MIN_EASE = 1.3;
+  const START_EASE = 2.5;
+  const HISTORY_LIMIT = 40;
+
+  function newState() {
+    return { reps: 0, lapses: 0, streak: 0, interval: 0, ease: START_EASE, due: 0, last: 0, history: [] };
+  }
+
+  /** 次の間隔（日数）。0 は「同じ日のうちにもう一度」 */
+  function nextInterval(state, rating, now) {
+    const s = state || newState();
+    if (rating === 'again') return 0;
+    if (rating === 'hard') {
+      if (s.interval < 1) return 1;
+      return Math.max(1, Math.round(s.interval / 2));
+    }
+    // good
+    if (isEarly(s, now)) return s.interval; // 予定より前の復習では間隔を伸ばさない
+    if (s.interval < 1) return 1;
+    if (s.interval === 1) return 3;
+    return Math.min(MAX_INTERVAL, Math.max(s.interval + 1, Math.round(s.interval * s.ease)));
+  }
+
+  /** 復習予定日より前に解いているか（同じ日の再出題は除く） */
+  function isEarly(state, now) {
+    return !!state && state.interval >= 1 && state.due > now;
+  }
+
+  /**
+   * そのセットで初めて答えたときの更新。
+   * 返り値は新しい状態（元の state は変更しない）。
+   */
+  function review(state, rating, now) {
+    if (!RATINGS.includes(rating)) throw new Error('unknown rating: ' + rating);
+    const prev = state || newState();
+    const s = util.clone(prev);
+    s.history = Array.isArray(s.history) ? s.history : [];
+    const early = isEarly(prev, now);
+    const ivl = nextInterval(prev, rating, now);
+
+    if (rating === 'again') {
+      if (prev.reps > 0) s.lapses += 1;
+      s.streak = 0;
+      s.ease = Math.max(MIN_EASE, round2(s.ease - 0.2));
+      s.interval = 0;
+      s.due = now + AGAIN_DELAY;
+    } else if (rating === 'hard') {
+      s.ease = Math.max(MIN_EASE, round2(s.ease - 0.15));
+      s.interval = ivl;
+      s.due = util.addDays(now, ivl);
+      if (early) s.due = Math.min(prev.due, s.due);
+    } else {
+      if (early) {
+        // 予定は変えない（前倒しで当たっても間隔は伸ばさない）
+        s.interval = prev.interval;
+        s.due = prev.due;
+      } else {
+        s.streak += 1;
+        s.interval = ivl;
+        s.due = util.addDays(now, ivl);
+      }
+    }
+    s.reps += 1;
+    s.last = now;
+    s.history.push({ t: now, r: rating, ivl: s.interval });
+    if (s.history.length > HISTORY_LIMIT) s.history = s.history.slice(-HISTORY_LIMIT);
+    return s;
+  }
+
+  /**
+   * 同じセット内で再出題したときの記録。予定は変えず、履歴だけ残す。
+   * （「あいまい」で再出題 → 「思い出せた」でも、間隔を2回伸ばさないため）
+   */
+  function recordRepeat(state, rating, now) {
+    const s = util.clone(state || newState());
+    s.history = Array.isArray(s.history) ? s.history : [];
+    s.history.push({ t: now, r: rating, re: true });
+    if (s.history.length > HISTORY_LIMIT) s.history = s.history.slice(-HISTORY_LIMIT);
+    if (rating === 'again') {
+      // 見直した直後でも思い出せない → 今日のうちにもう一度出す
+      s.interval = 0;
+      s.streak = 0;
+      s.due = now + AGAIN_DELAY;
+    }
+    return s;
+  }
+
+  /** ボタンの下に出す「次はいつ」 */
+  function previewLabel(state, rating, now) {
+    if (rating === 'again') return '10分後';
+    const s = state || newState();
+    if (rating === 'good' && isEarly(s, now)) return '予定どおり';
+    const ivl = nextInterval(s, rating, now);
+    if (ivl === 1) return '明日';
+    return ivl + '日後';
+  }
+
+  function isDue(state, now) {
+    return !!state && state.reps > 0 && state.due <= now;
+  }
+
+  /** 習得度。「完全習得」とは言わない */
+  const LEVELS = {
+    new: { key: 'new', label: '未学習', order: 0 },
+    learning: { key: 'learning', label: '覚えはじめ', order: 1 },
+    reviewing: { key: 'reviewing', label: '復習中', order: 2 },
+    settled: { key: 'settled', label: '定着してきた', order: 3 },
+  };
+
+  function level(state) {
+    if (!state || !state.reps) return LEVELS.new;
+    if (state.interval < 3) return LEVELS.learning;
+    if (state.interval >= 21 && state.streak >= 3) return LEVELS.settled;
+    return LEVELS.reviewing;
+  }
+
+  function round2(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  return {
+    RATINGS, RATING_LABEL, AGAIN_DELAY, LEVELS,
+    newState, nextInterval, isEarly, review, recordRepeat, previewLabel, isDue, level,
+  };
+});
+
+</script>
+<script>
+/*
+ * session.js — 1セット（基本10枚）の組み立てと、回答ごとの進め方
+ *
+ * 出題の優先順：
+ *   1. 復習予定日を過ぎたカード（遅れている順）
+ *   2. まだ学習していないカード
+ *   3. それでも足りなければ、復習予定が近いカード（前倒し）
+ * セット内では「思い出せなかった」は3枚後、「あいまい」は5枚後にもう一度出す。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('./util.js'), require('./srs.js'));
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.session = factory(root.CIF.util, root.CIF.srs);
+  }
+})(this, function (util, srs) {
+  'use strict';
+
+  const SET_SIZE = 10;
+  const MODES = {
+    fwd: { key: 'fwd', label: '英語 → 場面', long: '英単語を見て・聞いて、場面と感覚を思い出す' },
+    rev: { key: 'rev', label: '場面 → 英語', long: '場面や短い説明から、英単語を思い出す' },
+  };
+  const POINTS = { good: 10, hard: 6, again: 3, repeat: 1, setBonus: 20, goalBonus: 30 };
+  const REQUEUE = {
+    again: { gap: 3, max: 3 },
+    hard: { gap: 5, max: 1 },
+  };
+
+  /** 「要確認」を除いた、出題してよい用法の一覧 */
+  function studyable(words) {
+    const out = [];
+    (words || []).forEach((w) => {
+      if (!w || w.status === 'needs_review') return;
+      (w.senses || []).forEach((s) => {
+        if (!s || s.status === 'needs_review') return;
+        out.push({ word: w, sense: s });
+      });
+    });
+    return out;
+  }
+
+  function stateOf(progress, senseId, mode) {
+    const p = progress && progress[senseId];
+    return (p && p[mode]) || null;
+  }
+
+  /** 逆向き（場面→英語）に出せるのは、英語→場面で一度でも学習した用法だけ */
+  function eligible(item, progress, mode) {
+    if (mode === 'fwd') return true;
+    const f = stateOf(progress, item.sense.id, 'fwd');
+    const hasCue = !!(item.sense.nuance || (item.sense.scene && item.sense.scene.text));
+    return !!(f && f.reps > 0 && hasCue);
+  }
+
+  function pickCards(words, progress, mode, now, size) {
+    const items = studyable(words).filter((it) => eligible(it, progress, mode));
+    const due = [];
+    const fresh = [];
+    const later = [];
+    items.forEach((it, index) => {
+      const st = stateOf(progress, it.sense.id, mode);
+      if (!st || !st.reps) fresh.push({ it, index });
+      else if (st.due <= now) due.push({ it, st });
+      else later.push({ it, st });
+    });
+    due.sort((a, b) => a.st.due - b.st.due || b.st.lapses - a.st.lapses);
+    later.sort((a, b) => a.st.due - b.st.due);
+    const picked = [];
+    const early = {};
+    due.forEach((d) => picked.length < size && picked.push(d.it.sense.id));
+    fresh.forEach((f) => picked.length < size && picked.push(f.it.sense.id));
+    later.forEach((l) => {
+      if (picked.length < size) {
+        picked.push(l.it.sense.id);
+        early[l.it.sense.id] = true;
+      }
+    });
+    return { ids: spreadSameWord(picked, words), early };
+  }
+
+  /** 同じ単語のカードが続かないように、できる範囲で並べ替える */
+  function spreadSameWord(ids, words) {
+    const owner = {};
+    (words || []).forEach((w) => (w.senses || []).forEach((s) => (owner[s.id] = w.id)));
+    const rest = ids.slice();
+    const out = [];
+    while (rest.length) {
+      const prevOwner = out.length ? owner[out[out.length - 1]] : null;
+      let i = rest.findIndex((id) => owner[id] !== prevOwner);
+      if (i < 0) i = 0;
+      out.push(rest.splice(i, 1)[0]);
+    }
+    return out;
+  }
+
+  function build(words, progress, mode, now, opts) {
+    const size = (opts && opts.size) || SET_SIZE;
+    const { ids, early } = pickCards(words, progress, mode, now, size);
+    if (!ids.length) return null;
+    return {
+      id: util.randomId('set'),
+      mode,
+      createdAt: now,
+      updatedAt: now,
+      cards: ids.slice(),
+      queue: ids.slice(),
+      early,
+      results: {},
+      answered: 0,
+      points: 0,
+      flipped: false,
+      finished: false,
+      goalReached: false,
+    };
+  }
+
+  function current(session) {
+    return session && session.queue.length ? session.queue[0] : null;
+  }
+
+  function remaining(session) {
+    return session ? session.queue.length : 0;
+  }
+
+  /** 進捗バー用（再出題で分母が増える） */
+  function progressRatio(session) {
+    if (!session) return 0;
+    const total = session.answered + session.queue.length;
+    return total ? session.answered / total : 1;
+  }
+
+  /**
+   * 回答を反映する。session / progress は書き換えずに新しいものを返す。
+   * 戻り値: { session, progress, event }
+   */
+  function answer(session, progress, rating, now) {
+    if (!srs.RATINGS.includes(rating)) throw new Error('unknown rating');
+    const sid = current(session);
+    if (!sid) throw new Error('no current card');
+    const s = util.clone(session);
+    const p = Object.assign({}, progress);
+    const mode = s.mode;
+    const entry = Object.assign({}, p[sid] || {});
+    const result = s.results[sid] || { first: null, answers: [], repeats: 0 };
+    const isFirst = result.first === null;
+    let points;
+
+    if (isFirst) {
+      entry[mode] = srs.review(entry[mode], rating, now);
+      result.first = rating;
+      points = POINTS[rating];
+    } else {
+      entry[mode] = srs.recordRepeat(entry[mode], rating, now);
+      points = POINTS.repeat;
+    }
+    result.answers = result.answers.concat(rating);
+    result.nextDue = entry[mode].due;
+    p[sid] = entry;
+
+    s.queue.shift();
+    const rule = REQUEUE[rating];
+    const mayRepeat = rule && result.repeats < rule.max && (rating === 'again' || isFirst);
+    if (mayRepeat) {
+      const at = Math.min(rule.gap, s.queue.length);
+      s.queue.splice(at, 0, sid);
+      result.repeats += 1;
+    }
+    s.results[sid] = result;
+    s.answered += 1;
+    s.points += points;
+    s.flipped = false;
+    s.updatedAt = now;
+    if (!s.queue.length) s.finished = true;
+
+    return {
+      session: s,
+      progress: p,
+      event: { senseId: sid, rating, first: isFirst, points, requeued: !!mayRepeat, finished: s.finished },
+    };
+  }
+
+  /** 保存してあったセットを再開できる形に整える（削除された単語を除く） */
+  function sanitize(session, words) {
+    if (!session || !Array.isArray(session.queue)) return null;
+    const ids = new Set();
+    studyable(words).forEach((it) => ids.add(it.sense.id));
+    const s = util.clone(session);
+    s.queue = s.queue.filter((id) => ids.has(id));
+    s.cards = (s.cards || []).filter((id) => ids.has(id));
+    s.results = s.results || {};
+    s.flipped = !!s.flipped;
+    if (!s.queue.length) s.finished = true;
+    return s;
+  }
+
+  function summary(session) {
+    const out = { good: 0, hard: 0, again: 0, cards: 0, repeats: 0 };
+    if (!session) return out;
+    Object.keys(session.results).forEach((id) => {
+      const r = session.results[id];
+      if (r.first) {
+        out[r.first] += 1;
+        out.cards += 1;
+      }
+      out.repeats += Math.max(0, r.answers.length - 1);
+    });
+    return out;
+  }
+
+  /** ホーム画面用の件数 */
+  function counts(words, progress, now) {
+    const items = studyable(words);
+    const res = {
+      total: items.length,
+      dueFwd: 0, newFwd: 0, dueRev: 0, availableRev: 0, newRev: 0,
+      tomorrow: 0, week: 0, levels: { new: 0, learning: 0, reviewing: 0, settled: 0 },
+    };
+    const tomorrowEnd = util.addDays(now, 2);
+    const weekEnd = util.addDays(now, 8);
+    items.forEach((it) => {
+      const f = stateOf(progress, it.sense.id, 'fwd');
+      const r = stateOf(progress, it.sense.id, 'rev');
+      res.levels[srs.level(f).key] += 1;
+      if (!f || !f.reps) res.newFwd += 1;
+      else if (f.due <= now) res.dueFwd += 1;
+      if (eligible(it, progress, 'rev')) {
+        res.availableRev += 1;
+        if (!r || !r.reps) res.newRev += 1;
+        else if (r.due <= now) res.dueRev += 1;
+      }
+      [f, r].forEach((st) => {
+        if (!st || !st.reps || st.due <= now) return;
+        if (st.due < tomorrowEnd && st.due >= util.addDays(now, 1)) res.tomorrow += 1;
+        if (st.due < weekEnd) res.week += 1;
+      });
+    });
+    return res;
+  }
+
+  /* ---------- 学習記録（日ごと）・ポイント・連続日数 ---------- */
+
+  function emptyLog() {
+    return { days: {}, totalPoints: 0 };
+  }
+
+  function day(log, now) {
+    const key = util.dayKey(now);
+    if (!log.days[key]) log.days[key] = { cards: 0, answers: 0, good: 0, hard: 0, again: 0, points: 0, sets: 0 };
+    return log.days[key];
+  }
+
+  /** 1回の回答を日ごとの記録に足す。目標に届いたらボーナスを返す */
+  function logAnswer(log, event, now, dailyGoal) {
+    const l = util.clone(log || emptyLog());
+    const d = day(l, now);
+    const before = d.cards;
+    d.answers += 1;
+    d.points += event.points;
+    l.totalPoints += event.points;
+    let bonus = 0;
+    if (event.first) {
+      d.cards += 1;
+      d[event.rating] += 1;
+      if (dailyGoal && before < dailyGoal && d.cards >= dailyGoal) {
+        bonus = POINTS.goalBonus;
+        d.points += bonus;
+        l.totalPoints += bonus;
+        d.goalReached = true;
+      }
+    }
+    return { log: l, bonus };
+  }
+
+  function logSetComplete(log, now) {
+    const l = util.clone(log || emptyLog());
+    const d = day(l, now);
+    d.sets += 1;
+    d.points += POINTS.setBonus;
+    l.totalPoints += POINTS.setBonus;
+    return { log: l, bonus: POINTS.setBonus };
+  }
+
+  /** 連続学習日数（1枚でも学習した日が続いた数）。今日まだなら昨日までで数える */
+  function streak(log, now) {
+    const days = (log && log.days) || {};
+    const studied = (ts) => {
+      const d = days[util.dayKey(ts)];
+      return !!(d && d.cards > 0);
+    };
+    const todayDone = studied(now);
+    let cursor = todayDone ? now : util.addDays(now, -1);
+    let n = 0;
+    while (studied(cursor)) {
+      n += 1;
+      cursor = util.addDays(cursor, -1);
+      if (n > 3650) break;
+    }
+    return { days: n, todayDone };
+  }
+
+  function today(log, now) {
+    const d = log && log.days && log.days[util.dayKey(now)];
+    return d || { cards: 0, answers: 0, good: 0, hard: 0, again: 0, points: 0, sets: 0 };
+  }
+
+  /** 直近 n 日の学習枚数（古い順） */
+  function recentDays(log, now, n) {
+    const out = [];
+    for (let i = n - 1; i >= 0; i--) {
+      const ts = util.addDays(now, -i);
+      const d = log && log.days && log.days[util.dayKey(ts)];
+      out.push({ ts, key: util.dayKey(ts), cards: d ? d.cards : 0 });
+    }
+    return out;
+  }
+
+  return {
+    SET_SIZE, MODES, POINTS, REQUEUE,
+    studyable, stateOf, eligible, pickCards, build, current, remaining, progressRatio,
+    answer, sanitize, summary, counts,
+    emptyLog, logAnswer, logSetComplete, streak, today, recentDays,
+  };
+});
+
+</script>
+<script>
+/*
+ * storage.js — 保存・読み込み・書き出し・データの整形
+ *
+ * 保存先（backend）は差し替えられる：
+ *   - local  : ブラウザの localStorage（通常はこれ）
+ *   - memory : 保存できない環境での一時保存（再読み込みで消える → 画面で警告）
+ *   - その他 : window.CIF.extraBackend が用意されていればそれを優先（公開ページ版など）
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('./util.js'));
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.storage = factory(root.CIF.util);
+  }
+})(this, function (util) {
+  'use strict';
+
+  const PREFIX = 'cif.v1.';
+  const KEYS = ['words', 'progress', 'log', 'settings', 'session', 'meta'];
+  const FORMAT = 'core-image-flashcards';
+  const FORMAT_VERSION = 1;
+
+  const STATUS = {
+    verified: { key: 'verified', label: '確認済み', desc: '辞書などで確認した内容。出典を記録しています。' },
+    unverified: { key: 'unverified', label: '未確認', desc: '自分で入力した内容など。出題はしますが、辞書での確認はまだです。' },
+    needs_review: { key: 'needs_review', label: '要確認', desc: '読めない文字や意図が不明な点があるため、通常の出題から外しています。' },
+  };
+
+  const POS = {
+    noun: '名詞', verb: '動詞', adjective: '形容詞', adverb: '副詞',
+    preposition: '前置詞', interjection: '間投詞', conjunction: '接続詞', pronoun: '代名詞', other: 'その他',
+  };
+
+  const ROLE = {
+    thing: 'もの・こと', action: '動き', state: '状態', change: '変化（〜になる）',
+    quality: 'どんな（様子）', manner: 'どんなふうに', degree: 'どのくらい',
+    relation: '位置・関係', connector: '気持ち・話のつなぎ',
+  };
+
+  const GROUPS = ['A', 'B', 'C', 'D'];
+
+  const DEFAULT_SETTINGS = {
+    voiceURI: '',
+    rate: 0.95,
+    slowRate: 0.6,
+    dailyGoal: 10,
+    accent: 'us',
+    autoplay: false,
+  };
+
+  /* ---------- 保存先 ---------- */
+
+  function localBackend(storage) {
+    const ls = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
+    // 書き込めるか試す（プライベートモード等で例外になることがある）
+    ls.setItem(PREFIX + '_probe', '1');
+    ls.removeItem(PREFIX + '_probe');
+    return {
+      name: 'local',
+      persistent: true,
+      async load(key) {
+        const raw = ls.getItem(PREFIX + key);
+        return raw == null ? undefined : JSON.parse(raw);
+      },
+      async save(key, value) {
+        if (value === undefined || value === null) ls.removeItem(PREFIX + key);
+        else ls.setItem(PREFIX + key, JSON.stringify(value));
+      },
+      saveSync(key, value) {
+        if (value === undefined || value === null) ls.removeItem(PREFIX + key);
+        else ls.setItem(PREFIX + key, JSON.stringify(value));
+      },
+    };
+  }
+
+  function memoryBackend() {
+    const mem = {};
+    return {
+      name: 'memory',
+      persistent: false,
+      async load(key) {
+        return mem[key] === undefined ? undefined : util.clone(mem[key]);
+      },
+      async save(key, value) {
+        mem[key] = util.clone(value);
+      },
+    };
+  }
+
+  async function pickBackend() {
+    const g = typeof window !== 'undefined' ? window : {};
+    if (g.CIF && typeof g.CIF.extraBackend === 'function') {
+      try {
+        const b = await g.CIF.extraBackend();
+        if (b) return b;
+      } catch (e) {
+        /* 使えなければ localStorage へ */
+      }
+    }
+    try {
+      return localBackend();
+    } catch (e) {
+      return memoryBackend();
+    }
+  }
+
+  /* ---------- ストア（画面からはこれを使う） ---------- */
+
+  function createStore(backend) {
+    const state = { words: [], progress: {}, log: null, settings: null, session: null, meta: {} };
+    const status = { backend: backend.name, persistent: backend.persistent, error: '' };
+    const pending = {};
+    const writing = {};
+    const listeners = [];
+
+    function notify() {
+      listeners.forEach((fn) => {
+        try { fn(status); } catch (e) { /* noop */ }
+      });
+    }
+
+    async function flush(key) {
+      if (writing[key]) return;
+      writing[key] = true;
+      try {
+        while (Object.prototype.hasOwnProperty.call(pending, key)) {
+          const value = pending[key];
+          delete pending[key];
+          await backend.save(key, value);
+        }
+        if (status.error) {
+          status.error = '';
+          notify();
+        }
+      } catch (e) {
+        status.error = saveErrorMessage(e);
+        notify();
+      } finally {
+        writing[key] = false;
+      }
+    }
+
+    function persist(key) {
+      const value = state[key];
+      if (backend.saveSync) {
+        try {
+          backend.saveSync(key, value);
+          if (status.error) {
+            status.error = '';
+            notify();
+          }
+        } catch (e) {
+          status.error = saveErrorMessage(e);
+          notify();
+        }
+        return Promise.resolve();
+      }
+      pending[key] = util.clone(value);
+      return flush(key);
+    }
+
+    return {
+      state,
+      status,
+      onStatus(fn) { listeners.push(fn); },
+      async init(seed) {
+        const loaded = {};
+        for (const key of KEYS) {
+          try {
+            loaded[key] = await backend.load(key);
+          } catch (e) {
+            loaded[key] = undefined;
+            status.error = '保存データの一部を読み込めませんでした（' + key + '）。';
+          }
+        }
+        const meta = loaded.meta && typeof loaded.meta === 'object' ? loaded.meta : {};
+        let words;
+        if (Array.isArray(loaded.words)) {
+          words = loaded.words.map((w) => normalizeWord(w).word).filter(Boolean);
+          const merged = mergeNewSeedWords(words, seed, meta);
+          words = merged.words;
+          if (merged.added) loaded._wordsChanged = true;
+        } else {
+          words = (seed ? seed.words : []).map((w) => normalizeWord(w).word);
+          meta.seedVersion = seed ? seed.version : 0;
+          loaded._wordsChanged = true;
+        }
+        state.words = words;
+        state.progress = normalizeProgress(loaded.progress);
+        state.log = normalizeLog(loaded.log);
+        state.settings = normalizeSettings(loaded.settings);
+        state.session = loaded.session && typeof loaded.session === 'object' ? loaded.session : null;
+        state.meta = Object.assign({ deletedSeed: [] }, meta, { seedVersion: seed ? seed.version : meta.seedVersion || 0 });
+        if (loaded._wordsChanged) {
+          persist('words');
+          persist('meta');
+        }
+        return state;
+      },
+      set(key, value) {
+        if (!KEYS.includes(key)) throw new Error('unknown key ' + key);
+        state[key] = value;
+        return persist(key);
+      },
+      setMany(obj) {
+        return Promise.all(Object.keys(obj).map((k) => this.set(k, obj[k])));
+      },
+    };
+  }
+
+  function saveErrorMessage(e) {
+    const name = e && (e.name || e.code);
+    if (name === 'QuotaExceededError' || name === 'quota_exceeded' || name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+      return '保存できる容量がいっぱいです。不要な単語を削除するか、データを書き出してください。';
+    }
+    return '学習データを保存できませんでした。ブラウザの設定（プライベートモードなど）を確認してください。';
+  }
+
+  /** 新しいバージョンで増えた初期単語を追加（ユーザーが削除したものは戻さない） */
+  function mergeNewSeedWords(words, seed, meta) {
+    if (!seed || !(seed.version > (meta.seedVersion || 0))) return { words, added: 0 };
+    const have = new Set(words.map((w) => w.id));
+    const deleted = new Set(meta.deletedSeed || []);
+    const add = seed.words.filter((w) => !have.has(w.id) && !deleted.has(w.id)).map((w) => normalizeWord(w).word);
+    return { words: words.concat(add), added: add.length };
+  }
+
+  /* ---------- データの整形・チェック ---------- */
+
+  const MAX_TEXT = 2000;
+  const REPLACEMENT = /�/;
+  const HEADWORD_OK = /^[A-Za-z][A-Za-z '’.\-]*$/;
+
+  function str(v, max) {
+    if (v == null) return '';
+    const s = typeof v === 'string' ? v : typeof v === 'number' ? String(v) : '';
+    return s.trim().slice(0, max || MAX_TEXT);
+  }
+
+  function safeUrl(v) {
+    const s = str(v, 500);
+    if (!s) return '';
+    if (/^https?:\/\//i.test(s)) return s;
+    // 同じフォルダの録音ファイル（audio/xxx.mp3 など）も許可
+    if (/^[\w\-./]+\.(mp3|m4a|aac|wav|ogg|oga|webm)$/i.test(s) && !s.includes('..')) return s;
+    return '';
+  }
+
+  function safeId(v, prefix, fallbackText) {
+    const s = str(v, 64);
+    if (/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(s)) return s;
+    return util.randomId(prefix + '-' + util.slug(fallbackText));
+  }
+
+  function hasBrokenText(obj) {
+    return REPLACEMENT.test(JSON.stringify(obj || ''));
+  }
+
+  /**
+   * 単語データを安全な形にそろえる。
+   * 見出し語が英字でない・文字化けがある・意味が空 などは「要確認」にして理由を残す。
+   */
+  function normalizeWord(raw) {
+    if (!raw || typeof raw !== 'object') return { word: null, problems: ['データの形が正しくありません'] };
+    const problems = [];
+    const headword = str(raw.headword, 60);
+    const w = {
+      id: safeId(raw.id, 'w', headword),
+      headword,
+      status: STATUS[raw.status] ? raw.status : 'unverified',
+      check: {
+        date: str(raw.check && raw.check.date, 20),
+        method: str(raw.check && raw.check.method),
+        note: str(raw.check && raw.check.note),
+      },
+      sources: Array.isArray(raw.sources)
+        ? raw.sources
+            .map((s) => ({ label: str(s && s.label, 200), url: safeUrl(s && s.url) }))
+            .filter((s) => s.label || s.url)
+            .slice(0, 10)
+        : [],
+      groups: {},
+      senses: [],
+      reviewReasons: [],
+      createdAt: Number(raw.createdAt) || 0,
+      updatedAt: Number(raw.updatedAt) || 0,
+    };
+    if (raw.groups && typeof raw.groups === 'object') {
+      GROUPS.forEach((g) => {
+        const t = str(raw.groups[g], 300);
+        if (t) w.groups[g] = t;
+      });
+    }
+    const seenIds = new Set();
+    (Array.isArray(raw.senses) ? raw.senses : []).slice(0, 12).forEach((s) => {
+      const sense = normalizeSense(s, headword);
+      if (!sense) return;
+      if (seenIds.has(sense.id)) sense.id = util.randomId('s-' + util.slug(headword));
+      seenIds.add(sense.id);
+      w.senses.push(sense);
+    });
+
+    if (!headword) problems.push('見出し語がありません');
+    else if (REPLACEMENT.test(headword)) problems.push('見出し語に読めない文字（�）があります');
+    else if (!HEADWORD_OK.test(headword)) problems.push('見出し語に英字以外の文字が含まれています');
+    if (!w.senses.length) problems.push('意味・用法が登録されていません');
+    if (hasBrokenText(raw.senses)) problems.push('説明や例文に読めない文字（�）があります');
+    if (problems.length) {
+      w.status = 'needs_review';
+      w.reviewReasons = problems;
+    } else if (Array.isArray(raw.reviewReasons) && raw.status === 'needs_review') {
+      w.reviewReasons = raw.reviewReasons.map((r) => str(r, 200)).filter(Boolean).slice(0, 5);
+    }
+    return { word: w, problems };
+  }
+
+  function normalizeSense(s, headword) {
+    if (!s || typeof s !== 'object') return null;
+    const sense = {
+      id: safeId(s.id, 's', headword),
+      group: GROUPS.includes(s.group) ? s.group : 'A',
+      pos: POS[s.pos] ? s.pos : 'other',
+      role: ROLE[s.role] ? s.role : '',
+      cue: str(s.cue, 120),
+      speak: str(s.speak, 120),
+      ipa: { us: str(s.ipa && s.ipa.us, 60), uk: str(s.ipa && s.ipa.uk, 60) },
+      stress: str(s.stress, 60),
+      nuance: str(s.nuance, 200),
+      scene: {
+        emoji: str(s.scene && s.scene.emoji, 16),
+        diagram: str(s.scene && s.scene.diagram, 40),
+        text: str(s.scene && s.scene.text, 300),
+      },
+      meaning: str(s.meaning, 200),
+      roleText: str(s.roleText, 600),
+      examples: (Array.isArray(s.examples) ? s.examples : [])
+        .map((e) => ({ en: str(e && e.en, 300), ja: str(e && e.ja, 300) }))
+        .filter((e) => e.en)
+        .slice(0, 6),
+      contrasts: (Array.isArray(s.contrasts) ? s.contrasts : [])
+        .map((c) => ({ word: str(c && c.word, 60), text: str(c && c.text, 400) }))
+        .filter((c) => c.word || c.text)
+        .slice(0, 6),
+      note: str(s.note, 600),
+      status: s.status === 'needs_review' ? 'needs_review' : '',
+      audio: {
+        word: safeUrl(s.audio && s.audio.word),
+        examples: (s.audio && Array.isArray(s.audio.examples) ? s.audio.examples : []).map(safeUrl).slice(0, 6),
+      },
+    };
+    if (!sense.meaning) sense.status = 'needs_review';
+    return sense;
+  }
+
+  function num(v, d) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : d;
+  }
+
+  function normalizeState(st) {
+    if (!st || typeof st !== 'object') return null;
+    return {
+      reps: Math.max(0, Math.floor(num(st.reps, 0))),
+      lapses: Math.max(0, Math.floor(num(st.lapses, 0))),
+      streak: Math.max(0, Math.floor(num(st.streak, 0))),
+      interval: Math.max(0, Math.min(365, Math.floor(num(st.interval, 0)))),
+      ease: Math.max(1.3, Math.min(3.5, num(st.ease, 2.5))),
+      due: Math.max(0, num(st.due, 0)),
+      last: Math.max(0, num(st.last, 0)),
+      history: (Array.isArray(st.history) ? st.history : [])
+        .filter((h) => h && ['again', 'hard', 'good'].includes(h.r))
+        .map((h) => {
+          const e = { t: num(h.t, 0), r: h.r };
+          if (h.re) e.re = true;
+          if (h.ivl != null) e.ivl = num(h.ivl, 0);
+          return e;
+        })
+        .slice(-40),
+    };
+  }
+
+  function normalizeProgress(p) {
+    const out = {};
+    if (!p || typeof p !== 'object') return out;
+    Object.keys(p).forEach((id) => {
+      if (!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(id)) return;
+      const e = p[id] || {};
+      const fwd = normalizeState(e.fwd);
+      const rev = normalizeState(e.rev);
+      if (fwd || rev) {
+        out[id] = {};
+        if (fwd) out[id].fwd = fwd;
+        if (rev) out[id].rev = rev;
+      }
+    });
+    return out;
+  }
+
+  function normalizeLog(l) {
+    const out = { days: {}, totalPoints: 0 };
+    if (!l || typeof l !== 'object') return out;
+    out.totalPoints = Math.max(0, Math.floor(num(l.totalPoints, 0)));
+    const days = l.days && typeof l.days === 'object' ? l.days : {};
+    Object.keys(days).forEach((k) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+      const d = days[k] || {};
+      out.days[k] = {
+        cards: Math.max(0, Math.floor(num(d.cards, 0))),
+        answers: Math.max(0, Math.floor(num(d.answers, 0))),
+        good: Math.max(0, Math.floor(num(d.good, 0))),
+        hard: Math.max(0, Math.floor(num(d.hard, 0))),
+        again: Math.max(0, Math.floor(num(d.again, 0))),
+        points: Math.max(0, Math.floor(num(d.points, 0))),
+        sets: Math.max(0, Math.floor(num(d.sets, 0))),
+        goalReached: !!d.goalReached,
+      };
+    });
+    return out;
+  }
+
+  function normalizeSettings(s) {
+    const out = Object.assign({}, DEFAULT_SETTINGS);
+    if (!s || typeof s !== 'object') return out;
+    out.voiceURI = str(s.voiceURI, 300);
+    out.rate = Math.max(0.5, Math.min(1.3, num(s.rate, DEFAULT_SETTINGS.rate)));
+    out.slowRate = Math.max(0.3, Math.min(1, num(s.slowRate, DEFAULT_SETTINGS.slowRate)));
+    out.dailyGoal = [10, 20, 30, 40].includes(Number(s.dailyGoal)) ? Number(s.dailyGoal) : DEFAULT_SETTINGS.dailyGoal;
+    out.accent = s.accent === 'uk' ? 'uk' : 'us';
+    out.autoplay = !!s.autoplay;
+    return out;
+  }
+
+  /* ---------- 書き出し・読み込み ---------- */
+
+  function buildExport(state, opts) {
+    const includeProgress = !opts || opts.includeProgress !== false;
+    const data = {
+      format: FORMAT,
+      version: FORMAT_VERSION,
+      exportedAt: new Date().toISOString(),
+      words: state.words,
+    };
+    if (includeProgress) {
+      data.progress = state.progress;
+      data.log = state.log;
+      data.settings = state.settings;
+    }
+    return data;
+  }
+
+  function exportFileName(now) {
+    return 'core-image-cards-' + util.dayKey(now || Date.now()).replace(/-/g, '') + '.json';
+  }
+
+  /**
+   * 読み込むテキストを確認する。
+   * 戻り値: { ok, error?, data?, stats?, warnings? }
+   */
+  function parseImport(text) {
+    let json;
+    try {
+      json = JSON.parse(String(text || '').replace(/^﻿/, ''));
+    } catch (e) {
+      return { ok: false, error: 'JSON として読み込めませんでした。書き出したファイルをそのまま選んでください。' };
+    }
+    let rawWords;
+    if (Array.isArray(json)) rawWords = json;
+    else if (json && Array.isArray(json.words)) rawWords = json.words;
+    else return { ok: false, error: '単語データ（words）が見つかりません。' };
+    if (json && json.format && json.format !== FORMAT) {
+      return { ok: false, error: 'このアプリのデータ形式ではありません（format: ' + str(json.format, 40) + '）。' };
+    }
+    const warnings = [];
+    const words = [];
+    const ids = new Set();
+    rawWords.slice(0, 2000).forEach((raw, i) => {
+      const { word, problems } = normalizeWord(raw);
+      if (!word) {
+        warnings.push((i + 1) + '件目: 形式が正しくないため読み飛ばしました');
+        return;
+      }
+      if (ids.has(word.id)) word.id = util.randomId('w-' + util.slug(word.headword));
+      ids.add(word.id);
+      if (problems.length) warnings.push('「' + (word.headword || (i + 1) + '件目') + '」は要確認にしました: ' + problems.join('、'));
+      words.push(word);
+    });
+    const hasProgress = !!(json && !Array.isArray(json) && json.progress);
+    const data = {
+      words,
+      progress: hasProgress ? normalizeProgress(json.progress) : null,
+      log: json && json.log ? normalizeLog(json.log) : null,
+      settings: json && json.settings ? normalizeSettings(json.settings) : null,
+    };
+    const stats = {
+      words: words.length,
+      senses: words.reduce((n, w) => n + w.senses.length, 0),
+      needsReview: words.filter((w) => w.status === 'needs_review').length,
+      progress: data.progress ? Object.keys(data.progress).length : 0,
+      days: data.log ? Object.keys(data.log.days).length : 0,
+    };
+    return { ok: true, data, stats, warnings };
+  }
+
+  /**
+   * mode: 'merge'（同じIDは更新・新しい単語は追加。学習記録は今のものを残す）
+   *       'replace'（ファイルの内容に置き換える）
+   */
+  function applyImport(state, data, mode) {
+    if (mode === 'replace') {
+      return {
+        words: data.words,
+        progress: data.progress || {},
+        log: data.log || { days: {}, totalPoints: 0 },
+        settings: data.settings || state.settings,
+        session: null,
+      };
+    }
+    const byId = new Map(state.words.map((w) => [w.id, w]));
+    data.words.forEach((w) => byId.set(w.id, w));
+    const words = Array.from(byId.values());
+    const progress = Object.assign({}, state.progress);
+    if (data.progress) {
+      Object.keys(data.progress).forEach((id) => {
+        if (!progress[id]) progress[id] = data.progress[id];
+      });
+    }
+    return { words, progress };
+  }
+
+  return {
+    PREFIX, KEYS, FORMAT, STATUS, POS, ROLE, GROUPS, DEFAULT_SETTINGS,
+    localBackend, memoryBackend, pickBackend, createStore,
+    normalizeWord, normalizeSense, normalizeProgress, normalizeLog, normalizeSettings,
+    buildExport, exportFileName, parseImport, applyImport, safeUrl,
+  };
+});
+
+</script>
+<script>
+/*
+ * data-seed.js — 初期の単語データ（11語・21用法）
+ *
+ * 1カード = 1つの意味・用法（sense）。
+ * 例文の [ ] は、その用法の単語（変化した形を含む）を示す。
+ *   - 英語→場面では強調表示、場面→英語では空欄になる。
+ * group … 関連する用法のまとまり。グループが違う用法は「別の単語」として扱い、
+ *         無理に1つのイメージへ結びつけない（well の「上手に」と「井戸」など）。
+ * speak … 単語ボタンで読み上げる文字列。品詞で発音が変わる語（record, live）は、
+ *         その用法の発音になるよう短い語句で読み上げる。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.seed = factory();
+  }
+})(this, function () {
+  'use strict';
+
+  const CHECKED = '2026-11-04';
+  const METHOD =
+    'Web検索で表示された辞書の該当ページ（Oxford Learner\'s Dictionaries など）の情報と照らし合わせ、品詞・意味・発音記号を確認しました。' +
+    '作成環境からは辞書サイトの本文を直接開けなかったため、気になる点は出典リンクから確認してください。';
+  const NOTE = '例文・一言ニュアンス・場面の説明は、このアプリ用に作った学習用の文章です。';
+  const OXF = 'https://www.oxfordlearnersdictionaries.com/definition/english/';
+
+  function check(extra) {
+    return { date: CHECKED, method: METHOD, note: extra ? NOTE + extra : NOTE };
+  }
+
+  const words = [
+    {
+      id: 'w-pretty',
+      headword: 'pretty',
+      status: 'verified',
+      check: check(),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: pretty（形容詞）", url: OXF + 'pretty_1' },
+        { label: 'Merriam-Webster: pretty', url: 'https://www.merriam-webster.com/dictionary/pretty' },
+      ],
+      groups: {
+        A: '同じ pretty から広がった使い方。ただ「かわいい」と「けっこう」のつながりは感じにくいので、別々に覚えて大丈夫です。',
+      },
+      senses: [
+        {
+          id: 's-pretty-adj',
+          group: 'A',
+          pos: 'adjective',
+          role: 'quality',
+          cue: 'a pretty flower',
+          ipa: { uk: '/ˈprɪti/', us: '/ˈprɪti/' },
+          stress: 'PRET·ty',
+          nuance: '見ていて、ほっと和む「かわいい・きれい」って感じ',
+          scene: {
+            emoji: '🌷',
+            diagram: '',
+            text: '道ばたに小さな花が咲いていて、思わず「かわいい」と顔がゆるむ。',
+          },
+          meaning: 'かわいい、きれいな（見た目が感じよい）',
+          roleText:
+            '人やものが「どんな見た目か」を表す言葉です（形容詞）。a pretty flower のように「もの」の前に置いたり、It\'s pretty. のように be 動詞のあとに置いたりします。',
+          examples: [
+            { en: 'What a [pretty] flower!', ja: 'なんてかわいい花！' },
+            { en: 'This is a [pretty] little town.', ja: 'ここはこぢんまりとした、きれいな町だ。' },
+          ],
+          contrasts: [
+            { word: 'beautiful', text: '心を打つほどの「美しい」。pretty はもっと軽くて親しみのある「かわいい・きれい」。' },
+            { word: 'cute', text: '小さな子どもや動物などの「守りたくなる愛らしさ」。pretty は見た目の整った「きれいさ」寄り。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-pretty-adv',
+          group: 'A',
+          pos: 'adverb',
+          role: 'degree',
+          cue: 'pretty tired',
+          ipa: { uk: '/ˈprɪti/', us: '/ˈprɪti/' },
+          stress: 'PRET·ty',
+          nuance: '「とても」ほどじゃないけど「けっこう」って感じ',
+          scene: {
+            emoji: '🥱',
+            diagram: 'pretty-gauge',
+            text: '部活のあと。倒れるほどではないけれど、けっこう疲れた。',
+          },
+          meaning: 'けっこう、かなり、わりと',
+          roleText:
+            '「どのくらい」を表す言葉です（副詞）。tired（疲れた）や good（よい）など、様子を表す言葉の前に置いて、その強さを調整します。',
+          examples: [
+            { en: "I'm [pretty] tired today.", ja: '今日はけっこう疲れてる。' },
+            { en: 'The test was [pretty] easy.', ja: 'テストはわりと簡単だった。' },
+          ],
+          contrasts: [
+            { word: 'very', text: '「とても」とはっきり強め。pretty は会話でよく使う、少しくだけた「けっこう・わりと」。' },
+          ],
+          note: '「かわいい」という意味は入っていません。後ろの言葉の「程度」だけを表します。会話でよく使うくだけた言い方です。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-well',
+      headword: 'well',
+      status: 'verified',
+      check: check(' 「井戸」の well が別の語源であることは、語源辞典（Etymonline など）の情報で確認しました。'),
+      sources: [
+        { label: 'Merriam-Webster: well', url: 'https://www.merriam-webster.com/dictionary/well' },
+        { label: 'Online Etymology Dictionary: well', url: 'https://www.etymonline.com/word/well' },
+        { label: "Oxford Learner's Dictionaries（検索）", url: 'https://www.oxfordlearnersdictionaries.com/search/english/?q=well' },
+      ],
+      groups: {
+        A: '「よい・うまくいっている」に関係する well。',
+        B: '「井戸」の well。つづりと発音は同じですが、A とは別の語源の単語として扱われます。無理に結びつけなくて大丈夫です。',
+      },
+      senses: [
+        {
+          id: 's-well-adv',
+          group: 'A',
+          pos: 'adverb',
+          role: 'manner',
+          cue: 'sing well',
+          ipa: { uk: '/wel/', us: '/wel/' },
+          nuance: '「ちゃんと、うまくできている」って感じ',
+          scene: {
+            emoji: '🎤',
+            diagram: '',
+            text: 'カラオケで、友だちが音程ばっちりで気持ちよく歌っている。',
+          },
+          meaning: '上手に、よく',
+          roleText:
+            '「どんなふうに」を表す言葉です（副詞）。sing（歌う）や sleep（眠る）などの「動き」のあとに置いて、そのやり方や出来ばえを表します。',
+          examples: [
+            { en: 'She sings really [well].', ja: '彼女は本当に歌が上手だ。' },
+            { en: 'Did you sleep [well]?', ja: 'よく眠れた？' },
+          ],
+          contrasts: [
+            { word: 'good', text: 'good は「人・もの」がどんなか（a good singer）。well は「動き」がどんなふうか（sing well）。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-well-interj',
+          group: 'A',
+          pos: 'interjection',
+          role: 'connector',
+          cue: 'Well, ...',
+          ipa: { uk: '/wel/', us: '/wel/' },
+          nuance: '「うーん」「さて」と、ひと呼吸おくって感じ',
+          scene: {
+            emoji: '🤔',
+            diagram: '',
+            text: '「どうだった？」と聞かれて、少し考えながら答えはじめる。',
+          },
+          meaning: 'うーん、ええと、さて（話のつなぎ）',
+          roleText:
+            '気持ちをつなぐ言葉です（間投詞）。文の最初に置いて、「考えている」「言いにくい」「話を切り替える」といった気持ちを表します。',
+          examples: [
+            { en: "[Well], I'm not sure.", ja: 'うーん、よくわからないな。' },
+            { en: "[Well], let's get started.", ja: 'さて、始めましょう。' },
+          ],
+          contrasts: [
+            { word: 'um', text: '言葉が出てこない時の「えーと」という音。well は「さて」「まあ」と、気持ちの切り替えにも使える。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-well-noun',
+          group: 'B',
+          pos: 'noun',
+          role: 'thing',
+          cue: 'an old well',
+          ipa: { uk: '/wel/', us: '/wel/' },
+          nuance: '「地面を深く掘った、水をくむ穴」って感じ',
+          scene: {
+            emoji: '🪣',
+            diagram: 'well-pit',
+            text: '村の真ん中にある石の井戸。ロープでバケツを下ろして水をくむ。',
+          },
+          meaning: '井戸',
+          roleText: '「もの」を表す言葉です（名詞）。数えられるので a well（1つの井戸）、two wells（2つの井戸）と言います。',
+          examples: [
+            { en: 'There is an old [well] in the village.', ja: 'その村には古い井戸がある。' },
+            { en: 'They got water from the [well].', ja: '彼らは井戸から水をくんだ。' },
+          ],
+          contrasts: [],
+          note: '「上手に」の well とは、つづりと発音が同じなだけで、別の語源の単語とされています。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-light',
+      headword: 'light',
+      status: 'verified',
+      check: check(' 「光」と「軽い」が別の語源であることは、語源辞典（Etymonline など）の情報で確認しました。'),
+      sources: [
+        { label: "Oxford Learner's Dictionaries（検索）", url: 'https://www.oxfordlearnersdictionaries.com/search/english/?q=light' },
+        { label: 'Online Etymology Dictionary: light', url: 'https://www.etymonline.com/word/light' },
+        { label: 'Grammarphobia: light', url: 'https://www.grammarphobia.com/blog/2018/01/light.html' },
+      ],
+      groups: {
+        A: '「光・明かり」の light。',
+        B: '「軽い」の light。A とは語源が別で、つづりと発音が同じになっただけとされています。別の単語として覚えましょう。',
+      },
+      senses: [
+        {
+          id: 's-light-noun',
+          group: 'A',
+          pos: 'noun',
+          role: 'thing',
+          cue: 'turn on the light',
+          ipa: { uk: '/laɪt/', us: '/laɪt/' },
+          nuance: '「パッと照らして、見えるようにしてくれるもの」って感じ',
+          scene: {
+            emoji: '💡',
+            diagram: '',
+            text: '暗い部屋に入って、スイッチを押すと明かりがつく。',
+          },
+          meaning: '明かり、光、電灯',
+          roleText:
+            '「もの・こと」を表す言葉です（名詞）。電灯の「明かり」は a light / the light と数えます。「光」そのものは数えずに light と言います。',
+          examples: [
+            { en: 'Can you turn on the [light]?', ja: '明かりをつけてくれる？' },
+            { en: 'The room is full of [light].', ja: '部屋は光でいっぱいだ。' },
+          ],
+          contrasts: [
+            { word: 'lamp', text: '電気スタンドなど、照明の「器具」そのもの。light は天井の電灯も日の光も含む「明かり」全般。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-light-adj',
+          group: 'B',
+          pos: 'adjective',
+          role: 'quality',
+          cue: 'a light bag',
+          ipa: { uk: '/laɪt/', us: '/laɪt/' },
+          nuance: '「片手でひょいっと持ち上がる」って感じ',
+          scene: {
+            emoji: '🎒',
+            diagram: 'light-weight',
+            text: '中身がほとんど入っていないリュックを、片手でひょいっと持ち上げる。',
+          },
+          meaning: '軽い',
+          roleText:
+            '「どんな様子か」を表す言葉です（形容詞）。ものの重さが小さいことを表します。反対は heavy（重い）。',
+          examples: [
+            { en: 'This bag is very [light].', ja: 'このバッグはとても軽い。' },
+            { en: 'I had a [light] lunch.', ja: '軽めの昼ごはんを食べた。' },
+          ],
+          contrasts: [
+            { word: 'heavy', text: '「重い」。light の反対。' },
+          ],
+          note: 'a light lunch（軽めの昼食）のように、「量が少ない・負担が小さい」ことにも使います。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-record',
+      headword: 'record',
+      status: 'verified',
+      check: check(' 名詞と動詞で強く読む位置が変わることを確認済み。'),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: record（名詞）", url: OXF + 'record_1' },
+        { label: "Oxford Learner's Dictionaries: record（動詞）", url: OXF + 'record_2' },
+      ],
+      groups: {
+        A: 'どちらも「あとに残す」に関係する record。ただし名詞と動詞で強く読む位置が変わります。',
+      },
+      senses: [
+        {
+          id: 's-record-noun',
+          group: 'A',
+          pos: 'noun',
+          role: 'thing',
+          cue: 'a world record',
+          speak: 'a record',
+          ipa: { uk: '/ˈrekɔːd/', us: '/ˈrekərd/' },
+          stress: 'REC·ord',
+          nuance: '「あとで見返せるように残したもの」って感じ',
+          scene: {
+            emoji: '🏆',
+            diagram: '',
+            text: '陸上の大会で、電光掲示板に「世界新記録！」と表示される。',
+          },
+          meaning: '記録、（スポーツの）最高記録',
+          roleText: '「もの・こと」を表す言葉です（名詞）。a record（1つの記録）と数えます。',
+          examples: [
+            { en: 'He broke the world [record].', ja: '彼は世界記録を破った。' },
+            { en: 'I keep a [record] of my study time.', ja: '勉強時間の記録をつけている。' },
+          ],
+          contrasts: [
+            { word: 'record（動詞）', text: '「記録する・録音する」。動詞は後ろを強く re-CORD、名詞は前を強く REC-ord と読む。' },
+          ],
+          note: '単語ボタンでは、名詞の発音になるよう「a record」と読み上げます。',
+        },
+        {
+          id: 's-record-verb',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'record a video',
+          speak: 'to record',
+          ipa: { uk: '/rɪˈkɔːd/', us: '/rɪˈkɔːrd/' },
+          stress: 're·CORD',
+          nuance: '「今の音や様子を、あとまで残るように取っておく」って感じ',
+          scene: {
+            emoji: '📱',
+            diagram: '',
+            text: 'ライブ会場で、スマホを掲げて好きな曲を録画している。',
+          },
+          meaning: '録音する、録画する、記録する',
+          roleText: '「動き」を表す言葉です（動詞）。「何を」残すかを後ろに置きます（record a song）。',
+          examples: [
+            { en: 'Can I [record] your talk?', ja: 'あなたの話を録音してもいい？' },
+            { en: 'We [recorded] a song together.', ja: 'いっしょに歌を録音した。' },
+          ],
+          contrasts: [
+            { word: 'write down', text: '「紙に書き留める」。record は音・映像・数字など、形を問わず残すときに使える。' },
+            { word: 'record（名詞）', text: '「記録」。名詞は前を強く REC-ord と読む。' },
+          ],
+          note: '単語ボタンでは、動詞の発音になるよう「to record」と読み上げます。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-live',
+      headword: 'live',
+      status: 'verified',
+      check: check(' 動詞 /lɪv/ と形容詞 /laɪv/ で発音が違うことを確認済み。'),
+      sources: [
+        { label: 'Dictionary.com: live', url: 'https://www.dictionary.com/browse/live' },
+        { label: "Oxford Learner's Dictionaries（検索）", url: 'https://www.oxfordlearnersdictionaries.com/search/english/?q=live' },
+      ],
+      groups: {
+        A: '「住む・暮らす」の live（動詞）。発音は /lɪv/。',
+        B: '「生の・ライブの」の live（形容詞）。発音は /laɪv/ で、A とは音が違います。',
+      },
+      senses: [
+        {
+          id: 's-live-verb',
+          group: 'A',
+          pos: 'verb',
+          role: 'state',
+          cue: 'live in Tokyo',
+          speak: 'to live',
+          ipa: { uk: '/lɪv/', us: '/lɪv/' },
+          nuance: '「その場所で、毎日を過ごしている」って感じ',
+          scene: {
+            emoji: '🏠',
+            diagram: '',
+            text: '東京のアパートで、朝起きてごはんを食べ、仕事に出かける毎日。',
+          },
+          meaning: '住む、暮らす、生きる',
+          roleText:
+            'ずっと続いている「状態」を表す言葉です（動詞）。「どこに」は in などを使って後ろに続けます（live in Tokyo）。',
+          examples: [
+            { en: 'I [live] in Tokyo.', ja: '私は東京に住んでいます。' },
+            { en: 'My grandma [lives] alone.', ja: '祖母はひとりで暮らしている。' },
+          ],
+          contrasts: [
+            { word: 'stay', text: '旅行などで「一時的に泊まる・いる」。live は「生活の拠点としてそこにいる」。' },
+            { word: 'live（形容詞）', text: '「生の・ライブの」。発音が /laɪv/ に変わる別カード。' },
+          ],
+          note: '単語ボタンでは、動詞の発音になるよう「to live」と読み上げます。',
+        },
+        {
+          id: 's-live-adj',
+          group: 'B',
+          pos: 'adjective',
+          role: 'quality',
+          cue: 'live music',
+          speak: 'live music',
+          ipa: { uk: '/laɪv/', us: '/laɪv/' },
+          nuance: '「録画じゃなく、今まさにその場で起きている」って感じ',
+          scene: {
+            emoji: '🎸',
+            diagram: '',
+            text: '録音された音ではなく、目の前のステージでバンドが演奏している。',
+          },
+          meaning: '生の、ライブの、生放送の',
+          roleText:
+            '「どんな様子か」を表す言葉です（形容詞）。music（音楽）や show（番組）など、「もの・こと」の前に置きます。',
+          examples: [
+            { en: 'I love [live] music.', ja: '生演奏の音楽が大好き。' },
+            { en: 'This is a [live] broadcast.', ja: 'これは生放送です。' },
+          ],
+          contrasts: [
+            { word: 'recorded', text: '「録音・録画された」。live の反対。' },
+            { word: 'live（動詞）', text: '「住む」。発音が /lɪv/ で、音が違う。' },
+          ],
+          note: '単語ボタンでは、形容詞の発音になるよう「live music」と読み上げます。合成音声が /lɪv/ に聞こえるときは、発音記号 /laɪv/ を目安にしてください。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-run',
+      headword: 'run',
+      status: 'verified',
+      check: check(),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: run（動詞）", url: OXF + 'run_1' },
+      ],
+      groups: {
+        A: '「止まらずに動き続ける」という見方でつなげると覚えやすい run。（コアイメージは理解を助けるための説明です）',
+      },
+      senses: [
+        {
+          id: 's-run-move',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'run to the station',
+          ipa: { uk: '/rʌn/', us: '/rʌn/' },
+          nuance: '「足を速く動かして、止まらずに進む」って感じ',
+          scene: {
+            emoji: '🏃',
+            diagram: '',
+            text: '電車に遅れそうで、駅まで全力で走る。',
+          },
+          meaning: '走る',
+          roleText: '「動き」を表す言葉です（動詞）。「どこへ」は to で表します（run to the station）。過去形は ran。',
+          examples: [
+            { en: 'I [ran] to the station.', ja: '駅まで走った。' },
+            { en: 'My dog [runs] very fast.', ja: 'うちの犬はとても速く走る。' },
+          ],
+          contrasts: [
+            { word: 'walk', text: '「歩く」。' },
+            { word: 'jog', text: '「ゆっくり走る（ジョギングする）」。run は全力で走るときにも使える。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-run-manage',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'run a café',
+          ipa: { uk: '/rʌn/', us: '/rʌn/' },
+          nuance: '「お店や仕組みを、止めずに回し続ける」って感じ',
+          scene: {
+            emoji: '☕',
+            diagram: 'run-loop',
+            text: '小さなカフェを毎日開けて、仕入れも接客もひとりで切り盛りしている。',
+          },
+          meaning: '経営する、運営する',
+          roleText:
+            '「動き」を表す言葉です（動詞）。「何を」動かし続けるかを後ろに置きます（run a shop / run a club）。',
+          examples: [
+            { en: 'She [runs] a small café.', ja: '彼女は小さなカフェを経営している。' },
+            { en: 'My uncle [runs] a bike shop.', ja: 'おじは自転車屋をやっている。' },
+          ],
+          contrasts: [
+            { word: 'manage', text: '「管理する・なんとかやりくりする」。run は会話でよく使う「（お店などを）やっている」。' },
+          ],
+          note: '「走る」と同じく「止まらずに動き続ける」と考えるとつながります。あくまで覚えるための見方です。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-get',
+      headword: 'get',
+      status: 'verified',
+      check: check(),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: get", url: OXF + 'get' },
+      ],
+      groups: {
+        A: '「今と違う状態へ移る（ないものが手元に来る／様子が変わる）」と考えるとつながる get。（理解を助けるための見方です）',
+      },
+      senses: [
+        {
+          id: 's-get-obtain',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'get a new bike',
+          ipa: { uk: '/ɡet/', us: '/ɡet/' },
+          nuance: '「なかったものが、自分の手元にやってくる」って感じ',
+          scene: {
+            emoji: '🚲',
+            diagram: 'get-have',
+            text: '誕生日に、ずっとほしかった新しい自転車が手に入った。',
+          },
+          meaning: '手に入れる、もらう、受け取る',
+          roleText: '「動き」を表す言葉です（動詞）。「何を」手に入れるかを後ろに置きます。過去形は got。',
+          examples: [
+            { en: 'I [got] a new bike.', ja: '新しい自転車を手に入れた。' },
+            { en: 'Did you [get] my message?', ja: '私のメッセージ、届いた？' },
+          ],
+          contrasts: [
+            { word: 'buy', text: '「お金を払って買う」。get は買う・もらう・受け取るなど、手に入れ方を問わない。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-get-become',
+          group: 'A',
+          pos: 'verb',
+          role: 'change',
+          cue: 'get dark',
+          ipa: { uk: '/ɡet/', us: '/ɡet/' },
+          nuance: '「今の様子から、別の様子へ移っていく」って感じ',
+          scene: {
+            emoji: '🌆',
+            diagram: 'get-change',
+            text: '公園で遊んでいたら、空がだんだん暗くなってきた。',
+          },
+          meaning: '（ある状態に）なる',
+          roleText:
+            '「変化」を表す動きの言葉です（動詞）。後ろに dark（暗い）や hungry（お腹がすいた）など、「どんな様子か」を表す言葉が来ます。',
+          examples: [
+            { en: "It's [getting] dark.", ja: '暗くなってきた。' },
+            { en: 'I [got] hungry after school.', ja: '放課後、お腹がすいてきた。' },
+          ],
+          contrasts: [
+            { word: 'become', text: '少しかための「〜になる」。日常会話の「〜になってきた」は get がよく使われる。' },
+          ],
+          note: '',
+        },
+      ],
+    },
+
+    {
+      id: 'w-break',
+      headword: 'break',
+      status: 'verified',
+      check: check(),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: break（動詞）", url: OXF + 'break_1' },
+        { label: "Oxford Learner's Dictionaries: break（名詞）", url: OXF + 'break_2' },
+      ],
+      groups: {
+        A: '「続いているもの・ひとまとまりのものを、パキッと断ち切る」と考えるとつながる break。（理解を助けるための見方です）',
+      },
+      senses: [
+        {
+          id: 's-break-verb',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'break a cup',
+          ipa: { uk: '/breɪk/', us: '/breɪk/' },
+          nuance: '「力が加わって、パキッと割れる・壊れる」って感じ',
+          scene: {
+            emoji: '💥',
+            diagram: 'break-snap',
+            text: '手がすべって、マグカップを床に落として割ってしまった。',
+          },
+          meaning: '割る、壊す、折る',
+          roleText: '「動き」を表す言葉です（動詞）。「何を」壊すかを後ろに置きます。過去形は broke。',
+          examples: [
+            { en: 'I [broke] my favorite cup.', ja: 'お気に入りのカップを割ってしまった。' },
+            { en: "Be careful not to [break] it.", ja: '壊さないように気をつけて。' },
+          ],
+          contrasts: [
+            { word: 'destroy', text: '「跡形もなく破壊する」。break はカップ・骨・機械など、日常の「割る・壊す」。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-break-noun',
+          group: 'A',
+          pos: 'noun',
+          role: 'thing',
+          cue: 'take a break',
+          ipa: { uk: '/breɪk/', us: '/breɪk/' },
+          nuance: '「続けている作業を、いったん区切ってひと休み」って感じ',
+          scene: {
+            emoji: '🍵',
+            diagram: 'break-gap',
+            text: '2時間勉強したあと、手を止めてお茶を飲んでひと休み。',
+          },
+          meaning: '休憩、ひと休み',
+          roleText: '「こと」を表す言葉です（名詞）。take a break（休憩する）の形でよく使います。',
+          examples: [
+            { en: "Let's take a [break].", ja: 'ひと休みしよう。' },
+            { en: 'I had a ten-minute [break].', ja: '10分休憩した。' },
+          ],
+          contrasts: [
+            { word: 'rest', text: '「体を休めること」そのもの。break は「作業の合間の休み時間」。' },
+          ],
+          note: '作業の流れを「パキッと区切る」と考えると、「割る」の break とつながります。覚えるための見方です。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-take',
+      headword: 'take',
+      status: 'verified',
+      check: check(),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: take（動詞）", url: OXF + 'take_1' },
+      ],
+      groups: {
+        A: '「手に取って、別の場所へ持っていく」と考えるとつながる take。（理解を助けるための見方です）',
+      },
+      senses: [
+        {
+          id: 's-take-carry',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'take an umbrella',
+          ipa: { uk: '/teɪk/', us: '/teɪk/' },
+          nuance: '「手に取って、いっしょに持っていく」って感じ',
+          scene: {
+            emoji: '☔',
+            diagram: 'take-carry',
+            text: '空がくもっているので、玄関の傘を手に取って出かける。',
+          },
+          meaning: '持っていく、連れていく',
+          roleText:
+            '「動き」を表す言葉です（動詞）。「何を」持っていくかを後ろに置き、「どこへ」は to で表します（take him to the park）。過去形は took。',
+          examples: [
+            { en: '[Take] an umbrella with you.', ja: '傘を持っていきなさい。' },
+            { en: "I'll [take] you to the station.", ja: '駅まで送っていくよ。' },
+          ],
+          contrasts: [
+            { word: 'bring', text: '「（こちらへ）持ってくる」。take は「ここから別の場所へ持っていく」。' },
+          ],
+          note: '',
+        },
+        {
+          id: 's-take-time',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'It takes ten minutes.',
+          ipa: { uk: '/teɪk/', us: '/teɪk/' },
+          nuance: '「そのことに、それだけの時間が必要」って感じ',
+          scene: {
+            emoji: '🚌',
+            diagram: 'take-time',
+            text: '家から学校まで、バスで10分かかる。',
+          },
+          meaning: '（時間が）かかる',
+          roleText: '「動き」を表す言葉です（動詞）。It takes ＋ 時間 ＋ to ～（～するのに〇〇かかる）の形でよく使います。',
+          examples: [
+            { en: 'It [takes] ten minutes to get to school.', ja: '学校まで10分かかる。' },
+            { en: 'How long does it [take]?', ja: 'どのくらい時間がかかる？' },
+          ],
+          contrasts: [
+            { word: 'spend', text: '「人が時間を使う・費やす」（I spent an hour.）。take は「その事に時間が必要」。' },
+          ],
+          note: 'その事が時間を「持っていく」と考えると、「持っていく」の take とつながります。覚えるための見方です。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-on',
+      headword: 'on',
+      status: 'verified',
+      check: check(),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: on（前置詞）", url: OXF + 'on_1' },
+      ],
+      groups: {
+        A: '「何かの面にくっついている」の on。',
+      },
+      senses: [
+        {
+          id: 's-on-contact',
+          group: 'A',
+          pos: 'preposition',
+          role: 'relation',
+          cue: 'on the wall',
+          ipa: { uk: '/ɒn/', us: '/ɑːn/' },
+          nuance: '「何かの面に、ぴたっとくっついている」って感じ',
+          scene: {
+            emoji: '🖼️',
+            diagram: 'on-contact',
+            text: '壁に絵がかかっている。テーブルにはカップ。どちらも「面にくっついている」。',
+          },
+          meaning: '〜の上に、〜に（くっついて）',
+          roleText:
+            '「位置・関係」を表すつなぎの言葉です（前置詞）。the table（テーブル）などの「もの」の前に置いて、どこにあるかを表します。',
+          examples: [
+            { en: "There's a picture [on] the wall.", ja: '壁に絵がかかっている。' },
+            { en: 'Your phone is [on] the table.', ja: '携帯はテーブルの上にあるよ。' },
+          ],
+          contrasts: [
+            { word: 'above', text: '「離れて上のほうに」。on はくっついているので、壁でも天井でも on。' },
+            { word: 'in', text: '「中に入っている」（in the box）。' },
+          ],
+          note: '「上」とは限りません。壁（on the wall）や天井（on the ceiling）でも、くっついていれば on です。',
+        },
+      ],
+    },
+
+    {
+      id: 'w-look',
+      headword: 'look',
+      status: 'verified',
+      check: check(),
+      sources: [
+        { label: "Oxford Learner's Dictionaries: look（動詞）", url: OXF + 'look_1' },
+      ],
+      groups: {
+        A: '「意識して目を向ける」の look。',
+      },
+      senses: [
+        {
+          id: 's-look-at',
+          group: 'A',
+          pos: 'verb',
+          role: 'action',
+          cue: 'look at the moon',
+          ipa: { uk: '/lʊk/', us: '/lʊk/' },
+          nuance: '「意識して、そっちに目を向ける」って感じ',
+          scene: {
+            emoji: '🌙',
+            diagram: 'look-see-watch',
+            text: '「見て！」と言われて、夜空の月のほうへ顔を向ける。',
+          },
+          meaning: '（意識して）見る、目を向ける',
+          roleText: '「動き」を表す言葉です（動詞）。見る相手は at で示します（look at the moon）。',
+          examples: [
+            { en: '[Look] at the moon!', ja: '月を見て！' },
+            { en: 'She [looked] at me and smiled.', ja: '彼女は私を見てほほえんだ。' },
+          ],
+          contrasts: [
+            { word: 'see', text: '「自然と目に入る・見える」（I can see the sea.）。' },
+            { word: 'watch', text: '「動いているものを、しばらく見続ける」（watch TV）。' },
+          ],
+          note: '',
+        },
+      ],
+    },
+  ];
+
+  return { version: 1, words };
+});
+
+</script>
+<script>
+/*
+ * diagrams.js — 場面・コアイメージの簡単な図（インラインSVG）
+ * 色は CSS の変数（--ink, --accent など）から取るので、ダークモードでも読める。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.diagrams = factory();
+  }
+})(this, function () {
+  'use strict';
+
+  const svg = (body, label, h) =>
+    '<svg class="dg" viewBox="0 0 240 ' + (h || 120) + '" role="img" aria-label="' + label + '">' + body + '</svg>';
+
+  const eye = (x, y) =>
+    '<path class="ln" d="M' + (x - 16) + ' ' + y + ' Q' + x + ' ' + (y - 13) + ' ' + (x + 16) + ' ' + y +
+    ' Q' + x + ' ' + (y + 13) + ' ' + (x - 16) + ' ' + y + ' Z"/><circle class="ink" cx="' + x + '" cy="' + y + '" r="4.5"/>';
+
+  const LIB = {
+    'pretty-gauge': svg(
+      '<rect class="fl" x="20" y="48" width="200" height="16" rx="8"/>' +
+        '<rect class="ac" x="20" y="48" width="130" height="16" rx="8"/>' +
+        '<path class="ac" d="M150 42 l-8 -12 h16 z"/>' +
+        '<text class="te b" x="150" y="22" text-anchor="middle">pretty</text>' +
+        '<text class="t b" x="150" y="84" text-anchor="middle">けっこう</text>' +
+        '<line class="ln2" x1="206" y1="42" x2="206" y2="70"/>' +
+        '<text class="t" x="206" y="84" text-anchor="middle">とても</text>' +
+        '<text class="te s" x="206" y="100" text-anchor="middle">very</text>' +
+        '<text class="t" x="40" y="84" text-anchor="middle">少し</text>',
+      '程度のメーター。pretty は「とても」より少し手前の「けっこう」'
+    ),
+
+    'well-pit': svg(
+      '<line class="ln2" x1="10" y1="44" x2="230" y2="44"/>' +
+        '<text class="t s" x="20" y="38">地面</text>' +
+        '<line class="ln" x1="84" y1="44" x2="84" y2="10"/><line class="ln" x1="156" y1="44" x2="156" y2="10"/>' +
+        '<line class="ln" x1="78" y1="10" x2="162" y2="10"/>' +
+        '<rect class="fl ln" x="92" y="32" width="12" height="12"/><rect class="fl ln" x="136" y="32" width="12" height="12"/>' +
+        '<line class="ln2" x1="104" y1="44" x2="104" y2="112"/><line class="ln2" x1="136" y1="44" x2="136" y2="112"/>' +
+        '<rect class="ac" x="104" y="94" width="32" height="18"/>' +
+        '<line class="ln2" x1="120" y1="10" x2="120" y2="62"/>' +
+        '<path class="fl ln" d="M110 62 h20 l-3 14 h-14 z"/>' +
+        '<text class="t s" x="146" y="108">水</text>',
+      '井戸の断面。地面に掘った穴の底に水があり、ロープでバケツを下ろす'
+    ),
+
+    'light-weight': svg(
+      '<line class="ln2" x1="10" y1="104" x2="230" y2="104"/>' +
+        '<rect class="ink" x="30" y="58" width="62" height="46" rx="4"/>' +
+        '<path class="ln" d="M61 22 v22 m-8 -8 l8 8 l8 -8"/>' +
+        '<text class="te s" x="61" y="14" text-anchor="middle">heavy</text>' +
+        '<path class="fl ln" d="M150 44 h44 a6 6 0 0 1 6 6 v26 a6 6 0 0 1 -6 6 h-44 a6 6 0 0 1 -6 -6 v-26 a6 6 0 0 1 6 -6 z"/>' +
+        '<path class="ln" d="M162 44 v-8 a10 10 0 0 1 20 0 v8"/>' +
+        '<path class="acs" d="M156 94 h32 M164 100 h16"/>' +
+        '<path class="acs" d="M172 30 v-20 m-7 7 l7 -7 l7 7"/>' +
+        '<text class="te b" x="214" y="22" text-anchor="middle">light</text>',
+      '重い箱は地面に置いたまま。軽いバッグはひょいっと持ち上がる'
+    ),
+
+    'run-loop': svg(
+      '<path class="ln" d="M70 30 H170 A30 30 0 0 1 170 90 H70 A30 30 0 0 1 70 30 Z"/>' +
+        '<path class="ac" d="M128 30 l-12 -7 v14 z"/><path class="ac" d="M112 90 l12 -7 v14 z"/>' +
+        '<text class="t s" x="120" y="18" text-anchor="middle">毎日お店を開ける</text>' +
+        '<text class="t s" x="120" y="112" text-anchor="middle">止めずに回し続ける</text>' +
+        '<text class="te b" x="120" y="66" text-anchor="middle">run a café</text>',
+      'お店の仕事が輪のように止まらず回り続けるイメージ'
+    ),
+
+    'get-have': svg(
+      '<circle class="ln2 dash" cx="52" cy="54" r="30"/>' +
+        '<text class="t s" x="52" y="58" text-anchor="middle">まだない</text>' +
+        '<path class="acs" d="M92 54 H146 m-10 -9 l10 9 l-10 9"/>' +
+        '<text class="te b" x="119" y="40" text-anchor="middle">get</text>' +
+        '<circle class="fl ln" cx="188" cy="54" r="30"/>' +
+        '<rect class="ac" x="174" y="44" width="28" height="22" rx="2"/>' +
+        '<path class="ln" d="M188 44 v22 M174 52 h28"/>' +
+        '<text class="t s" x="52" y="104" text-anchor="middle">持っていない</text>' +
+        '<text class="t s" x="188" y="104" text-anchor="middle">手元にある</text>',
+      'なかったものが、自分の手元にやってくる'
+    ),
+
+    'get-change': svg(
+      '<rect class="sky" x="14" y="16" width="84" height="70" rx="8"/>' +
+        '<circle class="hl" cx="56" cy="50" r="14"/>' +
+        '<path class="acs" d="M108 51 H132 m-9 -8 l9 8 l-9 8"/>' +
+        '<text class="te b" x="120" y="34" text-anchor="middle">get</text>' +
+        '<rect class="night" x="142" y="16" width="84" height="70" rx="8"/>' +
+        '<path class="moon" d="M190 36 a14 14 0 1 0 10 24 a11 11 0 1 1 -10 -24 z"/>' +
+        '<text class="t s" x="56" y="106" text-anchor="middle">明るい</text>' +
+        '<text class="t s" x="184" y="106" text-anchor="middle">暗い（dark）</text>',
+      '明るい空から暗い空へ、様子が移っていく'
+    ),
+
+    'break-snap': svg(
+      '<path class="fl ln" d="M24 52 H104 l6 6 l-6 6 l6 6 H24 Z"/>' +
+        '<g transform="rotate(14 170 62)"><path class="fl ln" d="M128 52 l6 6 l-6 6 l6 6 H214 V52 Z"/></g>' +
+        '<path class="acs" d="M118 34 l-4 -12 M128 34 l6 -12 M108 40 l-10 -6 M138 40 l10 -6"/>' +
+        '<text class="t b" x="120" y="104" text-anchor="middle">パキッ</text>',
+      'ひとつながりのものが、パキッと2つに割れる'
+    ),
+
+    'break-gap': svg(
+      '<rect class="ac" x="14" y="44" width="86" height="22" rx="4"/>' +
+        '<rect class="ac" x="148" y="44" width="78" height="22" rx="4"/>' +
+        '<text class="t s on-ac" x="57" y="60" text-anchor="middle">作業</text>' +
+        '<text class="t s on-ac" x="187" y="60" text-anchor="middle">作業</text>' +
+        '<path class="fl ln" d="M112 46 h20 v14 a10 10 0 0 1 -20 0 z"/>' +
+        '<path class="ln2" d="M132 50 a5 5 0 0 1 0 10"/>' +
+        '<text class="te b" x="124" y="94" text-anchor="middle">a break</text>' +
+        '<text class="t s" x="124" y="110" text-anchor="middle">いったん区切る</text>',
+      '作業の流れの途中に、ひと休みの区切りが入る'
+    ),
+
+    'take-carry': svg(
+      '<path class="fl ln" d="M18 60 L48 34 L78 60 V100 H18 Z"/>' +
+        '<rect class="ln2" x="40" y="74" width="16" height="26"/>' +
+        '<text class="t s" x="48" y="116" text-anchor="middle">ここ</text>' +
+        '<path class="acs" d="M88 86 H196 m-10 -9 l10 9 l-10 9"/>' +
+        '<path class="ac" d="M122 54 a20 18 0 0 1 40 0 z"/>' +
+        '<path class="ln" d="M142 54 v20 a5 5 0 0 1 -10 0"/>' +
+        '<path class="ln" d="M214 100 V40 M214 40 l18 8 l-18 8"/>' +
+        '<text class="t s" x="214" y="116" text-anchor="middle">行き先</text>',
+      '手に取ったものを、ここから別の場所へ持っていく'
+    ),
+
+    'take-time': svg(
+      '<circle class="fl ln" cx="70" cy="60" r="40"/>' +
+        '<path class="ac" d="M70 60 L70 24 A36 36 0 0 1 101.2 42 Z"/>' +
+        '<path class="ln" d="M70 60 L70 32 M70 60 L88 70"/>' +
+        '<circle class="ink" cx="70" cy="60" r="3.5"/>' +
+        '<text class="t b big" x="172" y="58" text-anchor="middle">10分</text>' +
+        '<text class="t s" x="172" y="80" text-anchor="middle">かかる</text>' +
+        '<text class="te s" x="172" y="100" text-anchor="middle">It takes ten minutes.</text>',
+      '時計の10分ぶんが塗られている。その事に10分必要'
+    ),
+
+    'on-contact': svg(
+      '<line class="ln" x1="34" y1="10" x2="34" y2="96"/>' +
+        '<rect class="fl ln" x="36" y="30" width="44" height="34"/>' +
+        '<path class="ln2" d="M44 56 l10 -12 l8 8 l6 -6 l6 10"/>' +
+        '<circle class="ac" cx="35" cy="36" r="4"/><circle class="ac" cx="35" cy="58" r="4"/>' +
+        '<text class="te s" x="58" y="114" text-anchor="middle">on the wall</text>' +
+        '<line class="ln" x1="124" y1="78" x2="226" y2="78"/>' +
+        '<path class="ln" d="M134 78 v22 M216 78 v22"/>' +
+        '<path class="fl ln" d="M160 54 h24 v22 h-24 z"/><path class="ln2" d="M184 60 a7 7 0 0 1 0 12"/>' +
+        '<circle class="ac" cx="166" cy="78" r="4"/><circle class="ac" cx="178" cy="78" r="4"/>' +
+        '<text class="te s" x="175" y="114" text-anchor="middle">on the table</text>',
+      '壁の絵もテーブルのカップも、面にくっついている（色の点が接しているところ）'
+    ),
+
+    'look-see-watch': svg(
+      '<rect class="frame" x="4" y="4" width="74" height="112" rx="8"/>' +
+        '<text class="te b" x="41" y="22" text-anchor="middle">look</text>' +
+        eye(24, 58) +
+        '<path class="acs" d="M42 58 H60 m-7 -6 l7 6 l-7 6"/>' +
+        '<text class="t s" x="41" y="100" text-anchor="middle">目を向ける</text>' +
+        '<text class="te s" x="120" y="22" text-anchor="middle">see</text>' +
+        eye(104, 58) +
+        '<path class="ln2 dash" d="M142 50 L124 56 M142 66 L124 60"/>' +
+        '<circle class="fl ln" cx="146" cy="58" r="5"/>' +
+        '<text class="t s" x="120" y="100" text-anchor="middle">目に入る</text>' +
+        '<text class="te s" x="199" y="22" text-anchor="middle">watch</text>' +
+        eye(182, 66) +
+        '<path class="ln2 dash" d="M176 44 Q200 30 226 44"/>' +
+        '<circle class="fl ln2" cx="186" cy="38" r="3"/><circle class="fl ln2" cx="204" cy="35" r="3"/><circle class="ac" cx="222" cy="41" r="4"/>' +
+        '<text class="t s" x="199" y="100" text-anchor="middle">見続ける</text>',
+      'look は目を向ける、see は自然に目に入る、watch は動くものを見続ける'
+    ),
+  };
+
+  function has(key) {
+    return !!(key && LIB[key]);
+  }
+
+  function get(key) {
+    return has(key) ? LIB[key] : '';
+  }
+
+  function keys() {
+    return Object.keys(LIB);
+  }
+
+  return { has, get, keys };
+});
+
+</script>
+<script>
+/*
+ * speech.js — 英語音声の再生
+ *
+ * - 録音音声（URL）があればそれを優先し「録音」と表示する。
+ * - なければブラウザの読み上げ（合成音声）を使い「合成」と表示する。
+ *   端末に実際にある英語の声だけを候補にし、聞き取りやすい声を優先して選ぶ。
+ * - 日本語は読み上げない（英語の文字列だけを渡す）。
+ * - 使えないときは status で理由を返し、画面側でボタンを無効にして理由を表示する。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.speech = factory();
+  }
+})(this, function () {
+  'use strict';
+
+  // 聞き取りにくい・効果音的な声（macOS / iOS の一部）
+  const NOVELTY = /\b(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Junior|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Rocko|Shelley|Flo|Eddy|Reed|Sandy)\b/i;
+
+  const MESSAGES = {
+    loading: '音声を準備しています…',
+    ready: '',
+    'no-english': 'この端末で使える英語の音声が見つかりません。端末の設定で英語の読み上げ音声を追加すると使えるようになります。',
+    unsupported: 'このブラウザは音声の読み上げに対応していません。別のブラウザ（Safari や Chrome）で開くと使えます。',
+  };
+
+  function normLang(lang) {
+    return String(lang || '').replace('_', '-');
+  }
+
+  function isEnglish(v) {
+    return /^en(-|$)/i.test(normLang(v.lang));
+  }
+
+  function score(v, accent) {
+    const lang = normLang(v.lang).toLowerCase();
+    const name = v.name || '';
+    let s = 0;
+    const want = accent === 'uk' ? 'en-gb' : 'en-us';
+    if (lang === want) s += 30;
+    else if (lang === 'en-us' || lang === 'en-gb') s += 25;
+    else s += 18;
+    if (/(Natural|Neural)/i.test(name)) s += 15;
+    if (/(Enhanced|Premium|Siri)/i.test(name)) s += 12;
+    if (/Google/i.test(name)) s += 10;
+    if (/\b(Samantha|Alex|Daniel|Karen|Moira|Tessa|Serena|Ava|Allison|Susan|Zoe|Evan|Nathan|Aria|Jenny|Guy|Libby|Sonia|Ryan)\b/i.test(name)) s += 6;
+    if (NOVELTY.test(name)) s -= 100;
+    if (v.default) s += 2;
+    return s;
+  }
+
+  /**
+   * @param {Window} win
+   * @param {() => object} getSettings  { voiceURI, rate, slowRate, accent }
+   */
+  function create(win, getSettings) {
+    const synth = win && win.speechSynthesis;
+    const Utter = win && win.SpeechSynthesisUtterance;
+    const listeners = [];
+    const api = {
+      status: synth && Utter ? 'loading' : 'unsupported',
+      voices: [],
+      voice: null,
+      message() {
+        return MESSAGES[api.status] || '';
+      },
+      canSynth() {
+        return api.status === 'ready';
+      },
+      onChange(fn) {
+        listeners.push(fn);
+      },
+      refresh,
+      selectVoice,
+      speak,
+      play,
+      stop,
+      voiceLabel,
+      currentLabel,
+    };
+    let token = 0;
+    let audioEl = null;
+
+    function emit() {
+      listeners.forEach((fn) => {
+        try { fn(api); } catch (e) { /* noop */ }
+      });
+    }
+
+    function refresh(final) {
+      if (!synth || !Utter) return;
+      let list = [];
+      try { list = synth.getVoices() || []; } catch (e) { list = []; }
+      const settings = getSettings() || {};
+      const english = list.filter(isEnglish).filter((v) => !NOVELTY.test(v.name || ''));
+      english.sort((a, b) => score(b, settings.accent) - score(a, settings.accent));
+      api.voices = english;
+      const before = api.status + '|' + (api.voice && api.voice.voiceURI);
+      if (english.length) {
+        api.voice = english.find((v) => v.voiceURI === settings.voiceURI) || english[0];
+        api.status = 'ready';
+      } else {
+        api.voice = null;
+        if (final || list.length) api.status = 'no-english';
+      }
+      if (before !== api.status + '|' + (api.voice && api.voice.voiceURI)) emit();
+    }
+
+    function selectVoice(uri) {
+      const v = api.voices.find((x) => x.voiceURI === uri);
+      if (v) {
+        api.voice = v;
+        emit();
+      }
+      return !!v;
+    }
+
+    if (synth && Utter) {
+      refresh(false);
+      try {
+        if (synth.addEventListener) synth.addEventListener('voiceschanged', () => refresh(false));
+        else synth.onvoiceschanged = () => refresh(false);
+      } catch (e) { /* noop */ }
+      // voiceschanged が来ないブラウザもあるので数回確認する
+      [300, 800, 1600].forEach((ms) => setTimeout(() => refresh(false), ms));
+      setTimeout(() => refresh(true), 2600);
+    }
+
+    function stop() {
+      token += 1;
+      try { if (synth) synth.cancel(); } catch (e) { /* noop */ }
+      if (audioEl) {
+        try { audioEl.pause(); } catch (e) { /* noop */ }
+        audioEl = null;
+      }
+    }
+
+    /**
+     * 合成音声で読み上げる。クリック処理の中から同期的に呼ぶこと（iOS の制限）。
+     * cb(state, detail): 'playing' | 'ended' | 'error'
+     */
+    function speak(text, opts) {
+      const o = opts || {};
+      const cb = o.onState || function () {};
+      if (api.status !== 'ready' || !api.voice) return false;
+      stop();
+      const my = ++token;
+      const settings = getSettings() || {};
+      const u = new Utter(String(text));
+      u.voice = api.voice;
+      u.lang = normLang(api.voice.lang) || 'en-US';
+      u.rate = o.slow ? settings.slowRate || 0.6 : settings.rate || 0.95;
+      u.pitch = 1;
+      let started = false;
+      const watchdog = setTimeout(() => {
+        if (!started && my === token) {
+          try { synth.cancel(); } catch (e) { /* noop */ }
+          cb('error', 'no-start');
+        }
+      }, 4000);
+      u.onstart = () => {
+        started = true;
+        if (my === token) cb('playing');
+      };
+      u.onend = () => {
+        clearTimeout(watchdog);
+        if (my === token) cb('ended');
+      };
+      u.onerror = (e) => {
+        clearTimeout(watchdog);
+        if (my !== token) return;
+        const code = e && e.error;
+        if (code === 'interrupted' || code === 'canceled') cb('ended');
+        else cb('error', code || 'error');
+      };
+      try {
+        synth.speak(u);
+        if (synth.paused) synth.resume();
+      } catch (e) {
+        clearTimeout(watchdog);
+        cb('error', 'exception');
+        return false;
+      }
+      return true;
+    }
+
+    /** 録音音声の再生 */
+    function play(url, opts) {
+      const o = opts || {};
+      const cb = o.onState || function () {};
+      stop();
+      const my = ++token;
+      let a;
+      try {
+        a = new win.Audio(url);
+      } catch (e) {
+        cb('error', 'audio');
+        return false;
+      }
+      audioEl = a;
+      try {
+        a.preservesPitch = true;
+        a.playbackRate = o.slow ? 0.75 : 1;
+      } catch (e) { /* noop */ }
+      a.onplaying = () => my === token && cb('playing');
+      a.onended = () => my === token && cb('ended');
+      a.onerror = () => my === token && cb('error', 'audio');
+      const p = a.play();
+      if (p && p.catch) p.catch(() => my === token && cb('error', 'audio'));
+      return true;
+    }
+
+    function voiceLabel(v) {
+      if (!v) return '';
+      const online = v.localService === false ? '・オンライン' : '';
+      return v.name + '（' + normLang(v.lang) + online + '）';
+    }
+
+    function currentLabel() {
+      return api.voice ? voiceLabel(api.voice) : '';
+    }
+
+    return api;
+  }
+
+  return { create, score, isEnglish, MESSAGES };
+});
+
+</script>
+<script>
+/*
+ * app.js — 画面の表示と操作
+ * 画面: ホーム / カード学習 / 学習結果 / 単語一覧 / 単語詳細 / 単語の編集 / 設定
+ * URL の # で画面を切り替える（#home, #study, #result, #words, #word-<id>, #edit-<id>, #new-word, #options）
+ */
+(function () {
+  'use strict';
+
+  const C = window.CIF;
+  const util = C.util;
+  const srs = C.srs;
+  const SS = C.session;
+  const ST = C.storage;
+  const DG = C.diagrams;
+  const esc = util.esc;
+
+  const $app = document.getElementById('app');
+  const $modal = document.getElementById('modal');
+  const $toast = document.getElementById('toast');
+
+  let store = null;
+  let speech = null;
+  let aidSeq = 0;
+  const index = { words: new Map(), senses: new Map() };
+  const navStack = [];
+  const ui = {
+    route: '',
+    param: '',
+    query: '',
+    filter: 'all',
+    hint: false,
+    autoplayNext: false,
+    editDraft: null,
+    editErrors: [],
+    editSourcesText: '',
+    importPreview: null,
+    importText: '',
+    exportText: '',
+    includeProgress: true,
+    modal: null,
+  };
+
+  /* ================= アイコン ================= */
+
+  const ICON = {
+    speaker: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+    slow: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 10.5a2 2 0 0 1 0 3"/>',
+    mute: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
+    flame: '<path d="M12 3c.6 3.2 4.5 5 4.5 9.6A4.5 4.5 0 0 1 12 17a4.5 4.5 0 0 1-4.5-4.4c0-2 .9-3.3 1.9-4.2.1 1.6.9 2.6 2 2.9C11 9 11 5.6 12 3z"/><path d="M9.5 20.5h5"/>',
+    star: '<path d="M12 3.8l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z"/>',
+    target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8"/>',
+    home: '<path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
+    cards: '<rect x="3.5" y="6" width="13" height="14" rx="2"/><path d="M7.5 6V4.5a1 1 0 0 1 1-1H19a1.5 1.5 0 0 1 1.5 1.5v11.5a1 1 0 0 1-1 1H16.5"/><path d="M6.5 11h7M6.5 14.5h5"/>',
+    sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+    close: '<path d="M6 6l12 12M18 6L6 18"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    edit: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
+    trash: '<path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  };
+
+  function icon(name, cls) {
+    return '<svg class="ic ' + (cls || '') + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + ICON[name] + '</svg>';
+  }
+
+  const RATING_MARK = { good: '○', hard: '△', again: '✕' };
+
+  /* ================= 起動 ================= */
+
+  async function boot() {
+    $app.innerHTML = '<div class="screen loading"><p>読み込み中…</p></div>';
+    const backend = await ST.pickBackend();
+    store = ST.createStore(backend);
+    await store.init(C.seed);
+    rebuildIndex();
+    if (store.state.session) {
+      const fixed = SS.sanitize(store.state.session, store.state.words);
+      store.set('session', fixed);
+    }
+    speech = C.speech.create(window, () => store.state.settings);
+    speech.onChange(refreshAudioUI);
+    store.onStatus(() => {
+      const el = document.getElementById('save-banner');
+      if (el) el.outerHTML = saveBanner();
+      else if (store.status.error) render(false);
+    });
+
+    window.addEventListener('hashchange', () => onRoute(false));
+    document.addEventListener('click', onClick);
+    document.addEventListener('input', onInput);
+    document.addEventListener('change', onChange);
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('submit', (e) => e.preventDefault());
+    onRoute(true);
+  }
+
+  function rebuildIndex() {
+    index.words = new Map();
+    index.senses = new Map();
+    store.state.words.forEach((w) => {
+      index.words.set(w.id, w);
+      w.senses.forEach((s, i) => index.senses.set(s.id, { word: w, sense: s, n: i + 1, total: w.senses.length }));
+    });
+  }
+
+  function setWords(words) {
+    store.set('words', words);
+    rebuildIndex();
+  }
+
+  /* ================= 画面の切り替え ================= */
+
+  function parseHash() {
+    let h = '';
+    try { h = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (e) { h = ''; }
+    if (!h || h === 'home') return { route: 'home', param: '' };
+    if (['study', 'result', 'words', 'options', 'new-word'].includes(h)) return { route: h, param: '' };
+    if (h.indexOf('word-') === 0) return { route: 'word', param: h.slice(5) };
+    if (h.indexOf('edit-') === 0) return { route: 'edit', param: h.slice(5) };
+    return { route: 'home', param: '' };
+  }
+
+  /** how: 'push'（go で進む）/ 'replace'（入れ替え）/ なし（ブラウザの戻る・進む・リンク） */
+  function onRoute(force, how) {
+    const r = parseHash();
+    const changed = r.route !== ui.route || r.param !== ui.param;
+    if (!changed && !force) return;
+    if (changed) {
+      const key = r.route + ':' + r.param;
+      if (how === 'replace' && navStack.length) navStack[navStack.length - 1] = key;
+      else if (how === 'push') navStack.push(key);
+      else if (navStack.length > 1 && navStack[navStack.length - 2] === key) navStack.pop();
+      else navStack.push(key);
+      if (navStack.length > 60) navStack.shift();
+    }
+    ui.route = r.route;
+    ui.param = r.param;
+    if (changed) {
+      ui.hint = false;
+      if (r.route === 'edit' || r.route === 'new-word') prepareEditor();
+      if (r.route !== 'options') ui.importPreview = null;
+    }
+    render(true);
+  }
+
+  /**
+   * 画面を移動する（クリック処理の中ですぐ描画するので、音声の自動再生も動く）
+   * replace: 履歴に残さず今の画面と入れ替える（リダイレクトや保存後の移動）
+   */
+  function go(hash, replace) {
+    if (('#' + hash) !== location.hash) {
+      if (replace) location.replace('#' + hash);
+      else location.hash = hash;
+    }
+    onRoute(true, replace ? 'replace' : 'push');
+  }
+
+  function goBack(fallback) {
+    if (navStack.length > 1) history.back();
+    else go(fallback, true);
+  }
+
+  function render(resetScroll) {
+    let html = null;
+    switch (ui.route) {
+      case 'study': html = viewStudy(); break;
+      case 'result': html = viewResult(); break;
+      case 'words': html = viewWords(); break;
+      case 'word': html = viewWord(); break;
+      case 'edit':
+      case 'new-word': html = viewEdit(); break;
+      case 'options': html = viewOptions(); break;
+      default: html = viewHome();
+    }
+    if (html == null) return;
+    const withNav = ['home', 'words', 'word', 'options'].includes(ui.route);
+    $app.innerHTML = saveBanner() + html + (withNav ? navBar() : '');
+    document.body.dataset.route = ui.route;
+    if (resetScroll) window.scrollTo(0, 0);
+    afterRender();
+  }
+
+  function afterRender() {
+    if (ui.route === 'study' && ui.autoplayNext) {
+      ui.autoplayNext = false;
+      const s = store.state.session;
+      if (store.state.settings.autoplay && s && !s.flipped && s.mode === 'fwd') {
+        const btn = $app.querySelector('.card-front [data-action="speak"]:not([disabled])');
+        if (btn) playFrom(btn);
+      }
+    }
+    if (ui.route === 'result') {
+      const h = document.getElementById('result-title');
+      if (h) h.focus({ preventScroll: true });
+    }
+  }
+
+  function navBar() {
+    const item = (route, hash, ic, label) => {
+      const cur = ui.route === route || (route === 'words' && ui.route === 'word');
+      return '<a class="nav-item' + (cur ? ' is-current' : '') + '" href="#' + hash + '"' + (cur ? ' aria-current="page"' : '') + '>' +
+        icon(ic) + '<span>' + label + '</span></a>';
+    };
+    return '<nav class="bottom-nav" aria-label="メニュー">' +
+      item('home', 'home', 'home', 'ホーム') + item('words', 'words', 'cards', '単語') + item('options', 'options', 'sliders', '設定') +
+      '</nav>';
+  }
+
+  function saveBanner() {
+    const st = store && store.status;
+    if (!st) return '';
+    let msg = '';
+    if (st.error) msg = st.error;
+    else if (!st.persistent) msg = 'このブラウザでは学習記録を保存できません。ページを閉じると記録が消えます。設定の「書き出し」で保存してください。';
+    if (!msg) return '<div id="save-banner" hidden></div>';
+    return '<div id="save-banner" class="banner warn" role="alert">' + esc(msg) + '</div>';
+  }
+
+  /* ================= 共通の部品 ================= */
+
+  function posLabel(pos) {
+    return ST.POS[pos] || 'その他';
+  }
+
+  function roleLine(sense) {
+    const pos = posLabel(sense.pos);
+    if (!sense.role) return '<p class="role-line"><span class="chip pos">' + esc(pos) + '</span></p>';
+    return '<p class="role-line"><span class="role-chip">' + esc(ST.ROLE[sense.role]) + '</span>を表す言葉<span class="role-pos">（' + esc(pos) + '）</span></p>';
+  }
+
+  function ipaOf(sense) {
+    const accent = store.state.settings.accent;
+    const ipa = sense.ipa || {};
+    return (accent === 'uk' ? ipa.uk || ipa.us : ipa.us || ipa.uk) || '';
+  }
+
+  function speakTextOf(item) {
+    return item.sense.speak || item.word.headword;
+  }
+
+  /** 音声ボタン。録音があれば「録音」、なければ合成音声（使えない時は無効＋理由） */
+  function audioBtn(opts) {
+    const aid = 'a' + (++aidSeq);
+    const src = opts.src || '';
+    const slow = !!opts.slow;
+    const label = opts.label || (slow ? 'ゆっくり' : '再生');
+    const synthOk = speech && speech.canSynth();
+    const enabled = !!src || synthOk;
+    const tag = src ? '録音' : synthOk ? '合成' : speech && speech.status === 'loading' ? '準備中' : '音声なし';
+    const aria = (opts.aria || '英語を再生') + (slow ? '（ゆっくり）' : '') + '：' + (src ? '録音音声' : '合成音声');
+    return '<button type="button" class="audio-btn' + (opts.small ? ' sm' : '') + (slow ? ' slow' : '') + (enabled ? '' : ' is-off') + '"' +
+      ' data-action="speak" data-aid="' + aid + '" data-text="' + esc(opts.text) + '"' +
+      (src ? ' data-src="' + esc(src) + '"' : '') + ' data-slow="' + (slow ? '1' : '0') + '"' +
+      ' aria-label="' + esc(aria) + '"' + (enabled ? '' : ' disabled') + '>' +
+      icon(enabled ? (slow ? 'slow' : 'speaker') : 'mute') +
+      '<span class="ab-label">' + label + '</span><span class="src-tag">' + tag + '</span></button>';
+  }
+
+  function audioPair(text, src, aria, small) {
+    return audioBtn({ text, src, aria, small }) + audioBtn({ text, src, aria, small, slow: true });
+  }
+
+  function speechBanner(hasRecorded) {
+    if (!speech || speech.status === 'ready' || hasRecorded) return '<div data-speech-banner hidden></div>';
+    const loading = speech.status === 'loading';
+    return '<div data-speech-banner class="banner ' + (loading ? 'info' : 'warn') + '" role="status">' +
+      esc(speech.message()) + (loading ? '' : ' <a href="#options">音声の設定を見る</a>') + '</div>';
+  }
+
+  function refreshAudioUI() {
+    $app.querySelectorAll('.audio-btn').forEach((btn) => {
+      if (btn.dataset.src) return;
+      const ok = speech.canSynth();
+      btn.disabled = !ok;
+      btn.classList.toggle('is-off', !ok);
+      const tag = btn.querySelector('.src-tag');
+      if (tag) tag.textContent = ok ? '合成' : speech.status === 'loading' ? '準備中' : '音声なし';
+      const ic = btn.querySelector('.ic');
+      if (ic) ic.outerHTML = icon(ok ? (btn.dataset.slow === '1' ? 'slow' : 'speaker') : 'mute');
+    });
+    $app.querySelectorAll('[data-speech-banner]').forEach((el) => {
+      el.outerHTML = speechBanner(false);
+    });
+    const vs = document.getElementById('voice-section');
+    if (vs) vs.outerHTML = voiceSection();
+  }
+
+  function playFrom(btn) {
+    const aid = btn.dataset.aid;
+    const src = btn.dataset.src || '';
+    const slow = btn.dataset.slow === '1';
+    const text = btn.dataset.text || '';
+    const onState = (state, detail) => {
+      $app.querySelectorAll('.audio-btn.playing').forEach((b) => b.classList.remove('playing'));
+      const b = $app.querySelector('[data-aid="' + aid + '"]');
+      if (state === 'playing' && b) b.classList.add('playing');
+      if (state === 'error') toast(audioError(detail, !!src));
+    };
+    const ok = src ? speech.play(src, { slow, onState }) : speech.speak(text, { slow, onState });
+    if (!ok) toast(speech.message() || '音声を再生できません。');
+  }
+
+  function audioError(code, recorded) {
+    if (recorded) return '録音音声を再生できませんでした。ファイルの場所（URL）を確認してください。';
+    if (code === 'no-start') return '音声が再生されませんでした。音量やマナーモード、設定の「英語の声」を確認してください。';
+    if (code === 'not-allowed') return 'ブラウザが音声を止めました。もう一度ボタンを押してください。';
+    if (code === 'voice-unavailable' || code === 'language-unavailable') return '選んだ英語の声が使えません。設定で別の声を選んでください。';
+    return '音声の再生に失敗しました。もう一度試すか、設定で別の声を選んでください。';
+  }
+
+  function sceneArt(sense, big) {
+    const d = sense.scene && sense.scene.diagram;
+    if (d && DG.has(d)) return '<div class="scene-art has-dg">' + DG.get(d) + '</div>';
+    const emoji = sense.scene && sense.scene.emoji;
+    if (emoji) return '<div class="scene-art emoji' + (big ? ' big' : '') + '" aria-hidden="true">' + esc(emoji) + '</div>';
+    return '';
+  }
+
+  function stressHtml(stress) {
+    if (!stress) return '';
+    const parts = stress.split(/[·・\-\s]+/).filter(Boolean);
+    if (parts.length < 2) return '';
+    return '<span class="stress" aria-label="強く読む位置：' + esc(parts.filter((p) => p === p.toUpperCase()).join('').toLowerCase()) + '">' +
+      parts.map((p) => {
+        const strong = p === p.toUpperCase() && /[A-Z]/.test(p);
+        return '<span class="syl' + (strong ? ' strong' : '') + '"><i></i>' + esc(p.toLowerCase()) + '</span>';
+      }).join('') + '</span>';
+  }
+
+  function exampleHtml(item, ex, i, opts) {
+    const src = (item.sense.audio && item.sense.audio.examples && item.sense.audio.examples[i]) || '';
+    return '<div class="ex">' +
+      '<p class="ex-en" lang="en">' + util.markedHtml(ex.en) + '</p>' +
+      (ex.ja ? '<p class="ex-ja">' + esc(ex.ja) + '</p>' : '') +
+      '<div class="audio-row">' + audioPair(util.plainSentence(ex.en), src, '例文を再生', true) + '</div>' +
+      '</div>';
+  }
+
+  /** 場面→英語の練習用に、例文の単語を空欄にする（空欄にできない例文は英語を出さない） */
+  function clozeFor(item) {
+    const head = item.word.headword;
+    for (const ex of item.sense.examples) {
+      if (util.parseMarked(ex.en).some((p) => p.hit)) return { en: util.clozeHtml(ex.en), ja: ex.ja };
+      const re = new RegExp('\\b' + head.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\w*', 'i');
+      if (re.test(ex.en)) {
+        return { en: util.clozeHtml(ex.en.replace(re, (m) => '[' + m + ']')), ja: ex.ja };
+      }
+    }
+    const first = item.sense.examples[0];
+    return first && first.ja ? { en: '', ja: first.ja } : null;
+  }
+
+  function hintText(head) {
+    return head.split(' ').map((w) => w.charAt(0) + ' ' + Array(Math.max(0, w.length - 1)).fill('_').join(' ')).join('　') +
+      '（' + head.replace(/\s/g, '').length + '文字）';
+  }
+
+  function statusBadge(status) {
+    const s = ST.STATUS[status] || ST.STATUS.unverified;
+    return '<span class="badge st-' + s.key + '">' + s.label + '</span>';
+  }
+
+  function levelChip(state) {
+    const lv = srs.level(state);
+    return '<span class="level lv-' + lv.key + '">' + lv.label + '</span>';
+  }
+
+  function isStudyable(word, sense) {
+    return word.status !== 'needs_review' && sense.status !== 'needs_review';
+  }
+
+  /* ================= ホーム ================= */
+
+  function viewHome() {
+    const st = store.state;
+    const now = Date.now();
+    const c = SS.counts(st.words, st.progress, now);
+    const streak = SS.streak(st.log, now);
+    const today = SS.today(st.log, now);
+    const goal = st.settings.dailyGoal;
+    const pct = Math.min(100, Math.round((today.cards / goal) * 100));
+    const sess = st.session && !st.session.finished ? st.session : null;
+    const recent = SS.recentDays(st.log, now, 7);
+    const wk = ['日', '月', '火', '水', '木', '金', '土'];
+    const fwdSize = Math.min(SS.SET_SIZE, c.total);
+    const revSize = Math.min(SS.SET_SIZE, c.availableRev);
+    const lv = c.levels;
+    const lvTotal = Math.max(1, lv.new + lv.learning + lv.reviewing + lv.settled);
+    const seg = (k) => (lv[k] ? '<span class="lv-seg lv-' + k + '" style="flex:' + lv[k] + '"></span>' : '');
+
+    let html = '<main class="screen home" id="main">';
+    html += '<header class="home-head"><h1 class="app-title" tabindex="-1">コアイメージ単語帳</h1>' +
+      '<p class="tagline">英語の音 → 場面と感覚 → 使い方</p></header>';
+
+    html += '<section class="stats" aria-label="今日の記録">' +
+      '<div class="stat"><span class="stat-ic flame">' + icon('flame') + '</span><span class="stat-num">' + streak.days + '<small>日</small></span><span class="stat-label">連続学習' + (streak.days && !streak.todayDone ? '（今日まだ）' : '') + '</span></div>' +
+      '<div class="stat"><span class="stat-ic star">' + icon('star') + '</span><span class="stat-num">' + st.log.totalPoints + '<small>pt</small></span><span class="stat-label">獲得ポイント（今日 +' + today.points + '）</span></div>' +
+      '<div class="stat goal"><span class="stat-ic target">' + icon('target') + '</span><span class="stat-num">' + today.cards + '<small> / ' + goal + '枚</small></span><span class="stat-label">今日の目標' + (today.cards >= goal ? ' 達成！' : '') + '</span>' +
+      '<span class="meter" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + Math.min(goal, today.cards) + '"><span style="width:' + pct + '%"></span></span></div>' +
+      '</section>';
+
+    if (sess) {
+      const m = SS.MODES[sess.mode];
+      html += '<section class="resume">' +
+        '<div><p class="resume-title">途中のセットがあります</p><p class="resume-sub">' + esc(m.label) + '・残り ' + SS.remaining(sess) + '枚</p></div>' +
+        '<button type="button" class="btn primary" data-action="resume">続きから再開</button></section>';
+    }
+
+    html += '<section class="mode-card main-mode">' +
+      '<div class="mode-head"><h2>英語 → 場面</h2><span class="mode-sub">' + esc(SS.MODES.fwd.long) + '</span></div>' +
+      '<p class="mode-counts"><span><b>' + c.dueFwd + '</b>枚 復習</span><span><b>' + c.newFwd + '</b>枚 新しい</span></p>' +
+      (c.total
+        ? '<button type="button" class="btn primary big" data-action="start" data-mode="fwd">' + fwdSize + '枚はじめる</button>'
+        : '<p class="muted">出題できるカードがありません。単語を追加してください。</p>') +
+      '</section>';
+
+    html += '<section class="mode-card">' +
+      '<div class="mode-head"><h2>場面 → 英語</h2><span class="mode-sub">' + esc(SS.MODES.rev.long) + '</span></div>' +
+      (c.availableRev
+        ? '<p class="mode-counts"><span><b>' + c.dueRev + '</b>枚 復習</span><span><b>' + c.newRev + '</b>枚 はじめて</span></p>' +
+          '<button type="button" class="btn secondary big" data-action="start" data-mode="rev">' + revSize + '枚はじめる</button>'
+        : '<p class="muted">「英語 → 場面」で一度学習したカードが、ここで練習できるようになります。</p>') +
+      '</section>';
+
+    html += '<section class="panel schedule"><h2 class="panel-title">これからの復習</h2>' +
+      '<ul class="sched-list"><li><span>いま復習できる</span><b>' + (c.dueFwd + c.dueRev) + '枚</b></li>' +
+      '<li><span>明日の予定</span><b>' + c.tomorrow + '枚</b></li>' +
+      '<li><span>7日以内の予定</span><b>' + c.week + '枚</b></li></ul>' +
+      '<div class="week" aria-label="直近7日の学習枚数">' + recent.map((d) => {
+        const dt = new Date(d.ts);
+        const isToday = d.key === util.dayKey(now);
+        return '<div class="day' + (d.cards ? ' done' : '') + (isToday ? ' today' : '') + '"><span class="dot">' + (d.cards || '') + '</span><span class="wd">' + (isToday ? '今日' : wk[dt.getDay()]) + '</span></div>';
+      }).join('') + '</div>' +
+      '<h3 class="mini-title">覚え具合（英語 → 場面）</h3>' +
+      '<div class="lv-bar" aria-hidden="true">' + seg('settled') + seg('reviewing') + seg('learning') + seg('new') + '</div>' +
+      '<ul class="lv-legend">' +
+      ['settled', 'reviewing', 'learning', 'new'].map((k) => '<li><span class="lv-dot lv-' + k + '"></span>' + srs.LEVELS[k].label + ' ' + lv[k] + '</li>').join('') +
+      '</ul><p class="fine">「定着してきた」は、間隔をあけて3回続けて思い出せたカードです。その後も復習は続きます。（全' + lvTotal + '枚）</p>' +
+      '</section>';
+
+    html += '<details class="panel about"><summary>コアイメージについて</summary>' +
+      '<p>コアイメージは、単語の意味や使い方をつかみやすくするための「見方」です。すべてのネイティブスピーカーが同じ映像を思い浮かべているわけではありません。</p>' +
+      '<p>well の「上手に」と「井戸」のように、つづりが同じでも別の語源の単語は、無理に一つのイメージにまとめず、別々に覚えます。</p>' +
+      '<p>評価のしかた：○ 思い出せた → 間隔を広げて復習／△ あいまい → 間隔を短く／✕ 思い出せなかった → このセットですぐもう一度。</p>' +
+      '</details>';
+
+    html += '</main>';
+    return html;
+  }
+
+  /* ================= カード学習 ================= */
+
+  function viewStudy() {
+    const st = store.state;
+    let s = st.session;
+    if (!s) { go('home', true); return null; }
+    if (s.finished) { go('result', true); return null; }
+    let sid = SS.current(s);
+    let item = index.senses.get(sid);
+    if (!item || !isStudyable(item.word, item.sense)) {
+      s = SS.sanitize(s, st.words);
+      store.set('session', s);
+      if (!s || s.finished) { go('home', true); return null; }
+      sid = SS.current(s);
+      item = index.senses.get(sid);
+    }
+    const ratio = SS.progressRatio(s);
+    const rem = SS.remaining(s);
+    const res = s.results[sid];
+    const repeat = !!(res && res.first);
+    const hasRecorded = !!(item.sense.audio && item.sense.audio.word);
+
+    let html = '<main class="screen study" id="main">';
+    html += '<header class="study-bar">' +
+      '<button type="button" class="icon-btn" data-action="quit" aria-label="中断してホームへ（続きは保存されます）">' + icon('close') + '</button>' +
+      '<div class="progress" role="progressbar" aria-label="セットの進み具合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(ratio * 100) + '"><span style="width:' + Math.round(ratio * 100) + '%"></span></div>' +
+      '<p class="remain">残り <b>' + rem + '</b>枚</p></header>';
+    html += speechBanner(hasRecorded);
+
+    const top = '<div class="card-top"><span class="chip mode">' + esc(SS.MODES[s.mode].label) + '</span>' +
+      (repeat ? '<span class="chip again-chip">もう一度</span>' : '') +
+      (item.total > 1 ? '<span class="chip ghost">用法 ' + item.n + ' / ' + item.total + '</span>' : '') + '</div>';
+
+    if (!s.flipped) {
+      html += s.mode === 'rev' ? frontRev(item, top) : frontFwd(item, top);
+      html += '<div class="answer-bar"><button type="button" class="btn primary block big" data-action="flip">裏を見る</button></div>';
+    } else {
+      html += backCard(item, top, s.mode);
+      html += rateBar(s, sid);
+    }
+    html += '</main>';
+    return html;
+  }
+
+  function frontFwd(item, top) {
+    const w = item.word;
+    const sense = item.sense;
+    const speakText = speakTextOf(item);
+    const ipa = ipaOf(sense);
+    const src = sense.audio && sense.audio.word;
+    return '<article class="card card-front" data-action="flip" role="button" tabindex="0" aria-label="カードをめくって裏面を見る">' +
+      top +
+      '<div class="front-body">' +
+      '<h2 class="headword" lang="en">' + esc(w.headword) + '</h2>' +
+      (ipa ? '<p class="ipa" lang="en">' + esc(ipa) + '</p>' : '') +
+      '<div class="audio-row center">' + audioPair(speakText, src, '単語を再生') + '</div>' +
+      (sense.speak && sense.speak.toLowerCase() !== w.headword.toLowerCase()
+        ? '<p class="speak-note">読み上げ：<span lang="en">' + esc(sense.speak) + '</span>（この用法の発音）</p>' : '') +
+      (sense.cue
+        ? '<div class="cue-box"><p class="cue" lang="en">' + esc(sense.cue) + '</p>' + audioBtn({ text: sense.cue, aria: 'フレーズを再生', small: true, label: 'フレーズ' }) + '</div>'
+        : '') +
+      '</div>' +
+      '<p class="tap-hint">意味や場面を思い浮かべたら、タップして裏面へ</p>' +
+      '</article>';
+  }
+
+  function frontRev(item, top) {
+    const sense = item.sense;
+    const cz = clozeFor(item);
+    return '<article class="card card-front rev" data-action="flip" role="button" tabindex="0" aria-label="カードをめくって答えを見る">' +
+      top +
+      '<div class="front-body">' +
+      '<p class="rev-q">この場面・感覚に合う英単語は？</p>' +
+      sceneArt(sense, true) +
+      (sense.scene && sense.scene.text ? '<p class="scene-text">' + esc(sense.scene.text) + '</p>' : '') +
+      (sense.nuance ? '<p class="nuance-text">' + esc(sense.nuance) + '</p>' : '') +
+      roleLine(sense) +
+      (cz ? '<div class="cloze">' + (cz.en ? '<p class="ex-en" lang="en">' + cz.en + '</p>' : '') + (cz.ja ? '<p class="ex-ja">' + esc(cz.ja) + '</p>' : '') + '</div>' : '') +
+      '<div class="hint-row">' + (ui.hint
+        ? '<p class="hint" lang="en">' + esc(hintText(item.word.headword)) + '</p>'
+        : '<button type="button" class="btn ghost sm" data-action="hint">ヒント：最初の文字</button>') + '</div>' +
+      '</div>' +
+      '<p class="tap-hint">英単語を思い浮かべたら、タップして答えを見る</p>' +
+      '</article>';
+  }
+
+  function backCard(item, top, mode) {
+    const w = item.word;
+    const sense = item.sense;
+    const ipa = ipaOf(sense);
+    const src = sense.audio && sense.audio.word;
+    let html = '<article class="card card-back" aria-label="カードの裏面">' + top;
+    html += '<div class="back-head"><div class="bh-word"><h2 class="headword sm" lang="en">' + esc(w.headword) + '</h2>' +
+      (ipa ? '<p class="ipa" lang="en">' + esc(ipa) + '</p>' : '') + '</div>' +
+      '<div class="audio-row">' + audioPair(speakTextOf(item), src, '単語を再生') + '</div></div>';
+    if (mode === 'rev' && sense.cue) {
+      html += '<div class="cue-box inline"><p class="cue" lang="en">' + esc(sense.cue) + '</p>' + audioBtn({ text: sense.cue, aria: 'フレーズを再生', small: true, label: 'フレーズ' }) + '</div>';
+    }
+    html += senseBody(item, { inCard: true });
+    html += '</article>';
+    return html;
+  }
+
+  /** 裏面と単語詳細で共通の中身（1. ニュアンス 2. 場面 3. 意味と役割 4. 例文 ＋ くわしく） */
+  function senseBody(item, opts) {
+    const sense = item.sense;
+    let html = '';
+    if (sense.nuance) {
+      html += '<section class="sec nuance"><h3 class="sec-label">一言ニュアンス</h3><p class="nuance-text"><span>' + esc(sense.nuance) + '</span></p></section>';
+    }
+    if ((sense.scene && sense.scene.text) || sceneArt(sense)) {
+      html += '<section class="sec scene"><h3 class="sec-label">頭に浮かべる場面</h3>' + sceneArt(sense) +
+        (sense.scene.text ? '<p class="scene-text">' + esc(sense.scene.text) + '</p>' : '') + '</section>';
+    }
+    html += '<section class="sec meaning"><h3 class="sec-label">意味と、文の中での役割</h3>' +
+      '<p class="meaning-text">' + esc(sense.meaning || '（意味が未入力です）') + '</p>' + roleLine(sense) + '</section>';
+    if (sense.examples.length) {
+      html += '<section class="sec examples"><h3 class="sec-label">例文</h3>' +
+        sense.examples.map((ex, i) => exampleHtml(item, ex, i)).join('') + '</section>';
+    }
+    html += '<details class="more"><summary>くわしく見る<span>役割・似た単語との違い・発音</span></summary><div class="more-body">';
+    if (sense.roleText) {
+      html += '<section class="sub"><h4>文の中での役割</h4><p>' + esc(sense.roleText) + '</p></section>';
+    }
+    if (sense.contrasts.length) {
+      html += '<section class="sub"><h4>似た単語との違い</h4><ul class="contrast">' +
+        sense.contrasts.map((c) => '<li><b lang="en">' + esc(c.word) + '</b><span>' + esc(c.text) + '</span></li>').join('') + '</ul></section>';
+    }
+    html += '<section class="sub"><h4>発音</h4>' + pronHtml(item) + '</section>';
+    if (sense.note) html += '<section class="sub"><h4>補足</h4><p>' + esc(sense.note) + '</p></section>';
+    if (opts && opts.inCard) {
+      const others = item.word.senses.filter((x) => x.id !== sense.id);
+      html += '<section class="sub"><h4>同じ単語のほかの用法</h4>' +
+        (others.length ? '<ul class="others">' + others.map((o) => '<li><span class="chip pos">' + esc(posLabel(o.pos)) + '</span>' + esc(o.meaning) + '</li>').join('') + '</ul>' : '<p class="muted">このアプリに登録されている用法は、これだけです。</p>') +
+        '<p><a class="text-link" href="#word-' + esc(item.word.id) + '">' + esc(item.word.headword) + ' の詳細・出典を見る</a></p></section>';
+      html += '<p class="fine">コアイメージは理解を助けるための説明です。すべてのネイティブスピーカーが同じイメージを持っているとは限りません。</p>';
+    }
+    html += '</div></details>';
+    return html;
+  }
+
+  function pronHtml(item) {
+    const sense = item.sense;
+    const ipa = sense.ipa || {};
+    const rows = [];
+    if (ipa.us) rows.push('<li><span class="mini-label">アメリカ</span><span class="ipa" lang="en">' + esc(ipa.us) + '</span></li>');
+    if (ipa.uk) rows.push('<li><span class="mini-label">イギリス</span><span class="ipa" lang="en">' + esc(ipa.uk) + '</span></li>');
+    let html = rows.length ? '<ul class="pron">' + rows.join('') + '</ul>' : '<p class="muted">発音記号は未入力です。</p>';
+    const stress = stressHtml(sense.stress);
+    if (stress) html += '<p class="stress-line">強く読む位置：' + stress + '</p>';
+    const recorded = sense.audio && sense.audio.word;
+    html += '<p class="fine">音声：' + (recorded ? '録音音声' : speech && speech.canSynth() ? '合成音声（' + esc(speech.currentLabel()) + '）' : '合成音声（この端末では使えません）') +
+      (sense.speak && sense.speak.toLowerCase() !== item.word.headword.toLowerCase() ? '。単語ボタンでは「<span lang="en">' + esc(sense.speak) + '</span>」と読み上げます' : '') + '</p>';
+    return html;
+  }
+
+  function rateBar(s, sid) {
+    const now = Date.now();
+    const res = s.results[sid];
+    const first = !res || !res.first;
+    const st = SS.stateOf(store.state.progress, sid, s.mode);
+    const next = (r) => {
+      if (r === 'again') return first || res.repeats < SS.REQUEUE.again.max ? 'もう一度出題' : '次は10分後';
+      if (!first) return 'このセット完了';
+      if (r === 'hard') return srs.previewLabel(st, 'hard', now) + '・もう一度';
+      return '次は' + srs.previewLabel(st, 'good', now);
+    };
+    const btn = (r) => '<button type="button" class="rate r-' + r + '" data-action="rate" data-r="' + r + '">' +
+      '<span class="rate-mark" aria-hidden="true">' + RATING_MARK[r] + '</span>' +
+      '<span class="rate-label">' + (r === 'again' ? '思い出せ<wbr>なかった' : srs.RATING_LABEL[r]) + '</span>' +
+      '<span class="rate-next">' + next(r) + '</span></button>';
+    return '<div class="answer-bar rate-bar"><p class="rate-q">思い出せましたか？</p><div class="rate-row">' +
+      btn('again') + btn('hard') + btn('good') + '</div></div>';
+  }
+
+  function startSet(mode) {
+    const st = store.state;
+    const doStart = () => {
+      const s = SS.build(st.words, st.progress, mode, Date.now());
+      if (!s) {
+        toast(mode === 'rev' ? '「英語 → 場面」で学習したカードがまだありません。' : '出題できるカードがありません。');
+        return;
+      }
+      store.set('session', s);
+      ui.hint = false;
+      ui.autoplayNext = true;
+      go('study', ui.route === 'result');
+    };
+    if (st.session && !st.session.finished) {
+      openModal({
+        title: '新しいセットを始めますか？',
+        body: '途中のセット（残り ' + SS.remaining(st.session) + '枚）は終了します。これまでの回答はすでに保存されています。',
+        ok: '新しく始める',
+        onOk: doStart,
+      });
+      return;
+    }
+    doStart();
+  }
+
+  function flip() {
+    const s = store.state.session;
+    if (!s || s.finished || s.flipped) return;
+    s.flipped = true;
+    store.set('session', s);
+    render(true);
+  }
+
+  function rate(r) {
+    const st = store.state;
+    const s = st.session;
+    if (!s || s.finished || !s.flipped) return;
+    const now = Date.now();
+    const out = SS.answer(s, st.progress, r, now);
+    const la = SS.logAnswer(st.log, out.event, now, st.settings.dailyGoal);
+    let log = la.log;
+    const next = out.session;
+    if (la.bonus) {
+      next.goalReached = true;
+      next.points += la.bonus;
+    }
+    if (next.finished) {
+      const done = SS.logSetComplete(log, now);
+      log = done.log;
+      next.points += done.bonus;
+      next.setBonus = done.bonus;
+    }
+    store.set('progress', out.progress);
+    store.set('log', log);
+    store.set('session', next);
+    ui.hint = false;
+    if (next.finished) {
+      go('result', true);
+    } else {
+      ui.autoplayNext = true;
+      render(true);
+    }
+  }
+
+  /* ================= 学習結果 ================= */
+
+  function viewResult() {
+    const st = store.state;
+    const s = st.session;
+    if (!s || !s.finished) { go('home', true); return null; }
+    const now = Date.now();
+    const sum = SS.summary(s);
+    const today = SS.today(st.log, now);
+    const goal = st.settings.dailyGoal;
+    const streak = SS.streak(st.log, now);
+    const pct = Math.min(100, Math.round((today.cards / goal) * 100));
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let html = '<main class="screen result" id="main">';
+    html += '<div class="result-hero">' +
+      (reduce ? '' : '<div class="burst" aria-hidden="true">' + Array.from({ length: 12 }, (_, i) => '<i style="--i:' + i + '"></i>').join('') + '</div>') +
+      '<p class="stamp" aria-hidden="true">○</p>' +
+      '<h1 id="result-title" tabindex="-1">セット完了！</h1>' +
+      '<p class="earned">+' + s.points + ' <small>pt</small></p>' +
+      (s.goalReached ? '<p class="goal-done">今日の目標を達成しました</p>' : '') +
+      '</div>';
+    html += '<section class="tally" aria-label="自己評価の内訳">' +
+      '<div class="t-good"><span class="rate-mark">○</span><b>' + sum.good + '</b><span>思い出せた</span></div>' +
+      '<div class="t-hard"><span class="rate-mark">△</span><b>' + sum.hard + '</b><span>あいまい</span></div>' +
+      '<div class="t-again"><span class="rate-mark">✕</span><b>' + sum.again + '</b><span>思い出せなかった</span></div>' +
+      '</section>';
+    html += '<section class="panel result-meta">' +
+      '<div class="rm-row"><span>今日の目標</span><b>' + today.cards + ' / ' + goal + '枚</b></div>' +
+      '<span class="meter" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + Math.min(goal, today.cards) + '"><span style="width:' + pct + '%"></span></span>' +
+      '<div class="rm-row"><span>連続学習</span><b>' + streak.days + '日</b></div>' +
+      '<div class="rm-row"><span>獲得ポイント合計</span><b>' + st.log.totalPoints + ' pt</b></div>' +
+      (sum.repeats ? '<p class="fine">セットの中で ' + sum.repeats + '回 もう一度練習しました。</p>' : '') +
+      '</section>';
+    html += '<section class="panel"><h2 class="panel-title">次の復習</h2><ul class="result-list">' +
+      s.cards.map((sid) => {
+        const it = index.senses.get(sid);
+        if (!it) return '';
+        const r = s.results[sid] || {};
+        const state = SS.stateOf(st.progress, sid, s.mode);
+        return '<li><span class="rate-mark m-' + (r.first || 'none') + '" aria-label="' + esc(r.first ? srs.RATING_LABEL[r.first] : '未回答') + '">' + (r.first ? RATING_MARK[r.first] : '－') + '</span>' +
+          '<span class="rl-word"><b lang="en">' + esc(it.word.headword) + '</b><span>' + esc(it.sense.meaning) + '</span></span>' +
+          '<span class="rl-next">' + (state ? esc(util.formatDue(state.due, now)) : '') + '</span></li>';
+      }).join('') + '</ul>' +
+      '<p class="fine">思い出せたカードも、間隔をあけてまた出題します。</p></section>';
+    html += '<div class="result-actions">' +
+      '<button type="button" class="btn primary big block" data-action="start" data-mode="' + s.mode + '">もう1セット</button>' +
+      '<button type="button" class="btn ghost block" data-action="home">ホームへ</button></div>';
+    html += '</main>';
+    return html;
+  }
+
+  /* ================= 単語一覧 ================= */
+
+  function wordFlags(w, now) {
+    const st = store.state;
+    let due = false;
+    w.senses.forEach((s) => {
+      ['fwd', 'rev'].forEach((m) => {
+        const x = SS.stateOf(st.progress, s.id, m);
+        if (x && srs.isDue(x, now) && isStudyable(w, s)) due = true;
+      });
+    });
+    const review = w.status === 'needs_review' || w.senses.some((s) => s.status === 'needs_review');
+    return { due, review, unverified: w.status === 'unverified' };
+  }
+
+  function filteredWords() {
+    const now = Date.now();
+    const q = ui.query.trim().toLowerCase();
+    return store.state.words.filter((w) => {
+      const f = wordFlags(w, now);
+      if (ui.filter === 'due' && !f.due) return false;
+      if (ui.filter === 'review' && !f.review) return false;
+      if (ui.filter === 'unverified' && !f.unverified) return false;
+      if (!q) return true;
+      const hay = [w.headword].concat(w.senses.map((s) => s.meaning + ' ' + s.nuance + ' ' + s.cue)).join(' ').toLowerCase();
+      return hay.includes(q);
+    }).sort((a, b) => a.headword.localeCompare(b.headword));
+  }
+
+  function wordListItems() {
+    const list = filteredWords();
+    if (!list.length) return '<li class="empty">当てはまる単語がありません。</li>';
+    return list.map((w) => {
+      const dots = w.senses.map((s) => {
+        const lv = srs.level(SS.stateOf(store.state.progress, s.id, 'fwd'));
+        return '<span class="lv-dot lv-' + (isStudyable(w, s) ? lv.key : 'off') + '" title="' + esc(lv.label) + '"></span>';
+      }).join('');
+      return '<li><a class="word-row" href="#word-' + esc(w.id) + '">' +
+        '<span class="wr-main"><b class="wr-head" lang="en">' + esc(w.headword) + '</b>' + statusBadge(w.status) + '</span>' +
+        '<span class="wr-meanings">' + esc(w.senses.map((s) => s.meaning).join(' ／ ') || '（意味なし）') + '</span>' +
+        '<span class="wr-foot"><span class="wr-dots" aria-label="用法ごとの覚え具合">' + dots + '</span><span class="wr-count">' + w.senses.length + '用法</span></span>' +
+        '</a></li>';
+    }).join('');
+  }
+
+  function viewWords() {
+    const now = Date.now();
+    const all = store.state.words;
+    const cnt = { all: all.length, due: 0, review: 0, unverified: 0 };
+    all.forEach((w) => {
+      const f = wordFlags(w, now);
+      if (f.due) cnt.due += 1;
+      if (f.review) cnt.review += 1;
+      if (f.unverified) cnt.unverified += 1;
+    });
+    const chip = (key, label) => '<button type="button" class="filter' + (ui.filter === key ? ' is-on' : '') + '" data-action="filter" data-f="' + key + '" aria-pressed="' + (ui.filter === key) + '">' + label + ' <b>' + cnt[key] + '</b></button>';
+    return '<main class="screen words" id="main">' +
+      '<header class="page-head"><h1 tabindex="-1">単語一覧</h1><button type="button" class="btn primary sm" data-action="new-word">' + icon('plus') + '追加</button></header>' +
+      '<label class="search"><span class="sr-only">検索</span><input type="search" id="word-search" placeholder="英単語・意味で検索" value="' + esc(ui.query) + '" autocomplete="off" autocapitalize="off" spellcheck="false"></label>' +
+      '<div class="filters" role="group" aria-label="絞り込み">' + chip('all', 'すべて') + chip('due', '復習待ち') + chip('review', '要確認') + chip('unverified', '未確認') + '</div>' +
+      (cnt.review ? '<p class="fine">「要確認」の単語・用法は通常の出題から外しています。内容を確かめて編集すると出題されます。</p>' : '') +
+      '<ul class="word-list" id="word-list">' + wordListItems() + '</ul>' +
+      '</main>';
+  }
+
+  /* ================= 単語詳細 ================= */
+
+  function viewWord() {
+    const w = index.words.get(ui.param);
+    if (!w) {
+      return '<main class="screen" id="main"><header class="page-head"><button type="button" class="icon-btn" data-action="back" data-fallback="words" aria-label="戻る">' + icon('back') + '</button><h1>単語が見つかりません</h1></header>' +
+        '<p>削除されたか、まだ読み込まれていない単語です。</p><p><a class="text-link" href="#words">単語一覧へ</a></p></main>';
+    }
+    const now = Date.now();
+    const st = store.state;
+    const groups = [];
+    w.senses.forEach((s) => {
+      let g = groups.find((x) => x.key === s.group);
+      if (!g) groups.push((g = { key: s.group, senses: [] }));
+      g.senses.push(s);
+    });
+    groups.sort((a, b) => a.key.localeCompare(b.key));
+    const firstSense = w.senses[0];
+    const firstItem = firstSense ? index.senses.get(firstSense.id) : null;
+
+    let html = '<main class="screen word-detail" id="main">';
+    html += '<header class="page-head"><button type="button" class="icon-btn" data-action="back" data-fallback="words" aria-label="戻る">' + icon('back') + '</button>' +
+      '<span class="ph-spacer"></span><a class="btn ghost sm" href="#edit-' + esc(w.id) + '">' + icon('edit') + '編集</a></header>';
+    html += '<div class="detail-head"><h1 class="headword" lang="en" tabindex="-1">' + esc(w.headword) + '</h1>' + statusBadge(w.status) +
+      (firstItem && w.senses.length === 1 ? '<div class="audio-row">' + audioPair(speakTextOf(firstItem), firstSense.audio && firstSense.audio.word, '単語を再生') + '</div>' : '') +
+      '</div>';
+    html += speechBanner(false);
+
+    if (w.status === 'needs_review') {
+      html += '<div class="banner warn"><b>要確認：通常の出題から外しています。</b>' +
+        (w.reviewReasons.length ? '<ul>' + w.reviewReasons.map((r) => '<li>' + esc(r) + '</li>').join('') + '</ul>' : '') +
+        '内容を辞書などで確かめてから、編集で確認状況を変えてください。</div>';
+    }
+    html += '<p class="sense-count">用法 ' + w.senses.length + 'つ' + (groups.length > 1 ? '・' + groups.length + 'つのグループ' : '') + '</p>';
+    if (groups.length > 1) {
+      html += '<p class="group-note">グループが違う用法は、つづりが同じでも別の単語として覚えます。無理に一つのイメージにまとめなくて大丈夫です。</p>';
+    }
+
+    groups.forEach((g) => {
+      html += '<section class="group"><h2 class="group-title"><span class="g-key">' + esc(g.key) + '</span>' +
+        (w.groups[g.key] ? '<span class="g-label">' + esc(w.groups[g.key]) + '</span>' : '') + '</h2>';
+      g.senses.forEach((s) => {
+        const item = index.senses.get(s.id);
+        const fwd = SS.stateOf(st.progress, s.id, 'fwd');
+        const rev = SS.stateOf(st.progress, s.id, 'rev');
+        const off = !isStudyable(w, s);
+        html += '<article class="sense-card' + (off ? ' is-off' : '') + '">' +
+          '<div class="sense-top"><span class="chip pos">' + esc(posLabel(s.pos)) + '</span>' +
+          (s.cue ? '<span class="cue sm" lang="en">' + esc(s.cue) + '</span>' : '') +
+          (s.status === 'needs_review' ? '<span class="badge st-needs_review">要確認</span>' : '') + '</div>' +
+          (w.senses.length > 1 ? '<div class="audio-row">' + audioPair(speakTextOf(item), s.audio && s.audio.word, '単語を再生', true) +
+            (s.cue ? audioBtn({ text: s.cue, aria: 'フレーズを再生', small: true, label: 'フレーズ' }) : '') + '</div>' : '') +
+          senseBody(item, {}) +
+          '<div class="learn"><h4>学習の記録</h4>' +
+          '<div class="learn-row"><span class="mini-label">英語 → 場面</span>' + levelChip(fwd) + '<span class="learn-next">' + (fwd && fwd.reps ? '次の復習：' + esc(util.formatDue(fwd.due, now)) : 'まだ学習していません') + '</span></div>' +
+          '<div class="learn-row"><span class="mini-label">場面 → 英語</span>' + levelChip(rev) + '<span class="learn-next">' + (rev && rev.reps ? '次の復習：' + esc(util.formatDue(rev.due, now)) : fwd && fwd.reps ? 'これから出題できます' : '英語 → 場面のあとで出題') + '</span></div>' +
+          historyHtml(fwd, rev) +
+          '</div>' +
+          '</article>';
+      });
+      html += '</section>';
+    });
+
+    html += '<section class="panel sources"><h2 class="panel-title">出典と確認状況</h2>' +
+      '<p>' + statusBadge(w.status) + ' ' + esc((ST.STATUS[w.status] || ST.STATUS.unverified).desc) + '</p>' +
+      (w.check.date ? '<p class="fine">確認日：' + esc(w.check.date) + '</p>' : '') +
+      (w.check.method ? '<p class="fine">確認方法：' + esc(w.check.method) + '</p>' : '') +
+      (w.check.note ? '<p class="fine">' + esc(w.check.note) + '</p>' : '') +
+      (w.sources.length
+        ? '<ul class="source-list">' + w.sources.map((s) => '<li>' + (s.url ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + icon('link') + esc(s.label || s.url) + '</a>' : esc(s.label)) + '</li>').join('') + '</ul>'
+        : '<p class="muted">出典はまだ登録されていません。</p>') +
+      '<h3 class="mini-title">辞書で調べる</h3><div class="dict-links">' + dictLinks(w.headword) + '</div>' +
+      '</section>';
+
+    html += '<div class="danger-zone"><button type="button" class="btn danger-ghost" data-action="delete-word" data-id="' + esc(w.id) + '">' + icon('trash') + 'この単語を削除</button></div>';
+    html += '</main>';
+    return html;
+  }
+
+  function historyHtml(fwd, rev) {
+    const items = [];
+    [['fwd', fwd], ['rev', rev]].forEach(([m, st]) => {
+      if (!st || !st.history) return;
+      st.history.forEach((h) => items.push({ m, h }));
+    });
+    if (!items.length) return '';
+    items.sort((a, b) => b.h.t - a.h.t);
+    return '<ol class="history" aria-label="最近の自己評価">' + items.slice(0, 8).map(({ m, h }) =>
+      '<li class="m-' + h.r + '"><span class="rate-mark">' + RATING_MARK[h.r] + '</span>' +
+      '<span>' + esc(util.formatDateTime(h.t)) + '</span><span class="h-mode">' + (m === 'fwd' ? '英→場面' : '場面→英') + (h.re ? '・再' : '') + '</span></li>'
+    ).join('') + '</ol>';
+  }
+
+  function dictLinks(word) {
+    const q = encodeURIComponent(word.toLowerCase());
+    const links = [
+      ['Cambridge（英和）', 'https://dictionary.cambridge.org/dictionary/english-japanese/' + q],
+      ["Oxford Learner's", 'https://www.oxfordlearnersdictionaries.com/search/english/?q=' + q],
+      ['Merriam-Webster', 'https://www.merriam-webster.com/dictionary/' + q],
+      ['英辞郎 on the WEB', 'https://eow.alc.co.jp/search?q=' + q],
+    ];
+    return links.map(([l, u]) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + icon('link') + esc(l) + '</a>').join('');
+  }
+
+  function deleteWord(id) {
+    const w = index.words.get(id);
+    if (!w) return;
+    openModal({
+      title: '「' + w.headword + '」を削除しますか？',
+      body: 'この単語の用法 ' + w.senses.length + 'つと、その学習記録も消えます。元に戻せません（書き出したファイルがあれば読み込みで戻せます）。',
+      ok: '削除する',
+      danger: true,
+      onOk: () => {
+        const st = store.state;
+        const progress = Object.assign({}, st.progress);
+        w.senses.forEach((s) => delete progress[s.id]);
+        const meta = Object.assign({}, st.meta);
+        if (C.seed.words.some((x) => x.id === id)) meta.deletedSeed = Array.from(new Set((meta.deletedSeed || []).concat(id)));
+        setWords(st.words.filter((x) => x.id !== id));
+        store.set('progress', progress);
+        store.set('meta', meta);
+        if (st.session) store.set('session', SS.sanitize(st.session, store.state.words));
+        toast('「' + w.headword + '」を削除しました。');
+        go('words', true);
+      },
+    });
+  }
+
+  /* ================= 単語の追加・編集 ================= */
+
+  function emptySense() {
+    return {
+      id: '', group: 'A', pos: 'noun', role: '', cue: '', speak: '', ipa: { us: '', uk: '' }, stress: '',
+      nuance: '', scene: { emoji: '', diagram: '', text: '' }, meaning: '', roleText: '',
+      examples: [{ en: '', ja: '' }], contrasts: [], note: '', status: '', audio: { word: '', examples: [] },
+    };
+  }
+
+  function prepareEditor() {
+    ui.editErrors = [];
+    if (ui.route === 'edit') {
+      const w = index.words.get(ui.param);
+      ui.editDraft = w ? util.clone(w) : null;
+    } else {
+      ui.editDraft = {
+        id: '', headword: '', status: 'unverified', check: { date: '', method: '', note: '' }, sources: [],
+        groups: {}, senses: [emptySense()], reviewReasons: [],
+      };
+    }
+    ui.editSourcesText = ui.editDraft ? ui.editDraft.sources.map((s) => (s.url ? s.label + ' | ' + s.url : s.label)).join('\n') : '';
+  }
+
+  function field(label, path, value, opts) {
+    const o = opts || {};
+    const id = 'f-' + path.replace(/\./g, '-');
+    const attrs = ' id="' + id + '" data-field="' + path + '"' + (o.lang ? ' lang="' + o.lang + '"' : '') +
+      (o.placeholder ? ' placeholder="' + esc(o.placeholder) + '"' : '') + (o.required ? ' required aria-required="true"' : '') +
+      (o.en ? ' autocapitalize="off" autocomplete="off" spellcheck="false"' : '');
+    const input = o.textarea
+      ? '<textarea' + attrs + ' rows="' + (o.rows || 2) + '">' + esc(value) + '</textarea>'
+      : '<input type="' + (o.type || 'text') + '"' + attrs + ' value="' + esc(value) + '">';
+    return '<label class="f' + (o.half ? ' half' : '') + '" for="' + id + '"><span class="f-label">' + label + (o.required ? '<em>必須</em>' : '') + '</span>' + input +
+      (o.help ? '<span class="f-help">' + o.help + '</span>' : '') + '</label>';
+  }
+
+  function selectField(label, path, value, options, opts) {
+    const o = opts || {};
+    const id = 'f-' + path.replace(/\./g, '-');
+    return '<label class="f' + (o.half ? ' half' : '') + '" for="' + id + '"><span class="f-label">' + label + '</span>' +
+      '<select id="' + id + '" data-field="' + path + '">' +
+      options.map(([v, l]) => '<option value="' + esc(v) + '"' + (v === value ? ' selected' : '') + '>' + esc(l) + '</option>').join('') +
+      '</select>' + (o.help ? '<span class="f-help">' + o.help + '</span>' : '') + '</label>';
+  }
+
+  function viewEdit() {
+    const d = ui.editDraft;
+    const isNew = ui.route === 'new-word';
+    if (!d) {
+      return '<main class="screen" id="main"><header class="page-head"><button type="button" class="icon-btn" data-action="back" data-fallback="words" aria-label="戻る">' + icon('back') + '</button><h1>単語が見つかりません</h1></header></main>';
+    }
+    const posOpts = Object.keys(ST.POS).map((k) => [k, ST.POS[k]]);
+    const roleOpts = [['', '（選ばない）']].concat(Object.keys(ST.ROLE).map((k) => [k, ST.ROLE[k]]));
+    const groupOpts = ST.GROUPS.map((g) => [g, 'グループ ' + g]);
+    const statusOpts = Object.keys(ST.STATUS).map((k) => [k, ST.STATUS[k].label]);
+
+    let html = '<main class="screen editor" id="main"><form id="edit-form" novalidate>';
+    html += '<header class="page-head"><button type="button" class="icon-btn" data-action="back" data-fallback="words" aria-label="編集をやめて戻る">' + icon('back') + '</button>' +
+      '<h1 tabindex="-1">' + (isNew ? '単語を追加' : '単語を編集') + '</h1></header>';
+    if (ui.editErrors.length) {
+      html += '<div class="banner warn" role="alert"><ul>' + ui.editErrors.map((e) => '<li>' + esc(e) + '</li>').join('') + '</ul></div>';
+    }
+    html += '<fieldset class="ed-sec"><legend>単語</legend>' +
+      field('英単語（見出し語）', 'headword', d.headword, { required: true, lang: 'en', en: true, placeholder: '例: pretty' }) +
+      selectField('確認状況', 'status', d.status, statusOpts, { help: '確認済み＝辞書などで確かめた／未確認＝出題するが未確認／要確認＝読めない文字や不明な点があり、出題しない' }) +
+      field('確認メモ（確かめた方法・辞書名など）', 'check.method', d.check.method, { textarea: true, rows: 2 }) +
+      '<label class="f" for="f-sources"><span class="f-label">出典（1行に1つ「名前 | URL」）</span><textarea id="f-sources" data-field="_sources" rows="3" placeholder="Cambridge Dictionary | https://dictionary.cambridge.org/..." autocapitalize="off" spellcheck="false">' + esc(ui.editSourcesText) + '</textarea></label>' +
+      '<div class="f-row">' + ['A', 'B', 'C'].map((g) => field('グループ' + g + 'の説明', 'groups.' + g, d.groups[g] || '', { half: true, placeholder: g === 'A' ? '例: 「よい状態」の仲間' : '' })).join('') + '</div>' +
+      '<p class="f-help">意味が離れている用法（well の「上手に」と「井戸」など）は、別のグループにしてください。</p>' +
+      '</fieldset>';
+
+    d.senses.forEach((s, i) => {
+      const p = 'senses.' + i + '.';
+      html += '<fieldset class="ed-sec sense-ed"><legend>用法 ' + (i + 1) + '</legend>' +
+        (d.senses.length > 1 ? '<button type="button" class="btn danger-ghost sm ed-remove" data-action="remove-sense" data-i="' + i + '">この用法を削除</button>' : '') +
+        '<div class="f-row">' +
+        selectField('品詞', p + 'pos', s.pos, posOpts, { half: true }) +
+        selectField('文の中での役割', p + 'role', s.role, roleOpts, { half: true }) +
+        selectField('グループ', p + 'group', s.group, groupOpts, { half: true }) +
+        '</div>' +
+        field('意味（日本語）', p + 'meaning', s.meaning, { required: true, placeholder: '例: けっこう、かなり' }) +
+        field('一言ニュアンス', p + 'nuance', s.nuance, { placeholder: '例: 「とても」ほどじゃないけど「けっこう」って感じ' }) +
+        field('頭に浮かべる場面', p + 'scene.text', s.scene.text, { textarea: true, rows: 2, placeholder: '身近な具体的な場面を短く' }) +
+        field('場面の絵文字（任意）', p + 'scene.emoji', s.scene.emoji, { half: true, placeholder: '例: 🥱' }) +
+        field('表面に出すフレーズ（英語）', p + 'cue', s.cue, { lang: 'en', en: true, placeholder: '例: pretty tired', help: '同じ単語の用法を見分ける手がかりになります。' }) +
+        field('役割の説明', p + 'roleText', s.roleText, { textarea: true, rows: 3, placeholder: '「どのくらい」を表す言葉です（副詞）。…' }) +
+        '<div class="ed-sub"><p class="f-label">例文</p>' +
+        s.examples.map((ex, j) =>
+          '<div class="ed-item">' +
+          field('英語', p + 'examples.' + j + '.en', ex.en, { lang: 'en', en: true, placeholder: "I'm [pretty] tired." }) +
+          field('日本語訳', p + 'examples.' + j + '.ja', ex.ja, { placeholder: '今日はけっこう疲れてる。' }) +
+          '<button type="button" class="btn ghost sm" data-action="remove-example" data-i="' + i + '" data-j="' + j + '">この例文を削除</button></div>'
+        ).join('') +
+        '<p class="f-help">英語の例文では、その用法の単語を [ ] で囲んでください（例: I\'m [pretty] tired.）。裏面では強調、「場面→英語」では空欄になります。</p>' +
+        '<button type="button" class="btn ghost sm" data-action="add-example" data-i="' + i + '">' + icon('plus') + '例文を追加</button></div>' +
+        '<div class="ed-sub"><p class="f-label">似た単語との違い（任意）</p>' +
+        s.contrasts.map((c, j) =>
+          '<div class="ed-item">' +
+          field('似た単語', p + 'contrasts.' + j + '.word', c.word, { lang: 'en', en: true, half: true, placeholder: 'very' }) +
+          field('使う場面の違い', p + 'contrasts.' + j + '.text', c.text, { textarea: true, rows: 2 }) +
+          '<button type="button" class="btn ghost sm" data-action="remove-contrast" data-i="' + i + '" data-j="' + j + '">削除</button></div>'
+        ).join('') +
+        '<button type="button" class="btn ghost sm" data-action="add-contrast" data-i="' + i + '">' + icon('plus') + '似た単語を追加</button></div>' +
+        '<div class="ed-sub"><p class="f-label">発音</p><div class="f-row">' +
+        field('発音記号（アメリカ）', p + 'ipa.us', s.ipa.us, { half: true, lang: 'en', en: true, placeholder: '/ˈprɪti/' }) +
+        field('発音記号（イギリス）', p + 'ipa.uk', s.ipa.uk, { half: true, lang: 'en', en: true, placeholder: '/ˈprɪti/' }) +
+        '</div>' +
+        field('強く読む位置（任意）', p + 'stress', s.stress, { lang: 'en', en: true, placeholder: 're·CORD', help: '音節を「·」で区切り、強く読む音節を大文字にします。' }) +
+        field('単語ボタンで読み上げる英語（任意）', p + 'speak', s.speak, { lang: 'en', en: true, placeholder: '空欄なら見出し語', help: '品詞で発音が変わる語は「to record」「a record」のように、この用法の発音になる語句にします。' }) +
+        field('録音音声のURL（任意）', p + 'audio.word', s.audio.word, { en: true, placeholder: 'https://… または audio/xxx.mp3', help: '登録すると合成音声より優先して再生し、「録音」と表示します。' }) +
+        '</div>' +
+        field('補足（任意）', p + 'note', s.note, { textarea: true, rows: 2 }) +
+        '<label class="check"><input type="checkbox" id="f-' + i + '-status" data-field="' + p + 'status" value="needs_review"' + (s.status === 'needs_review' ? ' checked' : '') + '> この用法は要確認（出題しない）</label>' +
+        '</fieldset>';
+    });
+    html += '<button type="button" class="btn secondary block" data-action="add-sense">' + icon('plus') + '用法を追加</button>';
+    html += '<div class="ed-actions"><button type="button" class="btn ghost" data-action="back" data-fallback="words">キャンセル</button>' +
+      '<button type="button" class="btn primary" data-action="save-word">保存する</button></div>';
+    html += '</form></main>';
+    return html;
+  }
+
+  function setPath(obj, path, value) {
+    const parts = path.split('.');
+    let o = obj;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const k = /^\d+$/.test(parts[i]) ? Number(parts[i]) : parts[i];
+      if (o[k] == null) o[k] = /^\d+$/.test(parts[i + 1]) ? [] : {};
+      o = o[k];
+    }
+    o[parts[parts.length - 1]] = value;
+  }
+
+  function parseSources(text) {
+    return String(text || '').split(/\n+/).map((line) => line.trim()).filter(Boolean).map((line) => {
+      const m = line.split('|');
+      if (m.length >= 2) return { label: m[0].trim(), url: m.slice(1).join('|').trim() };
+      if (/^https?:\/\//i.test(line)) return { label: line, url: line };
+      return { label: line, url: '' };
+    });
+  }
+
+  function saveWord() {
+    const d = util.clone(ui.editDraft);
+    const errors = [];
+    d.headword = String(d.headword || '').trim();
+    if (!d.headword) errors.push('英単語（見出し語）を入力してください。');
+    d.sources = parseSources(ui.editSourcesText);
+    d.senses.forEach((s, i) => {
+      if (!String(s.meaning || '').trim()) errors.push('用法 ' + (i + 1) + ' の「意味（日本語）」を入力してください。');
+      s.examples = (s.examples || []).filter((e) => String(e.en || '').trim() || String(e.ja || '').trim());
+      s.examples.forEach((e, j) => {
+        if (!String(e.en || '').trim()) errors.push('用法 ' + (i + 1) + ' の例文 ' + (j + 1) + ' に英語がありません。');
+      });
+    });
+    const badUrl = d.sources.find((s) => s.url && !ST.safeUrl(s.url));
+    if (badUrl) errors.push('出典のURLは http:// か https:// で始まるものにしてください（' + badUrl.url + '）。');
+    if (d.status === 'verified' && !d.sources.length) errors.push('「確認済み」にするときは、出典を1つ以上入力してください。');
+    const dupe = store.state.words.find((w) => w.id !== d.id && w.headword.toLowerCase() === d.headword.toLowerCase());
+    if (dupe && !errors.length && !ui.confirmedDupe) {
+      ui.editErrors = [];
+      openModal({
+        title: '同じ単語がすでにあります',
+        body: '「' + dupe.headword + '」は登録済みです。別の単語として保存すると、一覧に2つ並びます。既存の単語に用法を追加したい場合は、そちらを編集してください。',
+        ok: '別の単語として保存',
+        onOk: () => { ui.confirmedDupe = true; saveWord(); ui.confirmedDupe = false; },
+      });
+      return;
+    }
+    if (errors.length) {
+      ui.editErrors = errors;
+      render(true);
+      return;
+    }
+    const now = Date.now();
+    if (!d.id) d.id = util.randomId('w-' + util.slug(d.headword));
+    d.senses.forEach((s) => { if (!s.id) s.id = util.randomId('s-' + util.slug(d.headword)); });
+    const prev = index.words.get(d.id);
+    if (d.status === 'verified' && (!prev || prev.status !== 'verified' || !d.check.date)) d.check.date = util.dayKey(now);
+    d.updatedAt = now;
+    if (!prev) d.createdAt = now;
+    const { word, problems } = ST.normalizeWord(d);
+    const words = store.state.words.slice();
+    const at = words.findIndex((w) => w.id === word.id);
+    if (at >= 0) words[at] = word;
+    else words.push(word);
+    setWords(words);
+    if (store.state.session) store.set('session', SS.sanitize(store.state.session, store.state.words));
+    ui.editErrors = [];
+    toast(problems.length ? '保存しました。要確認にしています：' + problems.join('、') : '保存しました。');
+    if (navStack.length > 1 && navStack[navStack.length - 2] === 'word:' + word.id) history.back();
+    else go('word-' + word.id, true);
+  }
+
+  /* ================= 設定 ================= */
+
+  function voiceSection() {
+    const s = store.state.settings;
+    let status;
+    if (!speech) status = '';
+    else if (speech.status === 'ready') status = '<p class="ok-line">合成音声（この端末の読み上げ機能）を使っています：<b>' + esc(speech.currentLabel()) + '</b></p>';
+    else status = '<p class="banner ' + (speech.status === 'loading' ? 'info' : 'warn') + '">' + esc(speech.message()) + '</p>';
+    const voices = speech ? speech.voices : [];
+    return '<section class="panel" id="voice-section"><h2 class="panel-title">音声</h2>' + status +
+      '<label class="f" for="voice-select"><span class="f-label">英語の声</span>' +
+      '<select id="voice-select"' + (voices.length ? '' : ' disabled') + '>' +
+      (voices.length ? voices.map((v) => '<option value="' + esc(v.voiceURI) + '"' + (speech.voice && v.voiceURI === speech.voice.voiceURI ? ' selected' : '') + '>' + esc(speech.voiceLabel(v)) + '</option>').join('') : '<option>使える英語の声がありません</option>') +
+      '</select><span class="f-help">端末に入っている英語の声だけを表示しています。「オンライン」の声は通信が必要です。</span></label>' +
+      '<div class="audio-row">' + audioBtn({ text: 'Hello! This is how I sound.', aria: 'テスト再生', label: 'テスト再生' }) + audioBtn({ text: 'Hello! This is how I sound.', aria: 'テスト再生', slow: true }) + '</div>' +
+      '<label class="f" for="rate"><span class="f-label">通常の速さ：<b id="rate-val">' + s.rate.toFixed(2) + '</b> 倍</span><input type="range" id="rate" min="0.7" max="1.1" step="0.05" value="' + s.rate + '"></label>' +
+      '<label class="f" for="slow-rate"><span class="f-label">ゆっくりの速さ：<b id="slow-rate-val">' + s.slowRate.toFixed(2) + '</b> 倍</span><input type="range" id="slow-rate" min="0.4" max="0.85" step="0.05" value="' + s.slowRate + '"></label>' +
+      '<label class="check"><input type="checkbox" id="autoplay"' + (s.autoplay ? ' checked' : '') + '> カードを表示したら、単語を自動で読み上げる（英語 → 場面）</label>' +
+      '<p class="fine">日本語の説明は読み上げません。録音音声が登録されたカードは「録音」と表示し、録音を優先して再生します。それ以外は「合成」と表示します。</p>' +
+      '</section>';
+  }
+
+  function viewOptions() {
+    const s = store.state.settings;
+    const st = store.status;
+    const storageText = st.backend === 'local' ? 'この端末のブラウザ（localStorage）に保存しています。ブラウザのデータを消すと記録も消えるので、ときどき書き出しておくと安心です。'
+      : st.backend === 'memory' ? 'このブラウザでは保存できません。ページを閉じると記録が消えます。'
+      : 'あなたのアカウントに保存しています（公開ページ版）。';
+    let html = '<main class="screen options" id="main"><header class="page-head"><h1 tabindex="-1">設定</h1></header>';
+    html += voiceSection();
+    html += '<section class="panel"><h2 class="panel-title">学習</h2>' +
+      '<label class="f" for="daily-goal"><span class="f-label">今日の目標（枚数）</span><select id="daily-goal">' +
+      [10, 20, 30, 40].map((n) => '<option value="' + n + '"' + (n === s.dailyGoal ? ' selected' : '') + '>' + n + '枚（' + n / 10 + 'セット）</option>').join('') + '</select></label>' +
+      '<label class="f" for="accent"><span class="f-label">発音記号の表示</span><select id="accent">' +
+      '<option value="us"' + (s.accent === 'us' ? ' selected' : '') + '>アメリカ英語</option><option value="uk"' + (s.accent === 'uk' ? ' selected' : '') + '>イギリス英語</option></select></label>' +
+      '</section>';
+
+    html += '<section class="panel"><h2 class="panel-title">データの書き出し</h2>' +
+      '<p class="fine">単語データと学習記録をファイル（JSON）にします。機種変更やバックアップに使えます。</p>' +
+      '<label class="check"><input type="checkbox" id="include-progress"' + (ui.includeProgress ? ' checked' : '') + '> 学習履歴・復習予定・設定も含める</label>' +
+      '<div class="btn-row"><button type="button" class="btn secondary" data-action="export-file">ファイルに保存</button><button type="button" class="btn ghost" data-action="export-copy">テキストでコピー</button></div>' +
+      (ui.exportText ? '<label class="f" for="export-text"><span class="f-label">書き出した内容（長押しで全選択してコピーできます）</span><textarea id="export-text" rows="6" readonly>' + esc(ui.exportText) + '</textarea></label>' : '') +
+      '</section>';
+
+    html += '<section class="panel"><h2 class="panel-title">データの読み込み</h2>' +
+      '<p class="fine">書き出したファイルを選ぶか、内容を貼り付けてください。読めない文字や不明な点がある単語は「要確認」にして、通常の出題から外します。</p>' +
+      '<label class="f" for="import-file"><span class="f-label">ファイルを選ぶ</span><input type="file" id="import-file" accept=".json,application/json,text/plain"></label>' +
+      '<label class="f" for="import-text"><span class="f-label">または貼り付け</span><textarea id="import-text" rows="4" placeholder=\'{"format":"core-image-flashcards", ...}\' spellcheck="false">' + esc(ui.importText) + '</textarea></label>' +
+      '<button type="button" class="btn secondary" data-action="import-check">内容を確認</button>' +
+      importPreviewHtml() +
+      '</section>';
+
+    html += '<section class="panel"><h2 class="panel-title">保存とリセット</h2><p class="fine">' + esc(storageText) + '</p>' +
+      '<div class="btn-row"><button type="button" class="btn danger-ghost" data-action="reset-progress">学習記録をリセット</button>' +
+      '<button type="button" class="btn danger-ghost" data-action="reset-words">単語を初期状態に戻す</button></div></section>';
+
+    html += '<section class="panel about"><h2 class="panel-title">このアプリについて</h2>' +
+      '<p>カードは「1つの意味・用法」ごとに作っています。同じ単語のほかの用法は、単語の詳細画面でまとめて見られます。</p>' +
+      '<p>初期の単語は、辞書の情報と照らし合わせて意味・品詞・発音記号を確かめ、出典と確認方法を単語ごとに記録しています。例文・ニュアンス・場面の説明は、このアプリ用に作った学習用の文章です。</p>' +
+      '<p>コアイメージは理解を助けるための説明で、すべてのネイティブスピーカーが同じイメージを持っているとは限りません。</p></section>';
+    html += '</main>';
+    return html;
+  }
+
+  function importPreviewHtml() {
+    const p = ui.importPreview;
+    if (!p) return '';
+    if (!p.ok) return '<div class="banner warn" role="alert">' + esc(p.error) + '</div>';
+    const s = p.stats;
+    return '<div class="import-preview" role="status"><p><b>読み込める内容</b></p><ul>' +
+      '<li>単語 ' + s.words + '語（用法 ' + s.senses + 'つ）</li>' +
+      (s.needsReview ? '<li>うち要確認 ' + s.needsReview + '語（出題しません）</li>' : '') +
+      '<li>学習記録 ' + (s.progress ? s.progress + '件・' + s.days + '日分' : 'なし') + '</li></ul>' +
+      (p.warnings.length ? '<details><summary>注意 ' + p.warnings.length + '件</summary><ul class="warn-list">' + p.warnings.slice(0, 30).map((w) => '<li>' + esc(w) + '</li>').join('') + '</ul></details>' : '') +
+      '<div class="btn-row"><button type="button" class="btn primary" data-action="import-merge">追加・更新する</button>' +
+      '<button type="button" class="btn danger-ghost" data-action="import-replace">すべて置き換える</button>' +
+      '<button type="button" class="btn ghost" data-action="import-cancel">やめる</button></div>' +
+      '<p class="fine">追加・更新：同じIDの単語は上書きし、新しい単語は追加します。今の学習記録は残します。<br>すべて置き換える：今の単語と学習記録を、ファイルの内容に置き換えます。</p></div>';
+  }
+
+  function exportJson() {
+    return JSON.stringify(ST.buildExport(store.state, { includeProgress: ui.includeProgress }), null, 2);
+  }
+
+  function exportFile() {
+    const text = exportJson();
+    ui.exportText = text;
+    if (typeof C.saveFile === 'function') {
+      // 公開ページ版など、専用の保存方法がある場合
+      C.saveFile(ST.exportFileName(Date.now()), text).then(
+        (ok) => toast(ok ? 'ファイルを保存しました。' : '保存できませんでした。「テキストでコピー」を使ってください。'),
+        () => toast('保存できませんでした。「テキストでコピー」を使ってください。')
+      );
+      render(false);
+      return;
+    }
+    try {
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = ST.exportFileName(Date.now());
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      toast('ファイルを保存しました。保存されない場合は「テキストでコピー」を使ってください。');
+    } catch (e) {
+      toast('ファイルを保存できませんでした。「テキストでコピー」を使ってください。');
+    }
+    render(false);
+  }
+
+  function exportCopy() {
+    const text = exportJson();
+    ui.exportText = text;
+    const done = () => toast('コピーしました。メモアプリなどに貼り付けて保存できます。');
+    const fail = () => {
+      toast('自動でコピーできませんでした。下の欄を長押しして全選択・コピーしてください。');
+      const ta = document.getElementById('export-text');
+      if (ta) { ta.focus(); ta.select(); }
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+      else setTimeout(fail, 0);
+    } catch (e) {
+      setTimeout(fail, 0);
+    }
+    render(false);
+  }
+
+  function importCheck(text) {
+    ui.importText = text;
+    ui.importPreview = ST.parseImport(text);
+    render(false);
+    const el = document.querySelector('.import-preview, .options .banner.warn');
+    if (el) el.scrollIntoView({ block: 'nearest' });
+  }
+
+  function importApply(mode) {
+    const p = ui.importPreview;
+    if (!p || !p.ok) return;
+    const apply = () => {
+      const next = ST.applyImport(store.state, p.data, mode);
+      Object.keys(next).forEach((k) => store.set(k, next[k]));
+      rebuildIndex();
+      if (store.state.session) store.set('session', SS.sanitize(store.state.session, store.state.words));
+      if (mode === 'replace') speech.refresh(false);
+      ui.importPreview = null;
+      ui.importText = '';
+      toast('読み込みました（単語 ' + p.stats.words + '語）。');
+      render(true);
+    };
+    if (mode === 'replace') {
+      openModal({
+        title: 'すべて置き換えますか？',
+        body: '今の単語データと学習記録は消え、ファイルの内容になります。必要なら先に書き出してください。',
+        ok: '置き換える',
+        danger: true,
+        onOk: apply,
+      });
+    } else {
+      apply();
+    }
+  }
+
+  /* ================= モーダル・トースト ================= */
+
+  function openModal(m) {
+    ui.modal = m;
+    $modal.innerHTML = '<div class="modal-back" data-action="modal-cancel"></div>' +
+      '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">' +
+      '<h2 id="modal-title">' + esc(m.title) + '</h2><p>' + esc(m.body) + '</p>' +
+      '<div class="btn-row end"><button type="button" class="btn ghost" data-action="modal-cancel">やめる</button>' +
+      '<button type="button" class="btn ' + (m.danger ? 'danger' : 'primary') + '" data-action="modal-ok">' + esc(m.ok) + '</button></div></div>';
+    $modal.hidden = false;
+    const okBtn = $modal.querySelector('[data-action="modal-ok"]');
+    if (okBtn) okBtn.focus();
+  }
+
+  function closeModal() {
+    ui.modal = null;
+    $modal.innerHTML = '';
+    $modal.hidden = true;
+  }
+
+  let toastTimer = null;
+  function toast(msg) {
+    $toast.textContent = msg;
+    $toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $toast.classList.remove('show'), Math.max(2600, msg.length * 90));
+  }
+
+  /* ================= 操作 ================= */
+
+  function onClick(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const a = el.dataset.action;
+    if (el.disabled) return;
+    switch (a) {
+      case 'speak':
+        e.stopPropagation();
+        playFrom(el);
+        return;
+      case 'flip':
+        flip();
+        return;
+      case 'rate':
+        rate(el.dataset.r);
+        return;
+      case 'hint':
+        ui.hint = true;
+        render(false);
+        return;
+      case 'start':
+        startSet(el.dataset.mode || 'fwd');
+        return;
+      case 'resume':
+        ui.autoplayNext = true;
+        go('study');
+        return;
+      case 'quit':
+        speech.stop();
+        toast('ここまでの回答は保存しました。ホームから続きを再開できます。');
+        go('home');
+        return;
+      case 'home':
+        goBack('home');
+        return;
+      case 'filter':
+        ui.filter = el.dataset.f;
+        render(false);
+        return;
+      case 'new-word':
+        go('new-word');
+        return;
+      case 'back':
+        speech.stop();
+        goBack(el.dataset.fallback || 'home');
+        return;
+      case 'delete-word':
+        deleteWord(el.dataset.id);
+        return;
+      case 'add-sense':
+        ui.editDraft.senses.push(Object.assign(emptySense(), { group: (ui.editDraft.senses[ui.editDraft.senses.length - 1] || {}).group || 'A' }));
+        render(false);
+        return;
+      case 'remove-sense':
+        ui.editDraft.senses.splice(Number(el.dataset.i), 1);
+        render(false);
+        return;
+      case 'add-example':
+        ui.editDraft.senses[Number(el.dataset.i)].examples.push({ en: '', ja: '' });
+        render(false);
+        return;
+      case 'remove-example':
+        ui.editDraft.senses[Number(el.dataset.i)].examples.splice(Number(el.dataset.j), 1);
+        render(false);
+        return;
+      case 'add-contrast':
+        ui.editDraft.senses[Number(el.dataset.i)].contrasts.push({ word: '', text: '' });
+        render(false);
+        return;
+      case 'remove-contrast':
+        ui.editDraft.senses[Number(el.dataset.i)].contrasts.splice(Number(el.dataset.j), 1);
+        render(false);
+        return;
+      case 'save-word':
+        saveWord();
+        return;
+      case 'export-file':
+        exportFile();
+        return;
+      case 'export-copy':
+        exportCopy();
+        return;
+      case 'import-check': {
+        const ta = document.getElementById('import-text');
+        importCheck(ta ? ta.value : ui.importText);
+        return;
+      }
+      case 'import-merge':
+        importApply('merge');
+        return;
+      case 'import-replace':
+        importApply('replace');
+        return;
+      case 'import-cancel':
+        ui.importPreview = null;
+        render(false);
+        return;
+      case 'reset-progress':
+        openModal({
+          title: '学習記録をリセットしますか？',
+          body: '復習予定・評価の履歴・ポイント・連続日数がすべて消えます。単語データは残ります。',
+          ok: 'リセットする',
+          danger: true,
+          onOk: () => {
+            store.set('progress', {});
+            store.set('log', SS.emptyLog());
+            store.set('session', null);
+            toast('学習記録をリセットしました。');
+            render(false);
+          },
+        });
+        return;
+      case 'reset-words':
+        openModal({
+          title: '単語を初期状態に戻しますか？',
+          body: '追加・編集した単語は消え、最初から入っている ' + C.seed.words.length + '語に戻ります。学習記録は、初期の単語のぶんだけ残ります。',
+          ok: '初期状態に戻す',
+          danger: true,
+          onOk: () => {
+            setWords(C.seed.words.map((w) => ST.normalizeWord(w).word));
+            store.set('meta', Object.assign({}, store.state.meta, { deletedSeed: [] }));
+            store.set('session', null);
+            toast('単語を初期状態に戻しました。');
+            render(false);
+          },
+        });
+        return;
+      case 'modal-ok': {
+        const m = ui.modal;
+        closeModal();
+        if (m && m.onOk) m.onOk();
+        return;
+      }
+      case 'modal-cancel':
+        closeModal();
+        return;
+      default:
+    }
+  }
+
+  function onInput(e) {
+    const t = e.target;
+    if (t.id === 'word-search') {
+      ui.query = t.value;
+      const list = document.getElementById('word-list');
+      if (list) list.innerHTML = wordListItems();
+      return;
+    }
+    if (t.dataset && t.dataset.field && ui.editDraft && t.type !== 'checkbox' && t.tagName !== 'SELECT') {
+      if (t.dataset.field === '_sources') ui.editSourcesText = t.value;
+      else setPath(ui.editDraft, t.dataset.field, t.value);
+      return;
+    }
+    if (t.id === 'import-text') {
+      ui.importText = t.value;
+      return;
+    }
+    if (t.id === 'rate' || t.id === 'slow-rate') {
+      const v = Number(t.value);
+      const key = t.id === 'rate' ? 'rate' : 'slowRate';
+      store.set('settings', Object.assign({}, store.state.settings, { [key]: v }));
+      const lbl = document.getElementById(t.id + '-val');
+      if (lbl) lbl.textContent = v.toFixed(2);
+    }
+  }
+
+  function onChange(e) {
+    const t = e.target;
+    if (t.dataset && t.dataset.field && ui.editDraft) {
+      if (t.type === 'checkbox') setPath(ui.editDraft, t.dataset.field, t.checked ? t.value : '');
+      else if (t.tagName === 'SELECT') setPath(ui.editDraft, t.dataset.field, t.value);
+      return;
+    }
+    const settings = store.state.settings;
+    switch (t.id) {
+      case 'voice-select':
+        store.set('settings', Object.assign({}, settings, { voiceURI: t.value }));
+        speech.selectVoice(t.value);
+        toast('英語の声を変更しました。');
+        return;
+      case 'autoplay':
+        store.set('settings', Object.assign({}, settings, { autoplay: t.checked }));
+        return;
+      case 'daily-goal':
+        store.set('settings', Object.assign({}, settings, { dailyGoal: Number(t.value) }));
+        toast('今日の目標を ' + t.value + '枚にしました。');
+        return;
+      case 'accent':
+        store.set('settings', Object.assign({}, settings, { accent: t.value }));
+        if (!settings.voiceURI) speech.refresh(false);
+        return;
+      case 'include-progress':
+        ui.includeProgress = t.checked;
+        ui.exportText = '';
+        render(false);
+        return;
+      case 'import-file': {
+        const f = t.files && t.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => importCheck(String(reader.result || ''));
+        reader.onerror = () => toast('ファイルを読み込めませんでした。');
+        reader.readAsText(f, 'utf-8');
+        return;
+      }
+      default:
+    }
+  }
+
+  function onKey(e) {
+    if (ui.modal) {
+      if (e.key === 'Escape') closeModal();
+      return;
+    }
+    if (ui.route !== 'study') return;
+    if (e.target.closest && e.target.closest('input, textarea, select, button, a, summary')) return;
+    const s = store.state.session;
+    if (!s || s.finished) return;
+    if (!s.flipped && (e.key === ' ' || e.key === 'Enter')) {
+      e.preventDefault();
+      flip();
+    } else if (s.flipped && ['1', '2', '3'].includes(e.key)) {
+      e.preventDefault();
+      rate(['again', 'hard', 'good'][Number(e.key) - 1]);
+    }
+  }
+
+  /* ================= オフライン用（対応ブラウザのみ） ================= */
+
+  function registerSW() {
+    if (!('serviceWorker' in navigator) || location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+    if (window.CIF_NO_SW) return;
+    try {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    } catch (e) { /* noop */ }
+  }
+
+  boot().then(registerSW).catch((e) => {
+    $app.innerHTML = '<main class="screen"><div class="banner warn">アプリを起動できませんでした：' + esc(e && e.message) + '</div></main>';
+  });
+})();
+
+</script>
+</body>
+</html>

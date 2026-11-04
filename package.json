@@ -1,0 +1,13 @@
+{
+  "name": "core-image-flashcards",
+  "version": "1.0.0",
+  "private": true,
+  "description": "英単語のコアイメージと自然な使い方をフラッシュカードで覚える学習アプリ",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "test": "node --test tests/unit.test.js",
+    "test:e2e": "node tests/e2e.js",
+    "build": "node scripts/build-single.js"
+  },
+  "license": "MIT"
+}
