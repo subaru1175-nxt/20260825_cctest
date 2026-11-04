@@ -46,6 +46,7 @@
       senses: [
         {
           id: 's-pretty-adj',
+          test: { en: 'She wore a [pretty] dress.', ja: '彼女はかわいいドレスを着ていた。', alts: [] },
           group: 'A',
           pos: 'adjective',
           role: 'quality',
@@ -73,6 +74,7 @@
         },
         {
           id: 's-pretty-adv',
+          test: { en: 'The exam was [pretty] hard.', ja: '試験はけっこう難しかった。', alts: [] },
           group: 'A',
           pos: 'adverb',
           role: 'degree',
@@ -117,6 +119,7 @@
       senses: [
         {
           id: 's-well-adv',
+          test: { en: 'He speaks English very [well].', ja: '彼は英語をとても上手に話す。', alts: [] },
           group: 'A',
           pos: 'adverb',
           role: 'manner',
@@ -142,6 +145,7 @@
         },
         {
           id: 's-well-interj',
+          test: { en: '[Well], let me think.', ja: 'うーん、ちょっと考えさせて。', alts: [] },
           group: 'A',
           pos: 'interjection',
           role: 'connector',
@@ -167,6 +171,7 @@
         },
         {
           id: 's-well-noun',
+          test: { en: 'The [well] was full of water.', ja: '井戸は水でいっぱいだった。', alts: [] },
           group: 'B',
           pos: 'noun',
           role: 'thing',
@@ -605,6 +610,7 @@
       senses: [
         {
           id: 's-take-carry',
+          test: { en: "Don't forget to [take] your lunch.", ja: 'お弁当を持っていくのを忘れないで。', alts: [] },
           group: 'A',
           pos: 'verb',
           role: 'action',
@@ -630,6 +636,7 @@
         },
         {
           id: 's-take-time',
+          test: { en: 'It [takes] an hour to clean the room.', ja: '部屋のそうじには1時間かかる。', alts: [] },
           group: 'A',
           pos: 'verb',
           role: 'action',
@@ -710,6 +717,7 @@
       senses: [
         {
           id: 's-look-at',
+          test: { en: 'Please [look] at the board.', ja: '黒板を見てください。', alts: [] },
           group: 'A',
           pos: 'verb',
           role: 'action',
@@ -740,5 +748,7 @@
   // 手書きの単語リスト（資料）の単語を先に、そのあとに最初から入っていた見本の単語を並べる。
   // version を上げると、すでに使っている人にも新しい単語だけが追加される（storage.js）。
   const fromNotebook = (notebook && notebook.words) || [];
-  return { version: 2, words: fromNotebook.concat(words), sample: words.map((w) => w.id) };
+  // 回（第1回・第2回…）。単語のまとまりで、テストもこの単位で行う。
+  const rounds = (notebook && notebook.rounds) || [];
+  return { version: 3, words: fromNotebook.concat(words), rounds, sample: words.map((w) => w.id) };
 });

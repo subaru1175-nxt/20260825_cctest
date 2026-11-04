@@ -15,6 +15,115 @@
   return {
  "source": "手書きの単語リスト（Untitled_Notebook.pdf）",
  "checked": "2026-11-04",
+ "rounds": [
+  {
+   "id": "r1",
+   "no": 1,
+   "title": "第1回",
+   "source": "手書きの単語リスト（Untitled_Notebook.pdf）",
+   "addedAt": "2026-11-04",
+   "wordIds": [
+    "w-begin",
+    "w-different",
+    "w-absent",
+    "w-fall",
+    "w-low",
+    "w-sad",
+    "w-afraid",
+    "w-laugh",
+    "w-shout",
+    "w-cry",
+    "w-anything",
+    "w-everyone",
+    "w-everything",
+    "w-nobody",
+    "w-none",
+    "w-care",
+    "w-trouble",
+    "w-excuse",
+    "w-pardon",
+    "w-health",
+    "w-tooth",
+    "w-cancer",
+    "w-thirsty",
+    "w-wish",
+    "w-promise",
+    "w-hear",
+    "w-fell",
+    "w-front",
+    "w-side",
+    "w-take",
+    "w-become",
+    "w-few",
+    "w-many",
+    "w-much",
+    "w-a-lot",
+    "w-supper",
+    "w-east",
+    "w-west",
+    "w-south",
+    "w-north",
+    "w-outside",
+    "w-inside",
+    "w-wrong",
+    "w-strange",
+    "w-dangerous",
+    "w-terrible",
+    "w-well",
+    "w-as-well",
+    "w-too",
+    "w-often",
+    "w-some",
+    "w-any",
+    "w-worry",
+    "w-tell",
+    "w-pretty",
+    "w-believe",
+    "w-hope",
+    "w-long",
+    "w-true",
+    "w-sure",
+    "w-meet",
+    "w-invite",
+    "w-heavy",
+    "w-strongly",
+    "w-train",
+    "w-show",
+    "w-see",
+    "w-look",
+    "w-seem",
+    "w-explain",
+    "w-art",
+    "w-poem",
+    "w-sound",
+    "w-public",
+    "w-astronaut",
+    "w-important",
+    "w-foreign",
+    "w-international",
+    "w-soon",
+    "w-brighe",
+    "w-hold",
+    "w-push",
+    "w-throw",
+    "w-brush",
+    "w-sell",
+    "w-spend",
+    "w-waste",
+    "w-own",
+    "w-voyage",
+    "w-leave",
+    "w-someone",
+    "w-anyone",
+    "w-something",
+    "w-suddenly",
+    "w-may",
+    "w-shall",
+    "w-would",
+    "w-should"
+   ]
+  }
+ ],
  "words": [
   {
    "id": "w-begin",
@@ -82,6 +191,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The movie [begins] at seven.",
+      "ja": "映画は7時に始まる。",
+      "alts": []
      }
     }
    ],
@@ -155,6 +269,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "We live in [different] towns.",
+      "ja": "私たちは別々の町に住んでいる。",
+      "alts": []
      }
     }
    ],
@@ -228,6 +347,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Three students were [absent] today.",
+      "ja": "今日は3人の生徒が休みだった。",
+      "alts": [
+       "today three students were absent"
+      ]
      }
     }
    ],
@@ -303,6 +429,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Be careful not to [fall].",
+      "ja": "転ばないように気をつけて。",
+      "alts": []
      }
     },
     {
@@ -342,6 +473,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My birthday is in the [fall].",
+      "ja": "私の誕生日は秋だ。",
+      "alts": []
      }
     }
    ],
@@ -419,6 +555,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The chair is too [low] for me.",
+      "ja": "そのいすは私には低すぎる。",
+      "alts": []
      }
     }
    ],
@@ -492,6 +633,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "This movie has a [sad] ending.",
+      "ja": "この映画は悲しい結末だ。",
+      "alts": []
      }
     }
    ],
@@ -563,6 +709,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My sister is [afraid] of the dark.",
+      "ja": "妹は暗いところが怖い。",
+      "alts": []
      }
     },
     {
@@ -602,6 +753,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I'm [afraid] the shop is closed.",
+      "ja": "あいにく、お店は閉まっています。",
+      "alts": []
      }
     }
    ],
@@ -671,6 +827,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The children [laughed] at the clown.",
+      "ja": "子どもたちはピエロを見て笑った。",
+      "alts": []
      }
     }
    ],
@@ -744,6 +905,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Please do not [shout] in the library.",
+      "ja": "図書館で大声を出さないでください。",
+      "alts": [
+       "do not shout in the library please"
+      ]
      }
     }
    ],
@@ -817,6 +985,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Why are you [crying]?",
+      "ja": "どうして泣いているの？",
+      "alts": []
      }
     }
    ],
@@ -894,6 +1067,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Is there [anything] in the box?",
+      "ja": "箱の中に何か入っていますか？",
+      "alts": []
      }
     }
    ],
@@ -975,6 +1153,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Everyone] was very happy.",
+      "ja": "みんなとても喜んでいた。",
+      "alts": []
      }
     }
    ],
@@ -1052,6 +1235,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Everything] in this shop is cheap.",
+      "ja": "この店のものは全部安い。",
+      "alts": []
      }
     }
    ],
@@ -1129,6 +1317,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Nobody] answered the phone.",
+      "ja": "だれも電話に出なかった。",
+      "alts": []
      }
     }
    ],
@@ -1210,6 +1403,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[None] of us knew the answer.",
+      "ja": "私たちのだれも答えを知らなかった。",
+      "alts": []
      }
     }
    ],
@@ -1285,6 +1483,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He doesn't [care] about clothes.",
+      "ja": "彼は服装を気にしない。",
+      "alts": []
      }
     },
     {
@@ -1328,6 +1531,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Please take [care] of my cat.",
+      "ja": "私の猫の世話をしてください。",
+      "alts": [
+       "take care of my cat please"
+      ]
      }
     }
    ],
@@ -1401,6 +1611,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "We had [trouble] with the computer.",
+      "ja": "パソコンのことで困った。",
+      "alts": []
      }
     }
    ],
@@ -1472,6 +1687,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Excuse] me, is this your bag?",
+      "ja": "すみません、これはあなたのバッグですか？",
+      "alts": []
      }
     },
     {
@@ -1515,6 +1735,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I have a good [excuse] for being late.",
+      "ja": "遅れたのにはちゃんとした理由がある。",
+      "alts": []
      }
     }
    ],
@@ -1592,6 +1817,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Pardon]? I didn't hear you.",
+      "ja": "えっ？聞こえませんでした。",
+      "alts": []
      }
     }
    ],
@@ -1665,6 +1895,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Walking is good for your [health].",
+      "ja": "歩くことは健康によい。",
+      "alts": []
      }
     }
    ],
@@ -1738,6 +1973,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The dentist checked my [teeth].",
+      "ja": "歯医者さんが私の歯を調べた。",
+      "alts": []
      }
     }
    ],
@@ -1807,6 +2047,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My uncle had [cancer] last year.",
+      "ja": "おじは去年がんをわずらった。",
+      "alts": [
+       "last year my uncle had cancer"
+      ]
      }
     }
    ],
@@ -1876,6 +2123,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The dog looks [thirsty].",
+      "ja": "犬はのどがかわいているようだ。",
+      "alts": []
      }
     }
    ],
@@ -1949,6 +2201,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I [wish] I had a sister.",
+      "ja": "姉妹がいたらいいのに。",
+      "alts": []
      }
     }
    ],
@@ -2022,6 +2279,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He [promised] to help me.",
+      "ja": "彼は手伝うと約束した。",
+      "alts": []
      }
     }
    ],
@@ -2095,6 +2357,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I can [hear] the birds singing.",
+      "ja": "鳥が鳴いているのが聞こえる。",
+      "alts": []
      }
     }
    ],
@@ -2146,7 +2413,8 @@
      "audio": {
       "word": "",
       "examples": []
-     }
+     },
+     "test": null
     }
    ],
    "reviewReasons": [
@@ -2225,6 +2493,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "There is a tree in [front] of my house.",
+      "ja": "家の前に木がある。",
+      "alts": []
      }
     }
    ],
@@ -2298,6 +2571,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Write your name on this [side].",
+      "ja": "こちら側に名前を書いて。",
+      "alts": []
      }
     }
    ],
@@ -2371,6 +2649,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He [became] a famous singer.",
+      "ja": "彼は有名な歌手になった。",
+      "alts": []
      }
     }
    ],
@@ -2446,6 +2729,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I stayed there for a [few] days.",
+      "ja": "そこに数日滞在した。",
+      "alts": []
      }
     },
     {
@@ -2485,6 +2773,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Very [few] people know this place.",
+      "ja": "この場所を知っている人はほとんどいない。",
+      "alts": []
      }
     }
    ],
@@ -2562,6 +2855,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "How [many] brothers do you have?",
+      "ja": "兄弟は何人いますか？",
+      "alts": []
      }
     }
    ],
@@ -2639,6 +2937,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "How [much] water do you drink?",
+      "ja": "水をどのくらい飲みますか？",
+      "alts": []
      }
     }
    ],
@@ -2712,6 +3015,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "She reads [a lot] of books.",
+      "ja": "彼女はたくさん本を読む。",
+      "alts": []
      }
     }
    ],
@@ -2785,6 +3093,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My mother is cooking [supper].",
+      "ja": "母が夕食を作っている。",
+      "alts": []
      }
     }
    ],
@@ -2854,6 +3167,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The wind is blowing from the [east].",
+      "ja": "風が東から吹いている。",
+      "alts": []
      }
     }
    ],
@@ -2923,6 +3241,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My grandparents live in the [west] of Japan.",
+      "ja": "祖父母は西日本に住んでいる。",
+      "alts": []
      }
     }
    ],
@@ -2992,6 +3315,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Birds fly to the [south] in winter.",
+      "ja": "冬になると鳥は南へ飛んでいく。",
+      "alts": [
+       "in winter birds fly to the south"
+      ]
      }
     }
    ],
@@ -3061,6 +3391,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "It is very cold in the [north].",
+      "ja": "北はとても寒い。",
+      "alts": []
      }
     }
    ],
@@ -3138,6 +3473,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The children are playing [outside].",
+      "ja": "子どもたちは外で遊んでいる。",
+      "alts": []
      }
     }
    ],
@@ -3215,6 +3555,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Come [inside] and have some tea.",
+      "ja": "中に入ってお茶をどうぞ。",
+      "alts": []
      }
     }
    ],
@@ -3294,6 +3639,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I think you have the [wrong] number.",
+      "ja": "番号をお間違えだと思います。",
+      "alts": []
      }
     },
     {
@@ -3337,6 +3687,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Is something [wrong] with your car?",
+      "ja": "車の調子がどこかおかしいの？",
+      "alts": []
      }
     }
    ],
@@ -3410,6 +3765,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "There is a [strange] man at the gate.",
+      "ja": "門のところに変な男の人がいる。",
+      "alts": []
      }
     }
    ],
@@ -3487,6 +3847,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Playing with fire is [dangerous].",
+      "ja": "火遊びは危険だ。",
+      "alts": []
      }
     }
    ],
@@ -3560,6 +3925,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The weather was [terrible] yesterday.",
+      "ja": "昨日の天気はひどかった。",
+      "alts": [
+       "yesterday the weather was terrible"
+      ]
      }
     }
    ],
@@ -3637,6 +4009,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He plays the guitar [as well].",
+      "ja": "彼はギターも弾く。",
+      "alts": []
      }
     }
    ],
@@ -3712,6 +4089,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My brother likes soccer [too].",
+      "ja": "兄もサッカーが好きだ。",
+      "alts": []
      }
     },
     {
@@ -3755,6 +4137,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "This bag is [too] expensive for me.",
+      "ja": "このバッグは私には高すぎる。",
+      "alts": []
      }
     }
    ],
@@ -3832,6 +4219,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "We [often] eat out on Sundays.",
+      "ja": "私たちは日曜日によく外食する。",
+      "alts": [
+       "on sundays we often eat out"
+      ]
      }
     }
    ],
@@ -3905,6 +4299,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Can I have [some] water, please?",
+      "ja": "お水を少しもらえますか？",
+      "alts": []
      }
     }
    ],
@@ -3978,6 +4377,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Are there [any] eggs in the fridge?",
+      "ja": "冷蔵庫に卵はある？",
+      "alts": []
      }
     }
    ],
@@ -4051,6 +4455,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My mother always [worries] about me.",
+      "ja": "母はいつも私のことを心配している。",
+      "alts": []
      }
     }
    ],
@@ -4128,6 +4537,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Can you [tell] me the way to the station?",
+      "ja": "駅への道を教えてくれますか？",
+      "alts": []
      }
     }
    ],
@@ -4201,6 +4615,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Nobody [believed] his story.",
+      "ja": "だれも彼の話を信じなかった。",
+      "alts": []
      }
     }
    ],
@@ -4274,6 +4693,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I [hope] you like it.",
+      "ja": "気に入ってもらえるといいな。",
+      "alts": []
      }
     }
    ],
@@ -4347,6 +4771,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "It was a [long] winter.",
+      "ja": "長い冬だった。",
+      "alts": []
      }
     }
    ],
@@ -4420,6 +4849,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "This story is [true].",
+      "ja": "この話は本当だ。",
+      "alts": []
      }
     }
    ],
@@ -4495,6 +4929,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Are you [sure] about that?",
+      "ja": "それ、確かなの？",
+      "alts": []
      }
     },
     {
@@ -4534,6 +4973,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Sure], I can help you.",
+      "ja": "いいよ、手伝ってあげる。",
+      "alts": []
      }
     }
    ],
@@ -4607,6 +5051,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Where did you [meet] your wife?",
+      "ja": "奥さんとはどこで出会ったの？",
+      "alts": []
      }
     }
    ],
@@ -4680,6 +5129,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "She [invited] me to dinner.",
+      "ja": "彼女は私を夕食に招待してくれた。",
+      "alts": []
      }
     }
    ],
@@ -4753,6 +5207,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Your suitcase is very [heavy].",
+      "ja": "あなたのスーツケースはとても重い。",
+      "alts": []
      }
     }
    ],
@@ -4826,6 +5285,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "My father [strongly] disagreed.",
+      "ja": "父は強く反対した。",
+      "alts": []
      }
     }
    ],
@@ -4902,6 +5366,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I missed the last [train].",
+      "ja": "終電に乗り遅れた。",
+      "alts": []
      }
     },
     {
@@ -4941,6 +5410,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He [trains] at the gym every day.",
+      "ja": "彼は毎日ジムでトレーニングしている。",
+      "alts": [
+       "every day he trains at the gym"
+      ]
      }
     }
    ],
@@ -5016,6 +5492,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Please [show] me your ticket.",
+      "ja": "切符を見せてください。",
+      "alts": [
+       "show me your ticket please"
+      ]
      }
     },
     {
@@ -5055,6 +5538,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The [show] starts at eight.",
+      "ja": "ショーは8時に始まる。",
+      "alts": []
      }
     }
    ],
@@ -5134,6 +5622,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Can you [see] that tall tower?",
+      "ja": "あの高い塔が見える？",
+      "alts": []
      }
     },
     {
@@ -5177,6 +5670,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Now I [see] why you were late.",
+      "ja": "あなたが遅れた理由がやっと分かった。",
+      "alts": [
+       "i see why you were late now"
+      ]
      }
     }
    ],
@@ -5250,6 +5750,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The new teacher [seems] kind.",
+      "ja": "新しい先生は優しそうだ。",
+      "alts": []
      }
     }
    ],
@@ -5323,6 +5828,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Please [explain] this word to me.",
+      "ja": "この単語を私に説明してください。",
+      "alts": [
+       "explain this word to me please"
+      ]
      }
     }
    ],
@@ -5396,6 +5908,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He is interested in modern [art].",
+      "ja": "彼は現代美術に興味がある。",
+      "alts": []
      }
     }
    ],
@@ -5469,6 +5986,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "We read a [poem] in class.",
+      "ja": "授業で詩を読んだ。",
+      "alts": [
+       "in class we read a poem"
+      ]
      }
     }
    ],
@@ -5548,6 +6072,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I heard the [sound] of a bell.",
+      "ja": "ベルの音が聞こえた。",
+      "alts": []
      }
     },
     {
@@ -5591,6 +6120,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Your idea [sounds] great.",
+      "ja": "あなたのアイデアはすばらしそうだ。",
+      "alts": []
      }
     }
    ],
@@ -5664,6 +6198,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "This is a [public] park.",
+      "ja": "ここは公共の公園だ。",
+      "alts": []
      }
     }
    ],
@@ -5733,6 +6272,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The [astronaut] stayed in space for six months.",
+      "ja": "その宇宙飛行士は6か月間宇宙に滞在した。",
+      "alts": []
      }
     }
    ],
@@ -5806,6 +6350,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Family is very [important] to me.",
+      "ja": "私にとって家族はとても大切だ。",
+      "alts": []
      }
     }
    ],
@@ -5879,6 +6428,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Do you speak any [foreign] languages?",
+      "ja": "何か外国語を話せますか？",
+      "alts": []
      }
     }
    ],
@@ -5948,6 +6502,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "This is an [international] airport.",
+      "ja": "ここは国際空港だ。",
+      "alts": []
      }
     }
    ],
@@ -6021,6 +6580,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Dinner will be ready [soon].",
+      "ja": "夕食はまもなくできる。",
+      "alts": []
      }
     }
    ],
@@ -6072,7 +6636,8 @@
      "audio": {
       "word": "",
       "examples": []
-     }
+     },
+     "test": null
     }
    ],
    "reviewReasons": [
@@ -6151,6 +6716,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Please [hold] the door for me.",
+      "ja": "ドアを押さえておいてください。",
+      "alts": [
+       "hold the door for me please"
+      ]
      }
     }
    ],
@@ -6224,6 +6796,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Please [push] this button.",
+      "ja": "このボタンを押してください。",
+      "alts": [
+       "push this button please"
+      ]
      }
     }
    ],
@@ -6297,6 +6876,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He [threw] the ball very far.",
+      "ja": "彼はボールをとても遠くまで投げた。",
+      "alts": []
      }
     }
    ],
@@ -6370,6 +6954,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Did you [brush] your teeth?",
+      "ja": "歯はみがいた？",
+      "alts": []
      }
     }
    ],
@@ -6443,6 +7032,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "They [sell] fruit at that shop.",
+      "ja": "あの店では果物を売っている。",
+      "alts": [
+       "at that shop they sell fruit"
+      ]
      }
     }
    ],
@@ -6514,6 +7110,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "How much did you [spend] on clothes?",
+      "ja": "服にいくら使ったの？",
+      "alts": []
      }
     },
     {
@@ -6557,6 +7158,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "We [spent] two days in Kyoto.",
+      "ja": "京都で2日間過ごした。",
+      "alts": []
      }
     }
    ],
@@ -6630,6 +7236,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Don't [waste] your money.",
+      "ja": "お金をむだにしないで。",
+      "alts": []
      }
     }
    ],
@@ -6705,6 +7316,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "He has his [own] car.",
+      "ja": "彼は自分の車を持っている。",
+      "alts": []
      }
     },
     {
@@ -6744,6 +7360,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Who [owns] this house?",
+      "ja": "この家はだれのものですか？",
+      "alts": []
      }
     }
    ],
@@ -6821,6 +7442,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The [voyage] took three weeks.",
+      "ja": "その航海は3週間かかった。",
+      "alts": []
      }
     }
    ],
@@ -6900,6 +7526,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "What time does the bus [leave]?",
+      "ja": "バスは何時に出発しますか？",
+      "alts": []
      }
     },
     {
@@ -6943,6 +7574,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I [left] my phone at home.",
+      "ja": "家に携帯を置いてきた。",
+      "alts": []
      }
     }
    ],
@@ -7024,6 +7660,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Someone] is calling your name.",
+      "ja": "だれかがあなたの名前を呼んでいる。",
+      "alts": []
      }
     }
    ],
@@ -7101,6 +7742,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "Does [anyone] have a pen?",
+      "ja": "だれかペンを持っていますか？",
+      "alts": []
      }
     }
    ],
@@ -7178,6 +7824,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I have [something] to tell you.",
+      "ja": "あなたに話したいことがある。",
+      "alts": []
      }
     }
    ],
@@ -7251,6 +7902,14 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "The lights went out [suddenly].",
+      "ja": "急に明かりが消えた。",
+      "alts": [
+       "suddenly the lights went out",
+       "the lights suddenly went out"
+      ]
      }
     }
    ],
@@ -7338,6 +7997,13 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "She [may] be late today.",
+      "ja": "彼女は今日遅れるかもしれない。",
+      "alts": [
+       "today she may be late"
+      ]
      }
     },
     {
@@ -7381,6 +8047,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[May] I sit here?",
+      "ja": "ここに座ってもいいですか？",
+      "alts": []
      }
     }
    ],
@@ -7458,6 +8129,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Shall] we eat lunch together?",
+      "ja": "いっしょにお昼を食べませんか？",
+      "alts": []
      }
     }
    ],
@@ -7541,6 +8217,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "[Would] you help me with this box?",
+      "ja": "この箱を運ぶのを手伝っていただけますか？",
+      "alts": []
      }
     },
     {
@@ -7584,6 +8265,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "I [would] like to go to Paris.",
+      "ja": "パリに行きたいです。",
+      "alts": []
      }
     }
    ],
@@ -7661,6 +8347,11 @@
      "audio": {
       "word": "",
       "examples": []
+     },
+     "test": {
+      "en": "You [should] go to bed early.",
+      "ja": "早く寝たほうがいいよ。",
+      "alts": []
      }
     }
    ],

@@ -54,8 +54,9 @@
     return !!(f && f.reps > 0 && hasCue);
   }
 
-  function pickCards(words, progress, mode, now, size) {
-    const items = studyable(words).filter((it) => eligible(it, progress, mode));
+  /** only: 出題してよい用法IDの集合（回や覚えていないリストで絞るとき） */
+  function pickCards(words, progress, mode, now, size, only) {
+    const items = studyable(words).filter((it) => (!only || only.has(it.sense.id)) && eligible(it, progress, mode));
     const due = [];
     const fresh = [];
     const later = [];
@@ -97,7 +98,8 @@
 
   function build(words, progress, mode, now, opts) {
     const size = (opts && opts.size) || SET_SIZE;
-    const { ids, early } = pickCards(words, progress, mode, now, size);
+    const only = opts && opts.only ? new Set(opts.only) : null;
+    const { ids, early } = pickCards(words, progress, mode, now, size, only);
     if (!ids.length) return null;
     return {
       id: util.randomId('set'),
@@ -113,6 +115,7 @@
       flipped: false,
       finished: false,
       goalReached: false,
+      scope: (opts && opts.scope) || { type: 'all' },
     };
   }
 
@@ -210,8 +213,9 @@
   }
 
   /** ホーム画面用の件数 */
-  function counts(words, progress, now) {
-    const items = studyable(words);
+  function counts(words, progress, now, only) {
+    const set = only ? new Set(only) : null;
+    const items = studyable(words).filter((it) => !set || set.has(it.sense.id));
     const res = {
       total: items.length,
       dueFwd: 0, newFwd: 0, dueRev: 0, availableRev: 0, newRev: 0,

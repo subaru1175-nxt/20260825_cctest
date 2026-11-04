@@ -467,3 +467,21 @@ test('保存ストア: 新しい版で増えた資料の単語は先頭に並び
   assert.equal(ids[ids.length - 1], 'w-mine');
   assert.equal(ids.length, seed.words.length + 1);
 });
+
+test('音声: アメリカ英語の高品質な声を最優先し、ゆっくりは1語ずつ区切る', () => {
+  const SP = require('../js/speech.js');
+  const v = (name, lang, uri) => ({ name, lang, voiceURI: uri || name });
+  const list = [
+    v('Daniel', 'en-GB'),
+    v('Samantha', 'en-US', 'com.apple.voice.compact.en-US.Samantha'),
+    v('Ava (Premium)', 'en-US', 'com.apple.voice.premium.en-US.Ava'),
+    v('Microsoft Aria Online (Natural) - English (United States)', 'en-US'),
+    v('Zarvox', 'en-US'),
+  ];
+  const sorted = list.slice().sort((a, b) => SP.score(b) - SP.score(a)).map((x) => x.name);
+  assert.ok(sorted.indexOf('Ava (Premium)') < sorted.indexOf('Samantha'));
+  assert.ok(sorted.indexOf('Samantha') < sorted.indexOf('Daniel'), 'アメリカ英語が先');
+  assert.equal(sorted[sorted.length - 1], 'Zarvox');
+  assert.ok(SP.isHighQuality(list[2]) && SP.isHighQuality(list[3]) && !SP.isHighQuality(list[1]));
+  assert.deepEqual(SP.slowChunks("I'm pretty tired today."), ["I'm", 'pretty', 'tired', 'today.']);
+});

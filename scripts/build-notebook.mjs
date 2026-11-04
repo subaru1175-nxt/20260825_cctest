@@ -16,11 +16,13 @@ import { dictionary as CMU } from 'cmu-pronouncing-dictionary';
 import part1 from '../data/notebook/words-1.mjs';
 import part2 from '../data/notebook/words-2.mjs';
 import part3 from '../data/notebook/words-3.mjs';
+import TESTS from '../data/notebook/tests.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WN_DIR = path.join(root, 'node_modules', 'wordnet-db', 'dict');
 const CHECKED = '2026-11-04';
 const SOURCE_LABEL = '手書きの単語リスト（Untitled_Notebook.pdf）';
+const ROUND = { id: 'r1', no: 1, title: '第1回', source: SOURCE_LABEL, addedAt: CHECKED };
 const POS_JA = { noun: '名詞', verb: '動詞', adjective: '形容詞', adverb: '副詞', pronoun: '代名詞', interjection: '間投詞', auxiliary: '助動詞', phrase: 'フレーズ', preposition: '前置詞', other: 'その他' };
 const WN_POS = { noun: 'noun', verb: 'verb', adj: 'adj', adv: 'adv' };
 
@@ -141,6 +143,19 @@ function buildWord(src) {
       if (!m.ok && !src.ipaWhy) errors.push(sid + ': 発音記号が CMU と合わない（' + ipa[0] + '）' + m.why);
       if (!m.ok && src.ipaWhy && i === 0) evidence.push('発音：' + src.ipaWhy);
     }
+    let test = null;
+    if (!review) {
+      const t = TESTS[sid];
+      if (!t) errors.push(sid + ': テスト用の例文（data/notebook/tests.mjs）がない');
+      else {
+        const [en, ja, alts] = t;
+        if (!/\[[^\]]+\]/.test(en)) errors.push(sid + ': テスト例文に [ ] がない');
+        const n = en.replace(/[\[\]]/g, '').trim().split(/\s+/).length;
+        if (n < 3 || n > 10) errors.push(sid + ': テスト例文の語数が ' + n + '（3〜10語にする）');
+        if (s.ex.some(([e]) => e.replace(/[\[\]]/g, '') === en.replace(/[\[\]]/g, ''))) errors.push(sid + ': テスト例文がカードの例文と同じ');
+        test = { en, ja, alts: alts || [] };
+      }
+    }
     return {
       id: sid,
       group: s.g || 'A',
@@ -159,6 +174,7 @@ function buildWord(src) {
       note: s.note || '',
       status: review ? 'needs_review' : '',
       audio: { word: '', examples: [] },
+      test,
     };
   });
 
@@ -196,13 +212,17 @@ function buildWord(src) {
   };
 }
 
-const words = [...part1, ...part2, ...part3].map(buildWord);
+const all = [...part1, ...part2, ...part3];
+const words = all.filter((x) => !x.ref).map(buildWord);
+ROUND.wordIds = all.map((x) => (x.ref ? x.ref : 'w-' + slug(x.w)));
+const unused = Object.keys(TESTS).filter((k) => !seenSense.has(k));
+if (unused.length) errors.push('使われていないテスト例文: ' + unused.join(', '));
 if (errors.length) {
   console.error('照合できなかった項目があります:\n  ' + errors.join('\n  '));
   process.exit(1);
 }
 
-const body = JSON.stringify({ source: SOURCE_LABEL, checked: CHECKED, words }, null, 1);
+const body = JSON.stringify({ source: SOURCE_LABEL, checked: CHECKED, rounds: [ROUND], words }, null, 1);
 const out = `/*
  * data-notebook.js — 手書きの単語リスト（Untitled_Notebook.pdf）から作った単語データ
  * このファイルは scripts/build-notebook.mjs で自動生成しています。直接は編集しないでください。
@@ -230,6 +250,7 @@ fs.writeFileSync(path.join(root, 'data', 'notebook', 'REPORT.md'),
   '自動生成：`node scripts/build-notebook.mjs`（' + CHECKED + '）\n\n' +
   '- 単語 ' + words.length + '語・用法 ' + senses + 'つ\n' +
   '- 確認済み ' + counts.verified + '語／未確認 ' + counts.unverified + '語／要確認 ' + counts.needs_review + '語\n' +
-  '- 資料にあってアプリにすでに入っていた語：take, well, pretty, look（重複して追加していません）\n\n' +
+  '- 第1回の単語：資料の ' + ROUND.wordIds.length + '語（すでに入っていた take, well, pretty, look を含む。重複して追加していません）\n' +
+  '- テスト（文章作成）用の例文：' + Object.keys(TESTS).length + '文（カードの例文とは別の文）\n\n' +
   '| 単語 | 資料の表記 | 確認状況 | 用法 |\n| --- | --- | --- | --- |\n' + report.join('\n') + '\n');
 console.log('wrote js/data-notebook.js — ' + words.length + ' words, ' + senses + ' senses', counts);

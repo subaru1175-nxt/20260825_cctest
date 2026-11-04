@@ -51,6 +51,7 @@ export default [
       ev: { wn: ['verb', 'let something be known'] },
     }],
   },
+  { ref: 'w-pretty' }, // 資料にある語（見本の単語として登録済み）
   {
     w: 'believe', ipa: ['/bɪˈliːv/', '/bɪˈliːv/'], st: 'be·LIEVE',
     senses: [{
@@ -246,6 +247,7 @@ export default [
       },
     ],
   },
+  { ref: 'w-look' }, // 資料にある語（見本の単語として登録済み）
   {
     w: 'seem', src: 'seems', ipa: ['/siːm/', '/siːm/'],
     readNote: '資料には「seems」（三人称単数の形）と書かれていたため、元の形 seem で登録しています。',

@@ -1,11 +1,15 @@
 /*
  * speech.js — 英語音声の再生
  *
- * - 録音音声（URL）があればそれを優先し「録音」と表示する。
- * - なければブラウザの読み上げ（合成音声）を使い「合成」と表示する。
- *   端末に実際にある英語の声だけを候補にし、聞き取りやすい声を優先して選ぶ。
- * - 日本語は読み上げない（英語の文字列だけを渡す）。
- * - 使えないときは status で理由を返し、画面側でボタンを無効にして理由を表示する。
+ * 音声の種類（ボタンに表示して区別する）
+ *   録音   … 人が読んだ録音ファイル（単語ごとに URL を登録できる）
+ *   高品質 … あらかじめ作っておいた高品質な音声ファイル（音声パック。js/audio-pack.js があるとき）
+ *   端末   … 端末のブラウザの読み上げ機能（合成音声）
+ *
+ * 端末の読み上げでは、アメリカ英語（en-US）の声を最優先し、その中でも
+ * Premium / Enhanced / Natural など高品質な声を選ぶ。
+ * 「ゆっくり」は速さを下げたうえで、複数語の文は 1 語ずつ間をあけて読む（細かく聞き取れるように）。
+ * 日本語は読み上げない（英語の文字列だけを渡す）。
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
@@ -19,11 +23,12 @@
 
   // 聞き取りにくい・効果音的な声（macOS / iOS の一部）
   const NOVELTY = /\b(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Junior|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Rocko|Shelley|Flo|Eddy|Reed|Sandy)\b/i;
+  const HIGH = /(premium|enhanced|natural|neural|siri|プレミアム|拡張|google us english)/i;
 
   const MESSAGES = {
     loading: '音声を準備しています…',
     ready: '',
-    'no-english': 'この端末で使える英語の音声が見つかりません。端末の設定で英語の読み上げ音声を追加すると使えるようになります。',
+    'no-english': 'この端末で使える英語の音声が見つかりません。設定の「きれいな発音にするには」を見て、英語（アメリカ）の声を追加してください。',
     unsupported: 'このブラウザは音声の読み上げに対応していません。別のブラウザ（Safari や Chrome）で開くと使えます。',
   };
 
@@ -35,26 +40,38 @@
     return /^en(-|$)/i.test(normLang(v.lang));
   }
 
-  function score(v, accent) {
-    const lang = normLang(v.lang).toLowerCase();
+  function isUS(v) {
+    return /^en-us$/i.test(normLang(v.lang));
+  }
+
+  function isHighQuality(v) {
+    return !!v && (HIGH.test(v.name || '') || HIGH.test(v.voiceURI || '') || /(Microsoft .+ Online)/i.test(v.name || ''));
+  }
+
+  function score(v) {
     const name = v.name || '';
-    let s = 0;
-    const want = accent === 'uk' ? 'en-gb' : 'en-us';
-    if (lang === want) s += 30;
-    else if (lang === 'en-us' || lang === 'en-gb') s += 25;
-    else s += 18;
-    if (/(Natural|Neural)/i.test(name)) s += 15;
-    if (/(Enhanced|Premium|Siri)/i.test(name)) s += 12;
-    if (/Google/i.test(name)) s += 10;
-    if (/\b(Samantha|Alex|Daniel|Karen|Moira|Tessa|Serena|Ava|Allison|Susan|Zoe|Evan|Nathan|Aria|Jenny|Guy|Libby|Sonia|Ryan)\b/i.test(name)) s += 6;
+    const uri = v.voiceURI || '';
+    let s = isUS(v) ? 50 : 10;
+    if (/premium|プレミアム/i.test(name + uri)) s += 30;
+    else if (/enhanced|拡張/i.test(name + uri)) s += 25;
+    if (/(Natural|Neural)/i.test(name) || /Microsoft .+ Online/i.test(name)) s += 25;
+    if (/siri/i.test(name + uri)) s += 20;
+    if (/Google US English/i.test(name)) s += 18;
+    if (/\b(Ava|Samantha|Allison|Susan|Zoe|Evan|Nathan|Tom|Aria|Jenny|Guy|Michelle|Joelle|Noelle)\b/i.test(name)) s += 6;
+    if (/compact/i.test(uri)) s -= 5;
     if (NOVELTY.test(name)) s -= 100;
-    if (v.default) s += 2;
+    if (v.default) s += 1;
     return s;
+  }
+
+  /** ゆっくり用に、文を1語ずつに分ける */
+  function slowChunks(text) {
+    return String(text || '').trim().split(/\s+/).filter(Boolean);
   }
 
   /**
    * @param {Window} win
-   * @param {() => object} getSettings  { voiceURI, rate, slowRate, accent }
+   * @param {() => object} getSettings  { voiceURI, rate, slowRate, slowGap, slowWordByWord }
    */
   function create(win, getSettings) {
     const synth = win && win.speechSynthesis;
@@ -73,6 +90,8 @@
       onChange(fn) {
         listeners.push(fn);
       },
+      isHighQuality,
+      isUS,
       refresh,
       selectVoice,
       speak,
@@ -83,6 +102,7 @@
     };
     let token = 0;
     let audioEl = null;
+    let timer = null;
 
     function emit() {
       listeners.forEach((fn) => {
@@ -96,7 +116,7 @@
       try { list = synth.getVoices() || []; } catch (e) { list = []; }
       const settings = getSettings() || {};
       const english = list.filter(isEnglish).filter((v) => !NOVELTY.test(v.name || ''));
-      english.sort((a, b) => score(b, settings.accent) - score(a, settings.accent));
+      english.sort((a, b) => score(b) - score(a));
       api.voices = english;
       const before = api.status + '|' + (api.voice && api.voice.voiceURI);
       if (english.length) {
@@ -131,6 +151,7 @@
 
     function stop() {
       token += 1;
+      clearTimeout(timer);
       try { if (synth) synth.cancel(); } catch (e) { /* noop */ }
       if (audioEl) {
         try { audioEl.pause(); } catch (e) { /* noop */ }
@@ -139,7 +160,7 @@
     }
 
     /**
-     * 合成音声で読み上げる。クリック処理の中から同期的に呼ぶこと（iOS の制限）。
+     * 端末の読み上げ機能で読む。クリック処理の中から同期的に呼ぶこと（iOS の制限）。
      * cb(state, detail): 'playing' | 'ended' | 'error'
      */
     function speak(text, opts) {
@@ -149,11 +170,12 @@
       stop();
       const my = ++token;
       const settings = getSettings() || {};
-      const u = new Utter(String(text));
-      u.voice = api.voice;
-      u.lang = normLang(api.voice.lang) || 'en-US';
-      u.rate = o.slow ? settings.slowRate || 0.6 : settings.rate || 0.95;
-      u.pitch = 1;
+      const words = slowChunks(text);
+      const byWord = !!o.slow && settings.slowWordByWord !== false && words.length > 1;
+      const parts = byWord ? words : [String(text)];
+      const slowRate = settings.slowRate || 0.55;
+      const rate = o.slow ? (byWord ? slowRate : Math.min(slowRate, 0.5)) : settings.rate || 0.95;
+      const gap = settings.slowGap == null ? 300 : settings.slowGap;
       let started = false;
       const watchdog = setTimeout(() => {
         if (!started && my === token) {
@@ -161,24 +183,39 @@
           cb('error', 'no-start');
         }
       }, 4000);
-      u.onstart = () => {
-        started = true;
-        if (my === token) cb('playing');
-      };
-      u.onend = () => {
-        clearTimeout(watchdog);
-        if (my === token) cb('ended');
-      };
-      u.onerror = (e) => {
-        clearTimeout(watchdog);
+
+      function say(i) {
         if (my !== token) return;
-        const code = e && e.error;
-        if (code === 'interrupted' || code === 'canceled') cb('ended');
-        else cb('error', code || 'error');
-      };
-      try {
+        const u = new Utter(parts[i]);
+        u.voice = api.voice;
+        u.lang = normLang(api.voice.lang) || 'en-US';
+        u.rate = rate;
+        u.pitch = 1;
+        u.onstart = () => {
+          if (!started) {
+            started = true;
+            clearTimeout(watchdog);
+            if (my === token) cb('playing');
+          }
+        };
+        u.onend = () => {
+          if (my !== token) return;
+          if (i + 1 < parts.length) timer = setTimeout(() => say(i + 1), gap);
+          else cb('ended');
+        };
+        u.onerror = (e) => {
+          clearTimeout(watchdog);
+          if (my !== token) return;
+          const code = e && e.error;
+          if (code === 'interrupted' || code === 'canceled') cb('ended');
+          else cb('error', code || 'error');
+        };
         synth.speak(u);
         if (synth.paused) synth.resume();
+      }
+
+      try {
+        say(0);
       } catch (e) {
         clearTimeout(watchdog);
         cb('error', 'exception');
@@ -187,7 +224,7 @@
       return true;
     }
 
-    /** 録音音声の再生 */
+    /** 音声ファイル（録音・高品質音声）の再生。slowUrl がなければ再生速度を下げる */
     function play(url, opts) {
       const o = opts || {};
       const cb = o.onState || function () {};
@@ -203,7 +240,7 @@
       audioEl = a;
       try {
         a.preservesPitch = true;
-        a.playbackRate = o.slow ? 0.75 : 1;
+        a.playbackRate = o.slow && !o.isSlowFile ? 0.7 : 1;
       } catch (e) { /* noop */ }
       a.onplaying = () => my === token && cb('playing');
       a.onended = () => my === token && cb('ended');
@@ -215,8 +252,12 @@
 
     function voiceLabel(v) {
       if (!v) return '';
-      const online = v.localService === false ? '・オンライン' : '';
-      return v.name + '（' + normLang(v.lang) + online + '）';
+      const tags = [];
+      if (isUS(v)) tags.push('アメリカ英語');
+      else tags.push(normLang(v.lang));
+      if (isHighQuality(v)) tags.push('高品質');
+      if (v.localService === false) tags.push('オンライン');
+      return v.name + '（' + tags.join('・') + '）';
     }
 
     function currentLabel() {
@@ -226,5 +267,5 @@
     return api;
   }
 
-  return { create, score, isEnglish, MESSAGES };
+  return { create, score, isEnglish, isUS, isHighQuality, slowChunks, MESSAGES };
 });

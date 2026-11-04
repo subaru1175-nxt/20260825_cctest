@@ -71,6 +71,7 @@ export default [
       ev: { wn: ['noun', 'a place within a region identified relative to a center'] },
     }],
   },
+  { ref: 'w-take' }, // 資料にある語（見本の単語として登録済み）
   {
     w: 'become', src: 'became', ipa: ['/bɪˈkʌm/', '/bɪˈkʌm/'], st: 'be·COME',
     readNote: '資料には過去形の「became」と書かれていたため、元の形 become で登録し、例文では became を使っています。',
@@ -292,6 +293,7 @@ export default [
       ev: { wn: ['adj', 'exceptionally bad or displeasing'] },
     }],
   },
+  { ref: 'w-well' }, // 資料にある語（見本の単語として登録済み）
   {
     w: 'as well', ipa: ['/əz ˈwel/', '/əz ˈwel/'],
     ipaWhy: 'CMU 発音辞書の as は強く読む形 /æz/ ですが、as well の as はふつう弱く /əz/ と読むため、弱い形で表記しています。',

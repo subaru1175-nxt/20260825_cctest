@@ -17,7 +17,7 @@
   'use strict';
 
   const PREFIX = 'cif.v1.';
-  const KEYS = ['words', 'progress', 'log', 'settings', 'session', 'meta'];
+  const KEYS = ['words', 'progress', 'log', 'settings', 'session', 'meta', 'rounds', 'tests'];
   const FORMAT = 'core-image-flashcards';
   const FORMAT_VERSION = 1;
 
@@ -46,7 +46,9 @@
   const DEFAULT_SETTINGS = {
     voiceURI: '',
     rate: 0.95,
-    slowRate: 0.6,
+    slowRate: 0.55,
+    slowGap: 300,
+    slowWordByWord: true,
     dailyGoal: 10,
     accent: 'us',
     autoplay: false,
@@ -111,7 +113,7 @@
   /* ---------- ストア（画面からはこれを使う） ---------- */
 
   function createStore(backend) {
-    const state = { words: [], progress: {}, log: null, settings: null, session: null, meta: {} };
+    const state = { words: [], progress: {}, log: null, settings: null, session: null, meta: {}, rounds: [], tests: null };
     const status = { backend: backend.name, persistent: backend.persistent, error: '' };
     const pending = {};
     const writing = {};
@@ -195,10 +197,14 @@
         state.settings = normalizeSettings(loaded.settings);
         state.session = loaded.session && typeof loaded.session === 'object' ? loaded.session : null;
         state.meta = Object.assign({ deletedSeed: [] }, meta, { seedVersion: seed ? seed.version : meta.seedVersion || 0 });
+        const rounds = mergeRounds(normalizeRounds(loaded.rounds), seed && seed.rounds, new Set(words.map((w) => w.id)));
+        state.rounds = rounds.rounds;
+        state.tests = normalizeTests(loaded.tests);
         if (loaded._wordsChanged) {
           persist('words');
           persist('meta');
         }
+        if (rounds.changed) persist('rounds');
         return state;
       },
       set(key, value) {
@@ -325,6 +331,7 @@
   function normalizeSense(s, headword) {
     if (!s || typeof s !== 'object') return null;
     const sense = {
+      test: normalizeTestSentence(s.test),
       id: safeId(s.id, 's', headword),
       group: GROUPS.includes(s.group) ? s.group : 'A',
       pos: POS[s.pos] ? s.pos : 'other',
@@ -426,12 +433,124 @@
     return out;
   }
 
+  function normalizeTestSentence(t) {
+    if (!t || typeof t !== 'object') return null;
+    const en = str(t.en, 300);
+    if (!en) return null;
+    return {
+      en,
+      ja: str(t.ja, 300),
+      alts: (Array.isArray(t.alts) ? t.alts : []).map((a) => str(a, 300)).filter(Boolean).slice(0, 6),
+    };
+  }
+
+  /* ---------- 回（第1回・第2回…） ---------- */
+
+  function normalizeRounds(list) {
+    if (!Array.isArray(list)) return [];
+    const seen = new Set();
+    return list
+      .filter((r) => r && typeof r === 'object' && /^[A-Za-z0-9-]+$/.test(String(r.id || '')))
+      .filter((r) => !seen.has(r.id) && seen.add(r.id))
+      .map((r) => ({
+        id: String(r.id),
+        no: Math.max(1, Math.floor(num(r.no, 1))),
+        title: str(r.title, 40) || '第' + Math.max(1, Math.floor(num(r.no, 1))) + '回',
+        source: str(r.source, 200),
+        addedAt: str(r.addedAt, 20),
+        wordIds: (Array.isArray(r.wordIds) ? r.wordIds : []).map((x) => str(x, 64)).filter((x) => /^[A-Za-z0-9][A-Za-z0-9-]*$/.test(x)),
+      }))
+      .sort((a, b) => a.no - b.no);
+  }
+
+  /** 初期データの回を足す。すでにある回には、新しく増えた単語だけを足す（自分で入れた単語は残す） */
+  function mergeRounds(rounds, seedRounds, wordIds) {
+    let changed = false;
+    const out = rounds.map((r) => Object.assign({}, r, { wordIds: r.wordIds.slice() }));
+    normalizeRounds(seedRounds || []).forEach((sr) => {
+      const cur = out.find((r) => r.id === sr.id);
+      if (!cur) {
+        out.push(sr);
+        changed = true;
+        return;
+      }
+      const have = new Set(cur.wordIds);
+      const add = sr.wordIds.filter((id) => !have.has(id));
+      if (add.length) {
+        cur.wordIds = sr.wordIds.concat(cur.wordIds.filter((id) => !sr.wordIds.includes(id)));
+        changed = true;
+      }
+    });
+    out.forEach((r) => {
+      const before = r.wordIds.length;
+      r.wordIds = r.wordIds.filter((id) => wordIds.has(id));
+      if (r.wordIds.length !== before) changed = true;
+    });
+    out.sort((a, b) => a.no - b.no);
+    return { rounds: out, changed };
+  }
+
+  /* ---------- テストの記録 ---------- */
+
+  const PARTS = ['understand', 'compose'];
+
+  function emptyTests() {
+    return { attempts: [], current: null, misses: {} };
+  }
+
+  function normalizeTests(t) {
+    const out = emptyTests();
+    if (!t || typeof t !== 'object') return out;
+    const part = (p) => ({
+      correct: Math.max(0, Math.floor(num(p && p.correct, 0))),
+      total: Math.max(0, Math.floor(num(p && p.total, 0))),
+    });
+    out.attempts = (Array.isArray(t.attempts) ? t.attempts : []).slice(-500).filter((a) => a && typeof a === 'object').map((a) => ({
+      id: str(a.id, 40),
+      kind: a.kind === 'review' ? 'review' : 'round',
+      roundId: str(a.roundId, 40),
+      no: Math.max(0, Math.floor(num(a.no, 0))),
+      startedAt: num(a.startedAt, 0),
+      finishedAt: num(a.finishedAt, 0),
+      score: Math.max(0, Math.min(100, Math.floor(num(a.score, 0)))),
+      parts: { understand: part(a.parts && a.parts.understand), compose: part(a.parts && a.parts.compose) },
+      wrongs: (Array.isArray(a.wrongs) ? a.wrongs : []).slice(0, 400).map((w) => ({
+        senseId: str(w && w.senseId, 64),
+        part: PARTS.includes(w && w.part) ? w.part : 'understand',
+        qtype: str(w && w.qtype, 20),
+        given: str(w && w.given, 300),
+        answer: str(w && w.answer, 300),
+      })).filter((w) => w.senseId),
+    }));
+    if (t.current && typeof t.current === 'object' && Array.isArray(t.current.questions) && Array.isArray(t.current.results)) out.current = t.current;
+    const m = t.misses && typeof t.misses === 'object' ? t.misses : {};
+    Object.keys(m).forEach((k) => {
+      const e = m[k];
+      if (!e || !/^[A-Za-z0-9][A-Za-z0-9-]*\|(understand|compose)$/.test(k)) return;
+      out.misses[k] = {
+        senseId: str(e.senseId, 64),
+        part: PARTS.includes(e.part) ? e.part : 'understand',
+        roundIds: (Array.isArray(e.roundIds) ? e.roundIds : []).map((x) => str(x, 40)).filter(Boolean),
+        count: Math.max(1, Math.floor(num(e.count, 1))),
+        firstAt: num(e.firstAt, 0),
+        lastAt: num(e.lastAt, 0),
+        solvedAt: e.solvedAt ? num(e.solvedAt, 0) : 0,
+        last: e.last && typeof e.last === 'object'
+          ? { qtype: str(e.last.qtype, 20), given: str(e.last.given, 300), answer: str(e.last.answer, 300) }
+          : { qtype: '', given: '', answer: '' },
+      };
+    });
+    return out;
+  }
+
   function normalizeSettings(s) {
     const out = Object.assign({}, DEFAULT_SETTINGS);
     if (!s || typeof s !== 'object') return out;
     out.voiceURI = str(s.voiceURI, 300);
     out.rate = Math.max(0.5, Math.min(1.3, num(s.rate, DEFAULT_SETTINGS.rate)));
     out.slowRate = Math.max(0.3, Math.min(1, num(s.slowRate, DEFAULT_SETTINGS.slowRate)));
+    out.slowGap = Math.max(0, Math.min(1200, Math.round(num(s.slowGap, DEFAULT_SETTINGS.slowGap))));
+    out.slowWordByWord = s.slowWordByWord !== false;
     out.dailyGoal = [10, 20, 30, 40].includes(Number(s.dailyGoal)) ? Number(s.dailyGoal) : DEFAULT_SETTINGS.dailyGoal;
     out.accent = s.accent === 'uk' ? 'uk' : 'us';
     out.autoplay = !!s.autoplay;
@@ -447,11 +566,13 @@
       version: FORMAT_VERSION,
       exportedAt: new Date().toISOString(),
       words: state.words,
+      rounds: state.rounds || [],
     };
     if (includeProgress) {
       data.progress = state.progress;
       data.log = state.log;
       data.settings = state.settings;
+      data.tests = Object.assign({}, state.tests || emptyTests(), { current: null });
     }
     return data;
   }
@@ -467,7 +588,7 @@
   function parseImport(text) {
     let json;
     try {
-      json = JSON.parse(String(text || '').replace(/^﻿/, ''));
+      json = JSON.parse(String(text || '').replace(/^\uFEFF/, ''));
     } catch (e) {
       return { ok: false, error: 'JSON として読み込めませんでした。書き出したファイルをそのまま選んでください。' };
     }
@@ -498,6 +619,8 @@
       progress: hasProgress ? normalizeProgress(json.progress) : null,
       log: json && json.log ? normalizeLog(json.log) : null,
       settings: json && json.settings ? normalizeSettings(json.settings) : null,
+      rounds: json && Array.isArray(json.rounds) ? normalizeRounds(json.rounds) : null,
+      tests: json && json.tests ? normalizeTests(json.tests) : null,
     };
     const stats = {
       words: words.length,
@@ -505,6 +628,8 @@
       needsReview: words.filter((w) => w.status === 'needs_review').length,
       progress: data.progress ? Object.keys(data.progress).length : 0,
       days: data.log ? Object.keys(data.log.days).length : 0,
+      rounds: data.rounds ? data.rounds.length : 0,
+      attempts: data.tests ? data.tests.attempts.length : 0,
     };
     return { ok: true, data, stats, warnings };
   }
@@ -515,12 +640,15 @@
    */
   function applyImport(state, data, mode) {
     if (mode === 'replace') {
+      const ids = new Set(data.words.map((w) => w.id));
       return {
         words: data.words,
         progress: data.progress || {},
         log: data.log || { days: {}, totalPoints: 0 },
         settings: data.settings || state.settings,
         session: null,
+        rounds: mergeRounds(data.rounds || [], [], ids).rounds,
+        tests: data.tests || emptyTests(),
       };
     }
     const byId = new Map(state.words.map((w) => [w.id, w]));
@@ -532,13 +660,16 @@
         if (!progress[id]) progress[id] = data.progress[id];
       });
     }
-    return { words, progress };
+    const ids = new Set(words.map((w) => w.id));
+    const rounds = mergeRounds(state.rounds || [], data.rounds || [], ids).rounds;
+    return { words, progress, rounds };
   }
 
   return {
     PREFIX, KEYS, FORMAT, STATUS, POS, ROLE, GROUPS, DEFAULT_SETTINGS,
     localBackend, memoryBackend, pickBackend, createStore,
     normalizeWord, normalizeSense, normalizeProgress, normalizeLog, normalizeSettings,
+    normalizeRounds, mergeRounds, normalizeTests, emptyTests,
     buildExport, exportFileName, parseImport, applyImport, safeUrl,
   };
 });
