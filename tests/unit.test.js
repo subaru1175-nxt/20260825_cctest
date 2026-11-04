@@ -520,7 +520,8 @@ test('AI音声: ファイルがそろい、区間は正しく、ゆっくりは�
   const path = require('path');
   const pack = loadPack();
   const files = new Set();
-  const ratio = { word: [], sentence: [] };
+  const pad = (pack.pad || [0, 0])[0] + (pack.pad || [0, 0])[1];
+  const ratio = { one: [], short: [], long: [] };
   Object.keys(pack.clips).forEach((k) => {
     const [file, a, b] = pack.clips[k];
     files.add(file);
@@ -528,16 +529,20 @@ test('AI音声: ファイルがそろい、区間は正しく、ゆっくりは�
     if (k.startsWith('n|')) {
       const t = k.slice(2);
       const s = pack.clips['s|' + t];
-      const r = (s[2] - s[1]) / (b - a);
-      (t.split(' ').length === 1 ? ratio.word : ratio.sentence).push(r);
+      // 前後の無音を除いた、声の部分の長さの比
+      const r = (s[2] - s[1] - pad) / (b - a - pad);
+      const n = t.split(' ').length;
+      (n === 1 ? ratio.one : n <= 4 ? ratio.short : ratio.long).push(r);
     }
   });
   files.forEach((f) => assert.ok(fs.statSync(path.join(__dirname, '..', pack.base, f + pack.ext)).size > 1000, f));
   const median = (xs) => xs.slice().sort((x, y) => x - y)[Math.floor(xs.length / 2)];
-  // 前後の無音も含めた長さの比。声の部分だけなら、単語は約2.3倍、文は約1.6倍
-  assert.ok(median(ratio.word) > 1.6, 'word ' + median(ratio.word));
-  assert.ok(median(ratio.sentence) > 1.35, 'sentence ' + median(ratio.sentence));
-  assert.ok(Math.min(...ratio.word) > 1.3);
+  assert.ok(pad > 0.2, '前後の無音の長さが目録にある');
+  // ゆっくりは、1語 2倍・2〜4語 約1.8倍・5語以上 約1.6倍
+  assert.ok(median(ratio.one) > 1.85, '1語 ' + median(ratio.one));
+  assert.ok(median(ratio.short) > 1.65, '2〜4語 ' + median(ratio.short));
+  assert.ok(median(ratio.long) > 1.45, '5語以上 ' + median(ratio.long));
+  assert.ok(Math.min(...ratio.one) > 1.7, '1語はどれもはっきり遅い');
 });
 
 test('AI音声: 品詞で読みが変わる語は、その用法の発音で作っている', () => {

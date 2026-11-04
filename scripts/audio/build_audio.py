@@ -9,6 +9,12 @@ build_audio.py — 高品質な音声パック（アメリカ英語・Kokoro af_
   us_gold.json, us_silver.json … misaki のアメリカ英語の発音辞書
   af_heart.bin         … 声（kokoro-js 同梱）
 
+ゆっくりの作り方
+  ふつうの速さの音声を、音の高さを変えずに引き伸ばす（ffmpeg の rubberband フィルター）。
+  1語 2倍・2〜4語 約1.8倍・5語以上 約1.6倍。
+  Kokoro 自体に遅く話させる（speed を 0.5〜0.65 にする）と音がくずれやすく、音声認識での聞き取り検査でも
+  大きく落ちたため（単語 21%、フレーズ 49%）、引き伸ばす方法にした（単語 79%、フレーズ 85%、文 97%）。
+
 出力
   audio/<単語ID>.mp3   … 単語ごとに、読み上げる英語（通常・ゆっくり）を1本につないだファイル
   js/audio-pack.js     … 「どの英語が、どのファイルの何秒から何秒か」の目録
@@ -30,11 +36,12 @@ sys.path.insert(0, HERE)
 from g2p import G2P  # noqa: E402
 from kokoro_synth import Kokoro, SAMPLE_RATE  # noqa: E402
 
-# 速さ（Kokoro の speed。小さいほどゆっくり）
-SPEED_NORMAL = 0.92        # 自然な速さのまま、少しだけ聞き取りやすく
-SPEED_SLOW_WORD = 0.5      # 単語のゆっくり（通常の約2.4倍の長さ）
-SPEED_SLOW_PHRASE = 0.6    # 2〜4語のフレーズ
-SPEED_SLOW_SENTENCE = 0.65 # 文
+# 速さ
+SPEED_NORMAL = 0.92        # Kokoro の speed。自然な速さのまま、少しだけ聞き取りやすく
+# ゆっくり：ふつうの音声を引き伸ばす倍率の逆数（rubberband の tempo。0.5 = 2倍の長さ）
+TEMPO_SLOW_WORD = 0.5
+TEMPO_SLOW_PHRASE = 0.55   # 2〜4語（約1.8倍）
+TEMPO_SLOW_SENTENCE = 0.62 # 5語以上（約1.6倍）
 LEAD = 0.12                # 音の前の無音（秒）
 TAIL = 0.22                # 音の後の無音
 GAP = 0.35                 # ファイルの中で、次の音までの無音
@@ -42,12 +49,28 @@ TARGET_RMS = 0.085         # 音量をそろえる（声のある部分の平均
 PEAK = 0.89
 
 
-def slow_speed(kind, text):
-    if kind == 'word' and len(text.split()) == 1:
-        return SPEED_SLOW_WORD
-    if len(text.split()) <= 4:
-        return SPEED_SLOW_PHRASE
-    return SPEED_SLOW_SENTENCE
+def slow_tempo(text):
+    """短いほど、ゆっくりにする（1語 2倍・2〜4語 約1.8倍・5語以上 約1.6倍）"""
+    n = len(text.split())
+    if n == 1:
+        return TEMPO_SLOW_WORD
+    if n <= 4:
+        return TEMPO_SLOW_PHRASE
+    return TEMPO_SLOW_SENTENCE
+
+
+def stretch(x, tempo):
+    """音の高さを変えずに引き伸ばす（Rubber Band）。
+    声の始まりの子音がぼやけないように、前後に無音を足してから引き伸ばす（あとで trim で切る）"""
+    x = np.concatenate([silence(0.15), x, silence(0.15)])
+    pcm = np.clip(x, -1, 1).astype(np.float32).tobytes()
+    out = subprocess.run([
+        'ffmpeg', '-hide_banner', '-loglevel', 'error',
+        '-f', 'f32le', '-ar', str(SAMPLE_RATE), '-ac', '1', '-i', 'pipe:0',
+        '-af', 'rubberband=tempo=%s' % tempo,
+        '-f', 'f32le', '-ar', str(SAMPLE_RATE), '-ac', '1', 'pipe:1',
+    ], input=pcm, capture_output=True, check=True).stdout
+    return np.frombuffer(out, dtype=np.float32).copy()
 
 
 def trim(x, thr=0.006, margin=0.04):
@@ -119,10 +142,9 @@ def main():
     t0 = time.time()
     for n, t in enumerate(texts):
         ph = g2p(t['text'], isolated=(t['kind'] == 'word'))
-        clips = {}
-        for variant, speed in (('n', SPEED_NORMAL), ('s', slow_speed(t['kind'], t['text']))):
-            w = level(trim(synth(ph, speed)))
-            clips[variant] = np.concatenate([silence(LEAD), w, silence(TAIL)])
+        normal = level(trim(synth(ph, SPEED_NORMAL)))
+        slow = level(trim(stretch(normal, slow_tempo(t['text']))))
+        clips = {v: np.concatenate([silence(LEAD), w, silence(TAIL)]) for v, w in (('n', normal), ('s', slow))}
         groups.setdefault(t['wordId'], []).append((t['text'], clips))
         report.append((t['text'], ph, len(clips['n']) / SAMPLE_RATE, len(clips['s']) / SAMPLE_RATE))
         if (n + 1) % 50 == 0:
@@ -153,6 +175,7 @@ def main():
         'accent': 'en-US',
         'base': 'audio/',
         'ext': '.mp3',
+        'pad': [LEAD, TAIL],
         'clips': index,
     }
     with open(os.path.join(ROOT, 'js', 'audio-pack.js'), 'w', encoding='utf-8') as f:
@@ -166,7 +189,8 @@ def main():
     with open(os.path.join(ROOT, 'data', 'audio-report.md'), 'w', encoding='utf-8') as f:
         f.write('# 音声パックの一覧\n\n自動生成：`scripts/audio/build_audio.py`\n\n')
         f.write(f'- 声：Kokoro-82M / {args.voice}（アメリカ英語）\n- 英語 {len(texts)}件 × 通常・ゆっくり\n')
-        f.write(f'- 速さ：通常 {SPEED_NORMAL}、ゆっくり 単語 {SPEED_SLOW_WORD}・フレーズ {SPEED_SLOW_PHRASE}・文 {SPEED_SLOW_SENTENCE}\n')
+        f.write(f'- 速さ：ふつう Kokoro speed {SPEED_NORMAL}。ゆっくりは、ふつうの音声を音の高さを変えずに引き伸ばしたもの'
+                f'（1語 {1 / TEMPO_SLOW_WORD:.1f}倍・2〜4語 {1 / TEMPO_SLOW_PHRASE:.1f}倍・5語以上 {1 / TEMPO_SLOW_SENTENCE:.1f}倍）\n')
         f.write(f'- ファイル：{len(groups)}本・合計 {total / 1e6:.1f} MB\n\n')
         f.write('| 英語 | 発音記号（Kokoro） | 通常（秒） | ゆっくり（秒） |\n| --- | --- | --- | --- |\n')
         for text, ph, dn, ds in report:
