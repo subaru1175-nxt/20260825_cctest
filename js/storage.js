@@ -229,7 +229,7 @@
   /* ---------- データの整形・チェック ---------- */
 
   const MAX_TEXT = 2000;
-  const REPLACEMENT = /�/;
+  const REPLACEMENT = /\uFFFD/;
   const HEADWORD_OK = /^[A-Za-z][A-Za-z '’.\-]*$/;
 
   function str(v, max) {
@@ -302,10 +302,10 @@
     });
 
     if (!headword) problems.push('見出し語がありません');
-    else if (REPLACEMENT.test(headword)) problems.push('見出し語に読めない文字（�）があります');
+    else if (REPLACEMENT.test(headword)) problems.push('見出し語に読めない文字（\uFFFD）があります');
     else if (!HEADWORD_OK.test(headword)) problems.push('見出し語に英字以外の文字が含まれています');
     if (!w.senses.length) problems.push('意味・用法が登録されていません');
-    if (hasBrokenText(raw.senses)) problems.push('説明や例文に読めない文字（�）があります');
+    if (hasBrokenText(raw.senses)) problems.push('説明や例文に読めない文字（\uFFFD）があります');
     if (problems.length) {
       w.status = 'needs_review';
       w.reviewReasons = problems;
