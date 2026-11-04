@@ -566,3 +566,14 @@ test('設定: 出題のしかた（英語→場面／場面→英語）を覚え
   assert.equal(ST.normalizeSettings({ studyMode: 'rev' }).studyMode, 'rev');
   assert.equal(ST.normalizeSettings({ studyMode: 'x' }).studyMode, 'fwd');
 });
+
+test('AI音声: ゆっくりの倍率（1語 2.2倍・2〜4語 1.8倍・5語以上 1.6倍）が目録にある', () => {
+  const pack = loadPack();
+  assert.deepEqual(pack.slow, { '1': 2.2, '2-4': 1.8, '5+': 1.6 });
+  const pad = pack.pad[0] + pack.pad[1];
+  // 声の前後には、引き伸ばさない短い余白（各 0.04 秒）があるので、それも除いて比べる
+  const len = (k) => pack.clips[k][2] - pack.clips[k][1] - pad - 0.08;
+  // begin は 1語なので約2.2倍
+  const r = len('s|begin') / len('n|begin');
+  assert.ok(r > 2.05 && r < 2.4, 'begin ' + r.toFixed(2));
+});

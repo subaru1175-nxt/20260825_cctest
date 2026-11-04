@@ -377,9 +377,45 @@
       ' aria-label="' + esc(what + 'を' + (slow ? 'ゆっくり' : '') + '再生（' + kindName + '）') + '"' + (enabled ? '' : ' disabled') + '>' +
       icon(enabled ? (slow ? 'slow' : 'speaker') : 'mute') + '<span>' + (slow ? 'ゆっくり' : '再生') + '</span></button>';
     const showCap = opts.cap === true || (opts.cap === 'auto' && src.kind !== 'pack');
+    const cap = capText(src.kind);
+    // 種類の表示は、AI音声の例文などではふだん隠し、再生中だけ「何倍で再生しているか」を出す
     return '<div class="audio-wrap' + (opts.left ? ' left' : '') + '">' +
       '<div class="audio' + (opts.sm ? ' sm' : '') + (enabled ? '' : ' off') + '" role="group" aria-label="' + esc(what + 'の音声') + '" data-kind="' + src.kind + '">' + btn(false) + btn(true) + '</div>' +
-      (showCap ? '<span class="audio-cap">' + esc(capText(src.kind)) + '</span>' : '') + '</div>';
+      '<span class="audio-cap" aria-live="polite" data-cap="' + esc(cap) + '"' + (showCap ? '' : ' data-hide="1" hidden') + '>' + esc(cap) + '</span></div>';
+  }
+
+  /** ゆっくりの倍率（音声パックの設定から。1語・2〜4語・5語以上） */
+  function slowFactor(text) {
+    const sl = (C.audioPack && C.audioPack.slow) || {};
+    const n = String(text || '').trim().split(/\s+/).length;
+    return n === 1 ? sl['1'] : n <= 4 ? sl['2-4'] : sl['5+'];
+  }
+
+  /** 再生中に出す文（ゆっくりは、ふつうの何倍の長さか・何秒か） */
+  function playingText(btn, kind, slow) {
+    if (kind === 'pack') {
+      const pad = ((C.audioPack && C.audioPack.pad) || [0, 0]).reduce((x, y) => x + y, 0);
+      const sec = Math.max(0.1, Number(btn.dataset.end) - Number(btn.dataset.start) - pad).toFixed(1);
+      if (!slow) return '再生中（' + sec + '秒）';
+      const f = slowFactor(btn.dataset.text);
+      return 'ゆっくり再生中（' + (f ? 'ふつうの' + f + '倍・' : '') + sec + '秒）';
+    }
+    if (!slow) return '再生中';
+    return kind === 'rec' ? 'ゆっくり再生中（録音）' : 'ゆっくり再生中（端末の読み上げ）';
+  }
+
+  /** 再生中の表示をすべて元に戻す */
+  function clearPlaying() {
+    $app.querySelectorAll('.audio button.playing, .speak-one.playing').forEach((b) => b.classList.remove('playing'));
+    $app.querySelectorAll('.audio.run').forEach((g) => {
+      g.classList.remove('run', 'timed');
+      const cap = g.parentElement && g.parentElement.querySelector('.audio-cap');
+      if (cap) {
+        cap.textContent = cap.dataset.cap || '';
+        cap.hidden = cap.dataset.hide === '1';
+        cap.classList.remove('live');
+      }
+    });
   }
 
   /** 丸い再生ボタン（表面のフレーズ用） */
@@ -411,7 +447,10 @@
         if (ic) ic.outerHTML = icon(ok ? (b.dataset.slow === '1' ? 'slow' : 'speaker') : 'mute');
       });
       const cap = g.parentElement && g.parentElement.querySelector('.audio-cap');
-      if (cap) cap.textContent = capText('synth');
+      if (cap && !cap.classList.contains('live')) {
+        cap.dataset.cap = capText('synth');
+        cap.textContent = cap.dataset.cap;
+      }
     });
     $app.querySelectorAll('.speak-one[data-kind="synth"]').forEach((b) => {
       b.disabled = !ok;
@@ -431,10 +470,24 @@
     const slow = btn.dataset.slow === '1';
     const text = btn.dataset.text || '';
     const mark = (on) => {
-      $app.querySelectorAll('.audio button.playing, .speak-one.playing').forEach((b) => b.classList.remove('playing'));
+      clearPlaying();
       if (!on) return;
       const b = $app.querySelector('[data-aid="' + aid + '"]');
-      if (b) b.classList.add('playing');
+      if (!b) return;
+      b.classList.add('playing');
+      const g = b.closest('.audio');
+      if (!g) return;
+      // 再生の長さだけ進む線（AI音声は長さが分かる。それ以外は動き続ける線）
+      const dur = kind === 'pack' ? Number(b.dataset.end) - Number(b.dataset.start) : 0;
+      g.style.setProperty('--dur', (dur || 1.2) + 's');
+      g.classList.toggle('timed', !!dur);
+      g.classList.add('run');
+      const cap = g.parentElement && g.parentElement.querySelector('.audio-cap');
+      if (cap) {
+        cap.textContent = playingText(b, kind, slow);
+        cap.hidden = false;
+        cap.classList.add('live');
+      }
     };
     const synthState = (state, detail) => {
       mark(state === 'playing');
@@ -554,13 +607,29 @@
 
   /* ================= ホーム ================= */
 
-  function statsGroup(streak, today, goal, points) {
-    const pct = Math.min(100, Math.round((today.cards / goal) * 100));
-    return '<section class="group" aria-label="今日の記録"><div class="stats">' +
-      '<div class="stat"><span class="stat-num">' + streak.days + '<small>日</small></span><span class="stat-label">連続学習' + (streak.days && !streak.todayDone ? '・今日まだ' : '') + '</span></div>' +
-      '<div class="stat"><span class="stat-num">' + today.cards + '<small>/' + goal + '</small></span><span class="stat-label">今日の目標' + (today.cards >= goal ? '・達成' : '') + '</span></div>' +
-      '<div class="stat"><span class="stat-num">' + points + '</span><span class="stat-label">ポイント</span></div>' +
-      '</div><span class="meter" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + Math.min(goal, today.cards) + '"><span style="width:' + pct + '%"></span></span></section>';
+  /** ホームの上：今日の目標（輪）・連続学習・ポイント */
+  function heroCard(streak, today, goal, points) {
+    const done = Math.min(goal, today.cards);
+    const c = 2 * Math.PI * 52;
+    const off = c * (1 - done / goal);
+    return '<section class="hero" aria-label="今日の記録">' +
+      '<div class="hero-ring" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + done + '">' +
+      '<svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="hero-metal" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="#e3eef9"/><stop offset=".3" stop-color="#8fb6dd"/><stop offset=".62" stop-color="#4f7fae"/><stop offset="1" stop-color="#c3d8ee"/></linearGradient></defs>' +
+      '<circle class="ring-track" cx="60" cy="60" r="52"/>' +
+      '<circle class="ring-fill" cx="60" cy="60" r="52" stroke="url(#hero-metal)" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"' + (done ? '' : ' opacity="0"') + '/></svg>' +
+      '<p class="ring-text"><b class="num">' + today.cards + '</b><span>/ ' + goal + '枚</span></p></div>' +
+      '<div class="hero-side"><p class="hero-label">今日の目標' + (today.cards >= goal ? '<span class="hero-done">達成</span>' : '') + '</p>' +
+      '<dl class="hero-stats">' +
+      '<div><dt>連続学習</dt><dd class="num">' + streak.days + '<small>日</small></dd></div>' +
+      '<div><dt>ポイント</dt><dd class="num">' + points + '</dd></div></dl>' +
+      (streak.days && !streak.todayDone ? '<p class="hero-note">今日はまだ学習していません</p>' : '') +
+      '</div></section>';
+  }
+
+  function todayLabel(now) {
+    const d = new Date(now);
+    return (d.getMonth() + 1) + '月' + d.getDate() + '日（' + '日月火水木金土'.charAt(d.getDay()) + '）';
   }
 
   /** カード学習を始めるまとまり：出題のしかた（切り替え）＋ 枚数 ＋ 青いボタン */
@@ -591,8 +660,8 @@
     const mc = Q.missCounts(st.tests);
 
     let html = '<main class="screen home" id="main">';
-    html += pageHead('コアイメージ単語帳');
-    html += statsGroup(streak, today, goal, st.log.totalPoints);
+    html += '<header class="page-head home-head"><p class="eyebrow">' + esc(todayLabel(now)) + '</p><h1 tabindex="-1">コアイメージ単語帳</h1></header>';
+    html += heroCard(streak, today, goal, st.log.totalPoints);
 
     if (sess || cur) {
       html += section('途中から', '<div class="list">' +
@@ -1793,7 +1862,7 @@
     if (n && !(speech && speech.packFailed)) {
       info = '<div class="audio-info"><p class="r-title">AI音声（アメリカ英語）</p>' +
         '<p class="fine">やわらかく聞き取りやすい、アメリカ英語の女性の声です。' +
-        '単語・フレーズ・例文 ' + n + '件を、ふつうの速さと「ゆっくり」の2種類で用意しています。「ゆっくり」は、単語なら約2倍の長さで、一つひとつの音を聞き取れる速さです。</p></div>';
+        '単語・フレーズ・例文 ' + n + '件を、ふつうの速さと「ゆっくり」の2種類で用意しています。「ゆっくり」は、単語なら2.2倍・2〜4語なら1.8倍・文なら1.6倍の長さで、一つひとつの音を聞き取れる速さです。再生中は、ボタンの下に何倍で再生しているかを出します。</p></div>';
     } else if (n) {
       info = '<p class="banner warn">AI音声を読み込めなかったため、端末の読み上げを使っています。通信できる状態で、アプリを開き直してください。</p>';
     } else {

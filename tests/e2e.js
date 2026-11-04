@@ -26,6 +26,7 @@ function speechMock(kind) {
   (() => {
     window.__spoken = [];
     window.__clips = [];
+    window.__stops = 0;
     try {
       const P = window.AudioBufferSourceNode && window.AudioBufferSourceNode.prototype;
       if (P) {
@@ -33,6 +34,11 @@ function speechMock(kind) {
         P.start = function (when, offset, duration) {
           if (offset !== undefined) window.__clips.push({ offset, duration });
           return orig.apply(this, arguments);
+        };
+        const origStop = P.stop;
+        P.stop = function () {
+          window.__stops += 1;
+          return origStop.apply(this, arguments);
         };
       }
     } catch (e) {}
@@ -124,6 +130,11 @@ async function sameClip(page, played, text, slow) {
   ok(Math.abs(played.offset - c[1]) < 0.002 && Math.abs(played.duration - (c[2] - c[1])) < 0.002, (slow ? 'ゆっくり ' : '') + text + ' の区間: ' + JSON.stringify(played) + ' / ' + JSON.stringify(c));
 }
 const capOf = (page, sel) => page.textContent(sel + ' .audio-cap');
+/** ホームの上のまとまり：[連続学習, 今日の枚数, ポイント] */
+const heroStats = (page) => page.evaluate(() => {
+  const dd = Array.from(document.querySelectorAll('.hero-stats dd')).map((e) => e.textContent);
+  return [dd[0], document.querySelector('.ring-text b').textContent, dd[1]];
+});
 
 async function flipAndRate(page, r) {
   await page.click('.card-front .tap-hint');
@@ -212,7 +223,8 @@ async function noHScroll(page, label) {
     await sameClip(page, cs[4], exEn, true);
     const texts = await page.$$eval('[data-action="speak"]', (els) => els.map((e) => e.dataset.text));
     ok(texts.length > 3 && texts.every((t) => t && !JA.test(t) && !t.includes('[')), '日本語は読み上げない・[ ] は読まない');
-    ok(!(await page.$('.card-back .ex .audio-cap')), '例文は AI音声なので、種類の表示をくり返さない');
+    await page.waitForFunction(() => !document.querySelector('.audio button.playing'), null, { timeout: 8000 });
+    ok(await page.$$eval('.card-back .ex .audio-cap', (els) => els.length > 0 && els.every((e) => e.hidden)), '例文は AI音声なので、再生していないときは種類の表示をくり返さない');
     ok(await page.$('.card-back'), '裏面のまま');
     eq(await current(page), sid, '音声ボタンで回答扱いにならない');
     eq(page.errors, []);
@@ -270,7 +282,10 @@ async function noHScroll(page, label) {
     await two[1].click();
     await waitClips(page, 1);
     await page.waitForTimeout(300);
-    eq((await clips(page)).length, 1, '続けて押すと、あとから押した音だけが鳴る（重ならない）');
+    const started = (await clips(page)).length;
+    const stopped = await page.evaluate(() => window.__stops);
+    ok(started - stopped <= 1, '続けて押すと前の音は止まり、重ならない（鳴り始め ' + started + '・止めた ' + stopped + '）');
+    await sameClip(page, (await clips(page))[started - 1], await two[1].getAttribute('data-text'));
     await page.evaluate(() => { window.__clips.length = 0; });
     const rec = await wordTexts('w-record');
     const live = await wordTexts('w-live');
@@ -324,9 +339,21 @@ async function noHScroll(page, label) {
     await page.click('.card-front .audio button[data-slow="0"]');
     await page.waitForSelector('.card-front .audio button.playing', { timeout: 8000 });
     await page.waitForFunction(() => !document.querySelector('.card-front .audio button.playing'), null, { timeout: 8000 });
+    const capBefore = await page.textContent('.card-front .audio-cap');
     await page.click('.card-front .audio button[data-slow="1"]');
     await page.waitForSelector('.card-front .audio button[data-slow="1"].playing', { timeout: 8000 });
+    const live = await page.evaluate(() => {
+      const g = document.querySelector('.card-front .audio');
+      return { cap: document.querySelector('.card-front .audio-cap').textContent, run: g.classList.contains('run') && g.classList.contains('timed'), dur: g.style.getPropertyValue('--dur') };
+    });
+    ok(/^ゆっくり再生中（ふつうの2\.2倍・\d\.\d秒）$/.test(live.cap), 'ゆっくり再生中の表示: ' + live.cap);
+    ok(live.run && parseFloat(live.dur) > 1, '音の長さだけ進む線: ' + JSON.stringify(live));
+    const t0 = Date.now();
     await page.waitForFunction(() => !document.querySelector('.audio button.playing'), null, { timeout: 8000 });
+    const took = (Date.now() - t0) / 1000;
+    ok(took > parseFloat(live.dur) * 0.6, 'ゆっくりは最後まで鳴る（' + took.toFixed(2) + '秒）');
+    eq(await page.textContent('.card-front .audio-cap'), capBefore, '鳴り終わると表示が元に戻る');
+    ok(!(await page.$('.card-front .audio.run')), '線も消える');
     const t = await page.textContent('#toast');
     ok(!t || !t.includes('読み込めません'), '読み込みに失敗しない: ' + t);
     eq(page.errors, []);
@@ -391,11 +418,12 @@ async function noHScroll(page, label) {
     await page.waitForSelector('#result-title');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    const stats = await page.$$eval('.home .stats .stat-num', (els) => els.map((e) => e.textContent));
+    const stats = await heroStats(page);
     ok(stats[0].startsWith('1'), '連続学習 1日: ' + stats[0]);
     ok(stats[1].startsWith('10'), '今日 10枚');
     ok(stats[2].startsWith(String(pts)), 'ポイント');
-    ok(await page.isVisible('text=今日の目標・達成'));
+    eq(await page.textContent('.hero-done'), '達成', '今日の目標・達成');
+    eq(await page.getAttribute('.hero-ring', 'aria-valuenow'), '10', '目標の輪がいっぱい');
     const sched = await page.$$eval('.home .facts dd', (els) => els.map((e) => e.textContent));
     eq(sched[1], '9枚', '明日の予定');
 
@@ -406,8 +434,9 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.home');
     const counts = await page.$$eval('.home .counts', (els) => Array.from(els[0].querySelectorAll('b')).map((e) => e.textContent));
     eq(counts.slice(0, 2), ['10', String(TOTAL - 10)], '翌日: 復習10枚・残りは新しいカード');
-    const stats2 = await page.$$eval('.home .stats .stat-num', (els) => els.map((e) => e.textContent));
-    ok(stats2[0].startsWith('1') && (await page.isVisible('text=連続学習・今日まだ')), '翌日はまだ学習していない表示');
+    const stats2 = await heroStats(page);
+    ok(stats2[0].startsWith('1') && (await page.isVisible('text=今日はまだ学習していません')), '翌日はまだ学習していない表示');
+    ok(!(await page.$('.hero-done')), '翌日は目標の達成表示が消える');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
     const set = await ls(page, 'session');
@@ -416,7 +445,7 @@ async function noHScroll(page, label) {
     await finishSet(page, 'good');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    const stats3 = await page.$$eval('.home .stats .stat-num', (els) => els.map((e) => e.textContent));
+    const stats3 = await heroStats(page);
     ok(stats3[0].startsWith('2'), '連続学習 2日: ' + stats3[0]);
     const p2 = await ls(page, 'progress');
     const someId = set.cards.find((id) => p2[id].fwd.history.length >= 2 && p2[id].fwd.history.every((h) => h.r === 'good'));

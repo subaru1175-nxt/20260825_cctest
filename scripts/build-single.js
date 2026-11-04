@@ -42,7 +42,7 @@ function standalone() {
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
     '<title>コアイメージ単語帳</title>',
-    '<meta name="theme-color" content="#f2f2f4">',
+    '<meta name="theme-color" content="#e6e8eb">',
     '<link rel="icon" href="' + icon + '">',
     fontLink,
     '<style>\n' + css + '\n</style>',

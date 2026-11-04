@@ -10,10 +10,12 @@ build_audio.py — 高品質な音声パック（アメリカ英語・Kokoro af_
   af_heart.bin         … 声（kokoro-js 同梱）
 
 ゆっくりの作り方
-  ふつうの速さの音声を、音の高さを変えずに引き伸ばす（ffmpeg の rubberband フィルター）。
-  1語 2倍・2〜4語 約1.8倍・5語以上 約1.6倍。
-  Kokoro 自体に遅く話させる（speed を 0.5〜0.65 にする）と音がくずれやすく、音声認識での聞き取り検査でも
-  大きく落ちたため（単語 21%、フレーズ 49%）、引き伸ばす方法にした（単語 79%、フレーズ 85%、文 97%）。
+  ふつうの速さの音声を、音の高さを変えずに引き伸ばす。
+    1語     … Praat の PSOLA（声の周期に合わせて引き伸ばす。単語でいちばん聞き取りやすかった）で 2.2倍
+    2〜4語  … WSOLA（ffmpeg の atempo）で 1.8倍
+    5語以上 … WSOLA で 1.6倍
+  方法は、音声認識での聞き取り（check_asr.py）と、音質の予測（DNSMOS）で比べて決めた（README.md）。
+  Kokoro 自体に遅く話させる方法（speed 0.5）と Rubber Band での引き伸ばしは、音がくずれやすいので使わない。
 
 出力
   audio/<単語ID>.mp3   … 単語ごとに、読み上げる英語（通常・ゆっくり）を1本につないだファイル
@@ -38,10 +40,10 @@ from kokoro_synth import Kokoro, SAMPLE_RATE  # noqa: E402
 
 # 速さ
 SPEED_NORMAL = 0.92        # Kokoro の speed。自然な速さのまま、少しだけ聞き取りやすく
-# ゆっくり：ふつうの音声を引き伸ばす倍率の逆数（rubberband の tempo。0.5 = 2倍の長さ）
-TEMPO_SLOW_WORD = 0.5
-TEMPO_SLOW_PHRASE = 0.55   # 2〜4語（約1.8倍）
-TEMPO_SLOW_SENTENCE = 0.62 # 5語以上（約1.6倍）
+# ゆっくり：ふつうの音声を引き伸ばす倍率
+SLOW_WORD = 2.2      # 1語（PSOLA）
+SLOW_PHRASE = 1.8    # 2〜4語（WSOLA）
+SLOW_SENTENCE = 1.6  # 5語以上（WSOLA）
 LEAD = 0.12                # 音の前の無音（秒）
 TAIL = 0.22                # 音の後の無音
 GAP = 0.35                 # ファイルの中で、次の音までの無音
@@ -49,28 +51,41 @@ TARGET_RMS = 0.085         # 音量をそろえる（声のある部分の平均
 PEAK = 0.89
 
 
-def slow_tempo(text):
-    """短いほど、ゆっくりにする（1語 2倍・2〜4語 約1.8倍・5語以上 約1.6倍）"""
+def slow_factor(text):
+    """短いほど、ゆっくりにする（1語 2.2倍・2〜4語 1.8倍・5語以上 1.6倍）"""
     n = len(text.split())
     if n == 1:
-        return TEMPO_SLOW_WORD
+        return SLOW_WORD
     if n <= 4:
-        return TEMPO_SLOW_PHRASE
-    return TEMPO_SLOW_SENTENCE
+        return SLOW_PHRASE
+    return SLOW_SENTENCE
 
 
-def stretch(x, tempo):
-    """音の高さを変えずに引き伸ばす（Rubber Band）。
-    声の始まりの子音がぼやけないように、前後に無音を足してから引き伸ばす（あとで trim で切る）"""
-    x = np.concatenate([silence(0.15), x, silence(0.15)])
+def psola(x, factor):
+    """声の周期に合わせて引き伸ばす（Praat の Lengthen (overlap-add)）"""
+    import parselmouth
+    from parselmouth.praat import call
+    snd = parselmouth.Sound(x.astype(np.float64), sampling_frequency=SAMPLE_RATE)
+    return call(snd, 'Lengthen (overlap-add)', 75, 600, factor).values[0].astype(np.float32)
+
+
+def wsola(x, factor):
+    """波形を少しずつ重ねて引き伸ばす（ffmpeg の atempo）"""
     pcm = np.clip(x, -1, 1).astype(np.float32).tobytes()
     out = subprocess.run([
         'ffmpeg', '-hide_banner', '-loglevel', 'error',
         '-f', 'f32le', '-ar', str(SAMPLE_RATE), '-ac', '1', '-i', 'pipe:0',
-        '-af', 'rubberband=tempo=%s' % tempo,
+        '-af', 'atempo=%.6f' % (1 / factor),
         '-f', 'f32le', '-ar', str(SAMPLE_RATE), '-ac', '1', 'pipe:1',
     ], input=pcm, capture_output=True, check=True).stdout
     return np.frombuffer(out, dtype=np.float32).copy()
+
+
+def make_slow(normal, text):
+    """ふつうの音声から、ゆっくりを作る。始まりの子音がぼやけないよう、前後に無音を足してから引き伸ばす"""
+    factor = slow_factor(text)
+    x = np.concatenate([silence(0.15), normal, silence(0.15)])
+    return psola(x, factor) if len(text.split()) == 1 else wsola(x, factor)
 
 
 def trim(x, thr=0.006, margin=0.04):
@@ -143,7 +158,7 @@ def main():
     for n, t in enumerate(texts):
         ph = g2p(t['text'], isolated=(t['kind'] == 'word'))
         normal = level(trim(synth(ph, SPEED_NORMAL)))
-        slow = level(trim(stretch(normal, slow_tempo(t['text']))))
+        slow = level(trim(make_slow(normal, t['text'])))
         clips = {v: np.concatenate([silence(LEAD), w, silence(TAIL)]) for v, w in (('n', normal), ('s', slow))}
         groups.setdefault(t['wordId'], []).append((t['text'], clips))
         report.append((t['text'], ph, len(clips['n']) / SAMPLE_RATE, len(clips['s']) / SAMPLE_RATE))
@@ -176,6 +191,7 @@ def main():
         'base': 'audio/',
         'ext': '.mp3',
         'pad': [LEAD, TAIL],
+        'slow': {'1': SLOW_WORD, '2-4': SLOW_PHRASE, '5+': SLOW_SENTENCE},
         'clips': index,
     }
     with open(os.path.join(ROOT, 'js', 'audio-pack.js'), 'w', encoding='utf-8') as f:
@@ -190,7 +206,7 @@ def main():
         f.write('# 音声パックの一覧\n\n自動生成：`scripts/audio/build_audio.py`\n\n')
         f.write(f'- 声：Kokoro-82M / {args.voice}（アメリカ英語）\n- 英語 {len(texts)}件 × 通常・ゆっくり\n')
         f.write(f'- 速さ：ふつう Kokoro speed {SPEED_NORMAL}。ゆっくりは、ふつうの音声を音の高さを変えずに引き伸ばしたもの'
-                f'（1語 {1 / TEMPO_SLOW_WORD:.1f}倍・2〜4語 {1 / TEMPO_SLOW_PHRASE:.1f}倍・5語以上 {1 / TEMPO_SLOW_SENTENCE:.1f}倍）\n')
+                f'（1語 {SLOW_WORD}倍 PSOLA・2〜4語 {SLOW_PHRASE}倍 WSOLA・5語以上 {SLOW_SENTENCE}倍 WSOLA）\n')
         f.write(f'- ファイル：{len(groups)}本・合計 {total / 1e6:.1f} MB\n\n')
         f.write('| 英語 | 発音記号（Kokoro） | 通常（秒） | ゆっくり（秒） |\n| --- | --- | --- | --- |\n')
         for text, ph, dn, ds in report:

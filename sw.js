@@ -3,7 +3,7 @@
  * いつもはネットから最新を取り、つながらない時だけ保存しておいたものを使う。
  * AI音声のファイル（audio/）は、一度再生したものを保存しておく。
  */
-const CACHE = 'cif-v4';
+const CACHE = 'cif-v5';
 const FILES = [
   './', './index.html', './css/style.css', './manifest.webmanifest', './icons/icon.svg', './icons/icon-180.png',
   './js/util.js', './js/srs.js', './js/session.js', './js/quiz.js', './js/storage.js', './js/data-notebook.js', './js/data-seed.js',
