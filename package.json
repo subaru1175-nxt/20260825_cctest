@@ -7,7 +7,12 @@
     "start": "node scripts/serve.js",
     "test": "node --test tests/unit.test.js",
     "test:e2e": "node tests/e2e.js",
-    "build": "node scripts/build-single.js"
+    "build": "node scripts/build-single.js",
+    "notebook": "node scripts/build-notebook.mjs"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "cmu-pronouncing-dictionary": "3.0.0",
+    "wordnet-db": "3.1.14"
+  }
 }

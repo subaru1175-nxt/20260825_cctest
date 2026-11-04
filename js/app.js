@@ -835,6 +835,7 @@
     if (w.status === 'needs_review') {
       html += '<div class="banner warn"><b>要確認：通常の出題から外しています。</b>' +
         (w.reviewReasons.length ? '<ul>' + w.reviewReasons.map((r) => '<li>' + esc(r) + '</li>').join('') + '</ul>' : '') +
+        w.senses.filter((s) => s.note).map((s) => '<p class="review-note">' + esc(s.note) + '</p>').join('') +
         '内容を辞書などで確かめてから、編集で確認状況を変えてください。</div>';
     }
     html += '<p class="sense-count">用法 ' + w.senses.length + 'つ' + (groups.length > 1 ? '・' + groups.length + 'つのグループ' : '') + '</p>';

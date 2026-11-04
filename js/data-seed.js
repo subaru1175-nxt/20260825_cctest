@@ -11,12 +11,12 @@
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
+    module.exports = factory(require('./data-notebook.js'));
   } else {
     root.CIF = root.CIF || {};
-    root.CIF.seed = factory();
+    root.CIF.seed = factory(root.CIF.notebook);
   }
-})(this, function () {
+})(this, function (notebook) {
   'use strict';
 
   const CHECKED = '2026-11-04';
@@ -737,5 +737,8 @@
     },
   ];
 
-  return { version: 1, words };
+  // 手書きの単語リスト（資料）の単語を先に、そのあとに最初から入っていた見本の単語を並べる。
+  // version を上げると、すでに使っている人にも新しい単語だけが追加される（storage.js）。
+  const fromNotebook = (notebook && notebook.words) || [];
+  return { version: 2, words: fromNotebook.concat(words), sample: words.map((w) => w.id) };
 });

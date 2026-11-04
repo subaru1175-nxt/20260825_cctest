@@ -2,10 +2,10 @@
  * sw.js — オフラインでも開けるようにする（https または localhost のときだけ動く）
  * いつもはネットから最新を取り、つながらない時だけ保存しておいたものを使う。
  */
-const CACHE = 'cif-v1';
+const CACHE = 'cif-v2';
 const FILES = [
   './', './index.html', './css/style.css', './manifest.webmanifest', './icons/icon.svg',
-  './js/util.js', './js/srs.js', './js/session.js', './js/storage.js', './js/data-seed.js',
+  './js/util.js', './js/srs.js', './js/session.js', './js/storage.js', './js/data-notebook.js', './js/data-seed.js',
   './js/diagrams.js', './js/speech.js', './js/app.js',
 ];
 

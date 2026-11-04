@@ -151,13 +151,46 @@
       '壁の絵もテーブルのカップも、面にくっついている（色の点が接しているところ）'
     ),
 
-    'look-see-watch': svg(
-      '<rect class="frame" x="4" y="4" width="74" height="112" rx="8"/>' +
-        '<text class="te b" x="41" y="22" text-anchor="middle">look</text>' +
+    'look-see-watch': lookSeeWatch(0),
+    'see-look-watch': lookSeeWatch(1),
+
+    'compass-north': compass(0),
+    'compass-east': compass(1),
+    'compass-south': compass(2),
+    'compass-west': compass(3),
+
+    'in-out-in': inOut(true),
+    'in-out-out': inOut(false),
+
+    'many-much-many': manyMuch(0),
+    'many-much-much': manyMuch(1),
+
+    'few-a': fewCookies(true),
+    'few-none': fewCookies(false),
+
+    'too-much': svg(
+      '<rect class="fl" x="20" y="48" width="200" height="16" rx="8"/>' +
+        '<rect class="ac" x="20" y="48" width="186" height="16" rx="8"/>' +
+        '<line class="again-ln" x1="150" y1="34" x2="150" y2="78"/>' +
+        '<text class="t s" x="150" y="28" text-anchor="middle">ちょうどいい線</text>' +
+        '<path class="ac" d="M206 42 l-8 -12 h16 z"/>' +
+        '<text class="te b" x="206" y="22" text-anchor="middle">too</text>' +
+        '<text class="t s" x="85" y="96" text-anchor="middle">very（とても）</text>' +
+        '<text class="t b" x="190" y="96" text-anchor="middle">こえすぎ</text>',
+      'too は、ちょうどいい線をこえてしまった状態'
+    ),
+  };
+
+  function lookSeeWatch(hi) {
+    const frame = (x) => '<rect class="frame" x="' + x + '" y="4" width="74" height="112" rx="8"/>';
+    const lbl = (x, word, i) => '<text class="te ' + (i === hi ? 'b' : 's') + '" x="' + x + '" y="22" text-anchor="middle">' + word + '</text>';
+    return svg(
+      frame(hi === 0 ? 4 : 83) +
+        lbl(41, 'look', 0) +
         eye(24, 58) +
         '<path class="acs" d="M42 58 H60 m-7 -6 l7 6 l-7 6"/>' +
         '<text class="t s" x="41" y="100" text-anchor="middle">目を向ける</text>' +
-        '<text class="te s" x="120" y="22" text-anchor="middle">see</text>' +
+        lbl(120, 'see', 1) +
         eye(104, 58) +
         '<path class="ln2 dash" d="M142 50 L124 56 M142 66 L124 60"/>' +
         '<circle class="fl ln" cx="146" cy="58" r="5"/>' +
@@ -168,8 +201,72 @@
         '<circle class="fl ln2" cx="186" cy="38" r="3"/><circle class="fl ln2" cx="204" cy="35" r="3"/><circle class="ac" cx="222" cy="41" r="4"/>' +
         '<text class="t s" x="199" y="100" text-anchor="middle">見続ける</text>',
       'look は目を向ける、see は自然に目に入る、watch は動くものを見続ける'
-    ),
-  };
+    );
+  }
+
+  function compass(dir) {
+    const cx = 120;
+    const cy = 60;
+    const pts = [[cx, cy - 34, 'N', '北'], [cx + 34, cy, 'E', '東'], [cx, cy + 34, 'S', '南'], [cx - 34, cy, 'W', '西']];
+    const [tx, ty, , ja] = pts[dir];
+    const lab = pts.map(([x, y, en, j], i) => {
+      const lx = x + (i === 1 ? 16 : i === 3 ? -16 : 0);
+      const ly = y + (i === 0 ? -8 : i === 2 ? 16 : 4);
+      return '<text class="te ' + (i === dir ? 'b' : 's') + '" x="' + lx + '" y="' + ly + '" text-anchor="middle">' + en + '</text>';
+    }).join('');
+    return svg(
+      '<circle class="fl ln2" cx="' + cx + '" cy="' + cy + '" r="40"/>' +
+        '<path class="ln2" d="M' + cx + ' ' + (cy - 30) + ' V' + (cy + 30) + ' M' + (cx - 30) + ' ' + cy + ' H' + (cx + 30) + '"/>' +
+        '<path class="acs" d="M' + cx + ' ' + cy + ' L' + tx + ' ' + ty + '"/>' +
+        '<circle class="ac" cx="' + tx + '" cy="' + ty + '" r="6"/>' +
+        '<circle class="ink" cx="' + cx + '" cy="' + cy + '" r="3"/>' + lab +
+        '<text class="t b big" x="' + (dir === 3 ? 206 : 34) + '" y="70" text-anchor="middle">' + ja + '</text>',
+      '方位の図。' + ja + 'の方角'
+    );
+  }
+
+  function inOut(inside) {
+    return svg(
+      '<path class="fl ln" d="M70 52 L120 18 L170 52 V104 H70 Z"/>' +
+        '<circle class="' + (inside ? 'ac' : 'fl ln2') + '" cx="120" cy="80" r="10"/>' +
+        '<circle class="' + (inside ? 'fl ln2' : 'ac') + '" cx="206" cy="86" r="10"/>' +
+        '<line class="ln2" x1="10" y1="104" x2="230" y2="104"/>' +
+        '<text class="te ' + (inside ? 'b' : 's') + '" x="120" y="62" text-anchor="middle">inside</text>' +
+        '<text class="te ' + (inside ? 's' : 'b') + '" x="206" y="66" text-anchor="middle">outside</text>' +
+        '<text class="t s" x="34" y="94" text-anchor="middle">' + (inside ? '中' : '外') + '</text>',
+      inside ? '建物の中に点がある（inside）' : '建物の外に点がある（outside）'
+    );
+  }
+
+  function manyMuch(hi) {
+    const dots = [[30, 40], [52, 34], [44, 58], [68, 52], [28, 74], [58, 80], [80, 72], [74, 30]]
+      .map(([x, y]) => '<circle class="ac" cx="' + (x + 6) + '" cy="' + y + '" r="7"/>').join('');
+    return svg(
+      '<rect class="frame" x="' + (hi === 0 ? 6 : 126) + '" y="6" width="108" height="108" rx="10"/>' +
+        dots +
+        '<path class="ln" d="M150 30 L156 96 H204 L210 30"/>' +
+        '<path class="ac" d="M153 50 L157 94 H203 L207 50 Z"/>' +
+        '<text class="te ' + (hi === 0 ? 'b' : 's') + '" x="60" y="106" text-anchor="middle">many（数）</text>' +
+        '<text class="te ' + (hi === 1 ? 'b' : 's') + '" x="180" y="112" text-anchor="middle">much（量）</text>',
+      'many は数えられる粒がたくさん、much は数えられない水などがたくさん'
+    );
+  }
+
+  function fewCookies(aFew) {
+    const plate = (cx) => '<ellipse class="fl ln2" cx="' + cx + '" cy="74" rx="50" ry="16"/>';
+    const cookie = (x, y) => '<circle class="hl ln2" cx="' + x + '" cy="' + y + '" r="11"/>';
+    const crumb = (x, y) => '<circle class="ink" cx="' + x + '" cy="' + y + '" r="2"/>';
+    return svg(
+      '<rect class="frame" x="' + (aFew ? 4 : 124) + '" y="10" width="112" height="104" rx="10"/>' +
+        plate(60) + cookie(44, 66) + cookie(64, 62) + cookie(78, 70) +
+        plate(180) + crumb(170, 72) + crumb(186, 76) +
+        '<text class="te ' + (aFew ? 'b' : 's') + '" x="60" y="34" text-anchor="middle">a few</text>' +
+        '<text class="t s" x="60" y="106" text-anchor="middle">少しある</text>' +
+        '<text class="te ' + (aFew ? 's' : 'b') + '" x="180" y="34" text-anchor="middle">few</text>' +
+        '<text class="t s" x="180" y="106" text-anchor="middle">ほとんどない</text>',
+      'a few はクッキーが少しある、few はほとんどない'
+    );
+  }
 
   function has(key) {
     return !!(key && LIB[key]);

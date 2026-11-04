@@ -12,6 +12,8 @@ const DAY = util.DAY;
 // 2026-11-04 10:00（端末の時刻）
 const T0 = new Date(2026, 10, 4, 10, 0, 0).getTime();
 const words = () => seed.words.map((w) => ST.normalizeWord(w).word);
+const TOTAL = S.studyable(words()).length; // 出題できる用法の数（要確認を除く）
+const SENSES = seed.words.reduce((n, w) => n + w.senses.length, 0);
 
 test('思い出せた: 1日 → 3日 → 8日 と間隔が広がる', () => {
   let s = srs.review(null, 'good', T0);
@@ -90,7 +92,7 @@ test('再出題の回答では予定を変えず、履歴だけ増える', () =>
 test('セット: 10枚。復習予定のカードを新しいカードより先に出す', () => {
   const ws = words();
   const ids = S.studyable(ws).map((x) => x.sense.id);
-  assert.equal(ids.length, 21);
+  assert.equal(ids.length, TOTAL);
   const progress = {};
   // 最後の2枚を「復習予定日を過ぎた」状態にする
   const dueIds = ids.slice(-2);
@@ -115,11 +117,12 @@ test('セット: 同じ単語のカードは続けて出さない', () => {
 test('要確認の単語・用法は出題しない', () => {
   const ws = words();
   ws[0].status = 'needs_review';
-  ws[1].senses[0].status = 'needs_review';
+  const two = ws.find((w) => w.senses.length >= 2 && w.status !== 'needs_review');
+  two.senses[0].status = 'needs_review';
   const ids = S.studyable(ws).map((x) => x.sense.id);
   assert.ok(!ids.includes(ws[0].senses[0].id));
-  assert.ok(!ids.includes(ws[1].senses[0].id));
-  assert.ok(ids.includes(ws[1].senses[1].id));
+  assert.ok(!ids.includes(two.senses[0].id));
+  assert.ok(ids.includes(two.senses[1].id));
 });
 
 test('場面→英語は、英語→場面で学習したカードだけ', () => {
@@ -209,9 +212,11 @@ test('進捗・残り枚数・まとめ', () => {
 test('途中のセットの復元: 削除された単語のカードを除く', () => {
   const ws = words();
   const set = S.build(ws, {}, 'fwd', T0);
-  const removed = ws.filter((w) => w.id !== 'w-pretty');
+  const firstWord = ws.find((w) => w.senses.some((x) => x.id === set.queue[0]));
+  const removed = ws.filter((w) => w.id !== firstWord.id);
   const fixed = S.sanitize(JSON.parse(JSON.stringify(set)), removed);
-  assert.ok(fixed.queue.every((id) => !id.startsWith('s-pretty')));
+  assert.ok(!fixed.queue.includes(set.queue[0]));
+  assert.equal(fixed.queue.length, set.queue.length - 1);
   assert.equal(fixed.finished, false);
 });
 
@@ -241,26 +246,31 @@ test('ポイント・今日の目標・連続学習日数', () => {
 test('ホームの件数', () => {
   const ws = words();
   const c = S.counts(ws, {}, T0);
-  assert.equal(c.total, 21);
-  assert.equal(c.newFwd, 21);
+  assert.equal(c.total, TOTAL);
+  assert.equal(c.newFwd, TOTAL);
   assert.equal(c.availableRev, 0);
   const id = ws[0].senses[0].id;
   const progress = { [id]: { fwd: srs.review(null, 'good', T0) } };
   const c2 = S.counts(ws, progress, T0 + 1000);
-  assert.equal(c2.newFwd, 20);
+  assert.equal(c2.newFwd, TOTAL - 1);
   assert.equal(c2.tomorrow, 1);
   assert.equal(c2.availableRev, 1);
   const c3 = S.counts(ws, progress, util.addDays(T0, 1) + 1);
   assert.equal(c3.dueFwd, 1);
 });
 
-test('初期データ: すべて必須項目があり、例文に [ ] の印がある', () => {
+test('初期データ: すべて必須項目があり、例文に [ ] の印がある（要確認の語を除く）', () => {
   assert.ok(seed.words.length >= 10);
   const ids = new Set();
   seed.words.forEach((w) => {
     const { word, problems } = ST.normalizeWord(w);
     assert.deepEqual(problems, [], w.headword);
-    assert.equal(word.status, 'verified');
+    if (word.status === 'needs_review') {
+      assert.ok(word.reviewReasons.length > 0, w.headword + ' に要確認の理由');
+      return;
+    }
+    assert.ok(['verified', 'unverified'].includes(word.status), w.headword);
+    if (word.status === 'unverified') assert.ok(word.check.note.includes('未確認の理由'), w.headword + ' に未確認の理由');
     assert.ok(word.sources.length > 0, w.headword + ' に出典');
     assert.ok(word.check.date && word.check.method, w.headword + ' に確認状況');
     word.senses.forEach((s) => {
@@ -328,8 +338,8 @@ test('書き出し → 読み込み で同じ内容に戻る', () => {
   const text = JSON.stringify(ST.buildExport(state));
   const parsed = ST.parseImport(text);
   assert.equal(parsed.ok, true);
-  assert.equal(parsed.stats.words, 11);
-  assert.equal(parsed.stats.senses, 21);
+  assert.equal(parsed.stats.words, seed.words.length);
+  assert.equal(parsed.stats.senses, SENSES);
   assert.equal(parsed.stats.progress, 1);
   const next = ST.applyImport({ words: [], progress: {}, settings: ST.DEFAULT_SETTINGS }, parsed.data, 'replace');
   assert.deepEqual(next.words, state.words);
@@ -348,7 +358,7 @@ test('読み込み: 追加・更新は学習記録を残し、壊れたファイ
   assert.ok(incoming.warnings.length >= 1);
   const base = { words: words(), progress: { 's-pretty-adj': { fwd: srs.review(null, 'good', T0) } } };
   const merged = ST.applyImport(base, incoming.data, 'merge');
-  assert.equal(merged.words.length, 13);
+  assert.equal(merged.words.length, seed.words.length + 2);
   assert.ok(merged.progress['s-pretty-adj']);
 });
 
@@ -356,7 +366,7 @@ test('保存ストア: 初回は初期データ、保存した内容は再読み
   const backend = ST.memoryBackend();
   const a = ST.createStore(backend);
   await a.init(seed);
-  assert.equal(a.state.words.length, 11);
+  assert.equal(a.state.words.length, seed.words.length);
   await a.set('progress', { 's-pretty-adj': { fwd: srs.review(null, 'good', T0) } });
   await a.set('settings', Object.assign({}, a.state.settings, { voiceURI: 'v1', slowRate: 0.5 }));
   const w = a.state.words.slice();
@@ -364,7 +374,7 @@ test('保存ストア: 初回は初期データ、保存した内容は再読み
   await a.set('words', w);
   const b = ST.createStore(backend);
   await b.init(seed);
-  assert.equal(b.state.words.length, 12);
+  assert.equal(b.state.words.length, seed.words.length + 1);
   assert.equal(b.state.settings.voiceURI, 'v1');
   assert.equal(b.state.settings.slowRate, 0.5);
   assert.equal(b.state.progress['s-pretty-adj'].fwd.interval, 1);
@@ -410,4 +420,50 @@ test('復習予定の表示', () => {
   assert.equal(util.formatDue(util.addDays(T0, 1), T0), '明日');
   assert.equal(util.formatDue(util.addDays(T0, 3), T0), '3日後');
   assert.equal(util.formatDue(T0 - 1, T0), '今すぐ');
+});
+
+test('手書きの単語リスト: 資料の単語が先、読めない・意図が不明な語は要確認で出題しない', () => {
+  const ws = words();
+  assert.equal(ws[0].headword, 'begin', '資料の単語から先に並ぶ');
+  const sample = new Set(seed.sample);
+  assert.ok(ws.findIndex((w) => sample.has(w.id)) > 90, '見本の単語は後ろ');
+  for (const h of ['fell', 'brighe']) {
+    const w = ws.find((x) => x.headword === h);
+    assert.equal(w.status, 'needs_review', h);
+    assert.ok(w.reviewReasons[0].includes('判断できません') || w.reviewReasons[0].includes('見つかりません'), h);
+    assert.ok(!S.studyable(ws).some((it) => it.word.id === w.id), h + ' は出題しない');
+  }
+  // 資料にあってすでに入っていた語は重複させない
+  for (const h of ['take', 'well', 'pretty', 'look']) assert.equal(ws.filter((x) => x.headword === h).length, 1, h);
+  // 表記を直した語は、元の表記と理由を記録している
+  const everyone = ws.find((x) => x.headword === 'everyone');
+  assert.ok(everyone.check.note.includes('every one'));
+  assert.ok(everyone.sources[0].label.includes('every one'));
+  const become = ws.find((x) => x.headword === 'become');
+  assert.ok(become.check.note.includes('became'));
+  // 品詞で発音が変わる excuse は、用法ごとに読み上げと発音記号が違う
+  const excuse = ws.find((x) => x.headword === 'excuse');
+  assert.deepEqual(excuse.senses.map((x) => x.speak), ['Excuse me.', 'an excuse']);
+  assert.deepEqual(excuse.senses.map((x) => x.ipa.us), ['/ɪkˈskjuːz/', '/ɪkˈskjuːs/']);
+  // would / should は辞書で確認できなかったので未確認
+  assert.equal(ws.find((x) => x.headword === 'would').status, 'unverified');
+  assert.equal(ws.find((x) => x.headword === 'should').status, 'unverified');
+  // 確認済みの語は、WordNet などの照合結果を記録している
+  const begin = ws.find((x) => x.headword === 'begin');
+  assert.equal(begin.status, 'verified');
+  assert.ok(begin.check.note.includes('WordNet: take the first step'));
+});
+
+test('保存ストア: 新しい版で増えた資料の単語は先頭に並び、自分で追加した単語は残る', async () => {
+  const backend = ST.memoryBackend();
+  const sampleWords = seed.words.filter((w) => seed.sample.includes(w.id));
+  const mine = { id: 'w-mine', headword: 'mine', senses: [{ meaning: '私のもの' }] };
+  await backend.save('words', sampleWords.concat([mine]));
+  await backend.save('meta', { seedVersion: 1, deletedSeed: [] });
+  const st = ST.createStore(backend);
+  await st.init(seed);
+  const ids = st.state.words.map((w) => w.id);
+  assert.equal(ids[0], 'w-begin');
+  assert.equal(ids[ids.length - 1], 'w-mine');
+  assert.equal(ids.length, seed.words.length + 1);
 });

@@ -72,15 +72,39 @@
 
 ## 単語データ
 
-初期データは、基本的な11語（21用法）です：
-`pretty`（かわいい／けっこう）、`well`（上手に／うーん・さて／井戸）、`light`（明かり／軽い）、`record`（記録／録音する）、`live`（住む／生の）、`run`（走る／経営する）、`get`（手に入れる／〜になる）、`break`（割る／休憩）、`take`（持っていく／時間がかかる）、`on`（くっついて）、`look`（目を向ける）。
+初期データは **105語（132用法）** です。
+
+1. **手書きの単語リスト（Untitled_Notebook.pdf）の94語（111用法）**：資料の順に並べ、最初はこちらから出題します。
+   資料にあった `take` `well` `pretty` `look` は見本の単語にすでにあるため、重ねて追加していません。
+2. **見本の11語（21用法）**：`pretty`（かわいい／けっこう）、`well`（上手に／うーん・さて／井戸）、`light`（明かり／軽い）、`record`（記録／録音する）、`live`（住む／生の）、`run`（走る／経営する）、`get`（手に入れる／〜になる）、`break`（割る／休憩）、`take`（持っていく／時間がかかる）、`on`（くっついて）、`look`（目を向ける）。
+
+前の版を使っていた場合も、学習記録はそのままで、資料の単語だけが追加されます（自分で削除した見本の単語は戻りません）。
+
+### 手書きの単語リストの読み取り
+
+推測で確定しないように、次のように扱いました。照合結果の一覧は `data/notebook/REPORT.md` にあります。
+
+| 資料の表記 | 登録した内容 | 理由 |
+| --- | --- | --- |
+| fell | **要確認**（出題しない） | fall の過去形か、feel の書き間違いか判断できない |
+| brighe | **要確認**（出題しない） | この綴りの英単語が辞書にない。bright のつもりか確認が必要 |
+| every one / every thing | everyone / everything | 前後の代名詞（anything・nobody）と同じ仲間として1語で登録。2語のつもりなら編集してください |
+| became / seems | become / seem | 元の形で登録し、例文で became / seems を使用 |
+| Brush | brush | 大文字で始まっていただけと判断 |
+| many（数）/ much（量） | many / much | メモの「数」「量」を、数えられる／数えられないの違いとして説明に反映 |
+| would / should | **未確認**（出題する） | Oxford の該当項目を確認できず、文法解説サイトの情報だけで照合したため |
+
+`w` が「vv」のように見える字（few・low・wrong・show など）は、同じ書き方が続いていることから w と読みました。
 
 ### 出典と確認状況
 
 単語ごとに **確認状況・確認日・確認方法・出典リンク** を記録し、単語詳細画面で見られます。
 
-- 初期データの品詞・意味・発音記号は、Web 検索で表示された辞書の該当ページ（Oxford Learner's Dictionaries、Merriam-Webster、Dictionary.com、語源は Online Etymology Dictionary など）の情報と照らし合わせて確認しました（2026-11-04）。
-- 作成時の環境からは辞書サイトの本文を直接開けなかったため、その旨を確認方法に書いています。気になる点は詳細画面の出典リンクや「辞書で調べる」リンクから確認できます。
+- **手書きリストの単語**は、`scripts/build-notebook.mjs` で辞書データと自動照合しています。照合できない項目が1つでもあると、データを作らずに止まります。
+  - 品詞・意味：[Princeton WordNet 3.1](https://wordnet.princeton.edu/) に、その品詞の語義があり、指定した説明文を含むか。照合した語義は単語ごとに記録しています。WordNet にない代名詞・助動詞などは、Web 検索で表示された辞書の該当ページで照合し、その出典を記録しています。
+  - 米音の発音記号：[CMU Pronouncing Dictionary](http://www.speech.cs.cmu.edu/cgi-bin/cmudict) の発音と、音の並びが一致するか（表記は Oxford 式にそろえています）。英音の発音記号は辞書と照合していません。
+- **見本の11語**の品詞・意味・発音記号は、Web 検索で表示された辞書の該当ページ（Oxford Learner's Dictionaries、Merriam-Webster、Dictionary.com、語源は Online Etymology Dictionary など）の情報と照らし合わせて確認しました。
+- 確認日はどちらも 2026-11-04 です。作成時の環境からは辞書サイトの本文を直接開けなかったため、その旨を確認方法に書いています。気になる点は、詳細画面の出典リンクや「辞書で調べる」リンクから確認できます。
 - 例文・一言ニュアンス・場面の説明は、このアプリ用に作った学習用の文章です。
 
 確認状況は3つです。
@@ -151,7 +175,10 @@
 npm test          # 単体テスト（間隔反復・再出題・ポイント・連続日数・データ検証・保存）
 npm run test:e2e  # ブラウザでの操作テスト（Playwright + Chromium）
 npm run build     # dist/core-image-cards.html を作り直す
+npm run notebook  # 手書きリストのデータ（data/notebook/words-*.mjs）を辞書と照合して js/data-notebook.js を作り直す
 ```
+
+`npm run notebook` を使うときは、先に `npm install` で辞書データ（cmu-pronouncing-dictionary・wordnet-db）を入れてください。アプリを動かすだけなら不要です。
 
 E2E テストでは次のことを、実際のブラウザで操作して確かめています。
 
@@ -177,7 +204,10 @@ js/util.js            日付・文字列などの共通処理
 js/srs.js             復習間隔の計算
 js/session.js         セットの組み立て・再出題・ポイント・連続日数
 js/storage.js         保存・データの整形と検証・書き出し／読み込み
-js/data-seed.js       初期の単語データ
+js/data-seed.js       初期の単語データ（資料の単語＋見本の単語）
+js/data-notebook.js   手書きリストの単語データ（自動生成）
+data/notebook/        手書きリストの元データと照合結果（REPORT.md）
+scripts/build-notebook.mjs  手書きリストのデータを辞書と照合して生成
 js/diagrams.js        場面・コアイメージの図（SVG）
 js/speech.js          音声（合成音声の声選び・録音音声の再生）
 js/app.js             画面と操作

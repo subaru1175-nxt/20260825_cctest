@@ -29,13 +29,16 @@
 
   const POS = {
     noun: '名詞', verb: '動詞', adjective: '形容詞', adverb: '副詞',
-    preposition: '前置詞', interjection: '間投詞', conjunction: '接続詞', pronoun: '代名詞', other: 'その他',
+    preposition: '前置詞', interjection: '間投詞', conjunction: '接続詞', pronoun: '代名詞',
+    auxiliary: '助動詞', phrase: 'フレーズ', other: 'その他',
   };
 
   const ROLE = {
     thing: 'もの・こと', action: '動き', state: '状態', change: '変化（〜になる）',
     quality: 'どんな（様子）', manner: 'どんなふうに', degree: 'どのくらい',
     relation: '位置・関係', connector: '気持ち・話のつなぎ',
+    person: '人', amount: '数・量', place: '場所・方角', time: '時・回数', addition: '付け加え（〜も）',
+    mood: '話し手の気持ち',
   };
 
   const GROUPS = ['A', 'B', 'C', 'D'];
@@ -223,7 +226,11 @@
     const have = new Set(words.map((w) => w.id));
     const deleted = new Set(meta.deletedSeed || []);
     const add = seed.words.filter((w) => !have.has(w.id) && !deleted.has(w.id)).map((w) => normalizeWord(w).word);
-    return { words: words.concat(add), added: add.length };
+    // 初期データの単語は新しい版の並び順にそろえる（新しい単語から出題されるように）。自分で追加した単語はそのあと。
+    const order = new Map(seed.words.map((w, i) => [w.id, i]));
+    const merged = words.concat(add).map((w, i) => ({ w, k: order.has(w.id) ? order.get(w.id) : seed.words.length + i }));
+    merged.sort((a, b) => a.k - b.k);
+    return { words: merged.map((x) => x.w), added: add.length };
   }
 
   /* ---------- データの整形・チェック ---------- */

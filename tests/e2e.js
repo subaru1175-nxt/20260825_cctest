@@ -8,6 +8,13 @@
 'use strict';
 const { chromium } = require('playwright');
 const { start } = require('../scripts/serve.js');
+const SEED = require('../js/data-seed.js');
+const STORAGE = require('../js/storage.js');
+const SESSION = require('../js/session.js');
+const WORDS = SEED.words.length;
+const SENSES = SEED.words.reduce((n, w) => n + w.senses.length, 0);
+const TOTAL = SESSION.studyable(SEED.words.map((w) => STORAGE.normalizeWord(w).word)).length;
+const REVIEW_WORDS = SEED.words.filter((w) => w.status === 'needs_review').map((w) => w.headword).sort();
 
 const PORT = 8765;
 const URL0 = 'http://localhost:' + PORT + '/';
@@ -71,7 +78,10 @@ async function newPage(opts) {
   return { ctx, page };
 }
 
+const ONLY = process.argv[2] || '';
+
 async function test(name, fn) {
+  if (ONLY && !name.includes(ONLY)) return;
   try {
     await fn();
     results.push([true, name]);
@@ -131,7 +141,7 @@ async function noHScroll(page, label) {
     eq(labels, ['一言ニュアンス', '頭に浮かべる場面', '意味と、文の中での役割', '例文']);
     ok((await page.textContent('.card-back .nuance-text')).endsWith('って感じ'));
     ok(await page.$('.card-back .scene-art'), '場面のイラスト');
-    ok(/（(形容詞|副詞|名詞|動詞|前置詞|間投詞)）/.test(await page.textContent('.card-back .role-line')), '品詞の名前');
+    ok(/（(形容詞|副詞|名詞|動詞|前置詞|間投詞|代名詞|助動詞|フレーズ)）/.test(await page.textContent('.card-back .role-line')), '品詞の名前');
     const exJa = await page.$$eval('.card-back .ex', (els) => els.map((e) => [!!e.querySelector('.ex-en'), !!e.querySelector('.ex-ja')]));
     ok(exJa.length >= 1 && exJa.every(([a, b]) => a && b), '例文は英語と日本語訳が別の行');
     ok(!(await page.$eval('details.more', (d) => d.open)), '詳しい説明は最初は閉じている');
@@ -301,7 +311,7 @@ async function noHScroll(page, label) {
     await page.reload();
     await page.waitForSelector('.home');
     const counts = await page.$$eval('.main-mode .mode-counts b', (els) => els.map((e) => e.textContent));
-    eq(counts, ['10', '11'], '翌日: 復習10枚・新しい11枚');
+    eq(counts, ['10', String(TOTAL - 10)], '翌日: 復習10枚・残りは新しいカード');
     const stats2 = await page.$$eval('.stat-num', (els) => els.map((e) => e.textContent));
     ok(stats2[0].startsWith('1') && (await page.isVisible('text=連続学習（今日まだ）')), '翌日はまだ学習していない表示');
     await page.click('[data-action="start"][data-mode="fwd"]');
@@ -406,7 +416,7 @@ async function noHScroll(page, label) {
     const { ctx, page } = await newPage();
     await page.click('.nav-item[href="#words"]');
     await page.waitForSelector('.word-list');
-    eq((await page.$$('.word-row')).length, 11);
+    eq((await page.$$('.word-row')).length, WORDS);
     await page.click('[data-action="new-word"]');
     await page.waitForSelector('#edit-form');
     await page.fill('#f-headword', 'borrow');
@@ -461,11 +471,11 @@ async function noHScroll(page, label) {
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
     const counts = await page.$$eval('.main-mode .mode-counts b', (els) => els.map((e) => e.textContent));
-    eq(counts, ['0', '22'], '追加した borrow は出題、要確認は出題しない');
+    eq(counts, ['0', String(TOTAL + 1)], '追加した borrow は出題、要確認は出題しない');
     await page.goto(URL0 + '#words');
     await page.waitForSelector('.word-list');
     await page.click('[data-action="filter"][data-f="review"]');
-    eq(await page.$$eval('.word-row .wr-head', (els) => els.map((e) => e.textContent)), ['かりる']);
+    eq(await page.$$eval('.word-row .wr-head', (els) => els.map((e) => e.textContent)), REVIEW_WORDS.concat(['かりる']));
     await page.click('[data-action="filter"][data-f="all"]');
     await page.fill('#word-search', '借り');
     eq((await page.$$eval('.word-row .wr-head', (els) => els.map((e) => e.textContent))).sort(), ['borrow', 'かりる']);
@@ -514,15 +524,16 @@ async function noHScroll(page, label) {
     const json = await page.inputValue('#export-text');
     const data = JSON.parse(json);
     eq(data.format, 'core-image-flashcards');
-    eq(data.words.length, 11);
+    eq(data.words.length, WORDS);
     ok(Object.keys(data.progress).length === 10);
     await page.click('[data-action="reset-progress"]');
     await page.click('[data-action="modal-ok"]');
     eq(await ls(page, 'progress'), {});
-    await page.fill('#import-text', json);
+    // 貼り付けと同じく、一度に入力する（fill は長い文字列だと遅すぎるため）
+    await page.$eval('#import-text', (el, v) => { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); }, json);
     await page.click('[data-action="import-check"]');
     await page.waitForSelector('.import-preview');
-    ok((await page.textContent('.import-preview')).includes('単語 11語（用法 21つ）'));
+    ok((await page.textContent('.import-preview')).includes('単語 ' + WORDS + '語（用法 ' + SENSES + 'つ）'));
     await page.click('[data-action="import-replace"]');
     await page.click('[data-action="modal-ok"]');
     await page.waitForTimeout(100);
@@ -539,7 +550,7 @@ async function noHScroll(page, label) {
     ok((await page.textContent('.import-preview')).includes('うち要確認 1語'));
     await page.click('[data-action="import-merge"]');
     const ws = await ls(page, 'words');
-    eq(ws.length, 12);
+    eq(ws.length, WORDS + 1);
     eq(ws.find((w) => w.id === 'w-x').status, 'needs_review');
     // ファイルに保存（ダウンロード）
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-action="export-file"]')]);
@@ -600,6 +611,55 @@ async function noHScroll(page, label) {
     await page.click('.detail-head .audio-btn');
     await page.waitForFunction(() => document.getElementById('toast').textContent.includes('録音音声を再生できませんでした'), null, { timeout: 5000 });
     eq((await spoken(page)).length, 0, '録音があるときは合成音声を使わない');
+    await ctx.close();
+  });
+
+  await test('手書きの単語リスト: 資料の単語から出題し、要確認の語は詳細で理由を表示', async () => {
+    const { ctx, page } = await newPage();
+    await page.click('[data-action="start"][data-mode="fwd"]');
+    await page.waitForSelector('.card-front');
+    eq(await page.textContent('.card-front .headword'), 'begin', '資料の最初の単語から');
+    const set = await ls(page, 'session');
+    const ws = await ls(page, 'words');
+    const owner = (id) => ws.find((w) => w.senses.some((x) => x.id === id));
+    ok(set.cards.every((id) => !SEED.sample.includes(owner(id).id)), '最初のセットは資料の単語だけ');
+    await page.goto(URL0 + '#word-w-fell');
+    await page.waitForSelector('.word-detail');
+    const t = await page.textContent('.word-detail');
+    ok(t.includes('要確認：通常の出題から外しています') && t.includes('判断できません'), 'fell の理由');
+    await page.goto(URL0 + '#word-w-everyone');
+    await page.waitForSelector('.word-detail');
+    const e = await page.textContent('.word-detail');
+    ok(e.includes('every one') && e.includes('確認済み') && e.includes("Oxford Learner's Dictionaries: everyone"), 'everyone の読み取りメモと出典');
+    await page.goto(URL0 + '#word-w-excuse');
+    await page.waitForSelector('.sense-card');
+    const cards = await page.$$('.sense-card');
+    await (await cards[0].$('.audio-row .audio-btn')).click();
+    await (await cards[1].$('.audio-row .audio-btn')).click();
+    eq((await spoken(page)).map((x) => x.text), ['Excuse me.', 'an excuse'], 'excuse は用法ごとの発音で読み上げ');
+    await page.goto(URL0 + '#word-w-north');
+    await page.waitForSelector('.word-detail .dg');
+    ok((await page.getAttribute('.word-detail .dg', 'aria-label')).includes('北'), '方角の図');
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('前の版の学習記録がある人にも、資料の単語が追加される', async () => {
+    const { ctx, page } = await newPage();
+    // 見本の11語だけ・版1 の状態を作り、1枚学習済みにする
+    await page.evaluate((sample) => {
+      const words = JSON.parse(localStorage.getItem('cif.v1.words')).filter((w) => sample.includes(w.id));
+      localStorage.setItem('cif.v1.words', JSON.stringify(words));
+      localStorage.setItem('cif.v1.meta', JSON.stringify({ seedVersion: 1, deletedSeed: [] }));
+      localStorage.setItem('cif.v1.progress', JSON.stringify({ 's-pretty-adj': { fwd: { reps: 1, lapses: 0, streak: 1, interval: 1, ease: 2.5, due: Date.now() + 864e5, last: Date.now(), history: [] } } }));
+    }, SEED.sample);
+    await page.reload();
+    await page.waitForSelector('.home');
+    const ws = await ls(page, 'words');
+    eq(ws.length, WORDS);
+    eq(ws[0].headword, 'begin');
+    ok((await ls(page, 'progress'))['s-pretty-adj'], '学習記録は残る');
+    eq((await ls(page, 'meta')).seedVersion, SEED.version);
     await ctx.close();
   });
 

@@ -256,6 +256,7 @@ body[data-route="result"] .screen { padding-bottom: calc(32px + env(safe-area-in
 .banner.warn { background: var(--hard-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--hard) 35%, transparent); }
 .banner.info { background: var(--surface); color: var(--ink-2); }
 .banner ul { list-style: disc; padding-left: 1.2em; margin: 6px 0; }
+.banner .review-note { margin: 6px 0; padding: 8px 10px; border-radius: 8px; background: var(--card); }
 #save-banner.banner { max-width: 600px; margin: 10px auto 0; margin-left: max(16px, env(safe-area-inset-left, 0px)); margin-right: max(16px, env(safe-area-inset-right, 0px)); }
 @media (min-width: 632px) { #save-banner.banner { margin-left: auto; margin-right: auto; } }
 .muted { color: var(--ink-3); }
@@ -526,6 +527,7 @@ details.more[open] > summary { margin-bottom: 12px; }
 .dg .s { font-size: 11px; }
 .dg .big { font-size: 26px; }
 .dg .on-ac { fill: var(--accent-ink); font-weight: 700; }
+.dg .again-ln { stroke: var(--stamp); stroke-width: 2.5; stroke-dasharray: 5 4; }
 
 /* ---------- 結果 ---------- */
 .result-hero { position: relative; text-align: center; padding: 28px 0 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
