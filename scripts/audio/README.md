@@ -54,7 +54,7 @@ python -m venv .venv && .venv/bin/pip install onnxruntime numpy praat-parselmout
 ## 確認したこと（2026-11-04 の生成分）
 
 - 1,172 区間（586件 × ふつう・ゆっくり）すべてで、無音・音割れ・声の途中での切れがない（`check_signal.py`）
-- 声の部分の音量がそろっている（RMS 0.078〜0.091）
+- 声の部分の音量がそろっている（RMS 0.078〜0.092）
 - ゆっくりの長さ（声の部分）：1語 2.19倍・2〜4語 1.82倍・5語以上 1.61倍（中央値）
 - 品詞で読みが変わる語：`a record` /ˈrekərd/・`to record` /rɪˈkɔːrd/、`to live` /lɪv/・`live music` /laɪv/、`Excuse me.` /z/・`an excuse` /s/、`We read a poem in class.` の read は過去形 /red/（`tests/unit.test.js` で発音記号を確認）
 
@@ -64,7 +64,7 @@ python -m venv .venv && .venv/bin/pip install onnxruntime numpy praat-parselmout
 | --- | --- | --- | --- | --- |
 | 5語以上 | 100% | 100% | 3.29 | 3.19 |
 | 2〜4語 | 97% | 89% | 3.20 | 3.02 |
-| 1語（単語どうしの候補） | 85% | 72% | 3.02 | 2.67 |
+| 1語（単語どうしの候補） | 85% | 71% | 3.02 | 2.70 |
 
 - 聞き取り：音声認識に、アプリのすべての英語（1語は単語どうし）を候補として与え、ねらった英語として認識された割合。認識ソフト自体の精度は高くないので、短い単語ほど低く出る（café を含む3件は、認識ソフトの辞書にないため除外）
 - 音質：DNSMOS の OVRL（1〜5）。点数そのものより、ふつうとの差や、作り方どうしの比較に使っている

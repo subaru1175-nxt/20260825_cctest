@@ -12745,7 +12745,8 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     if (!pack || !pack.clips || (speech && speech.packFailed)) return null;
     const c = pack.clips[(slow ? 's|' : 'n|') + String(text || '').trim()];
     if (!c) return null;
-    return { url: (pack.base || '') + c[0] + (pack.ext || ''), start: c[1], end: c[2] };
+    // ?v= はファイルの版。作り直したときに、古い音声がキャッシュから鳴らないようにする
+    return { url: (pack.base || '') + c[0] + (pack.ext || '') + (pack.v ? '?v=' + pack.v : ''), start: c[1], end: c[2] };
   }
 
   function packCount() {

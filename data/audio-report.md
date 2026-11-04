@@ -42,7 +42,7 @@
 | I was sad to hear the news. | ˌI wʌz sˈæd tə hˈɪɹ ðə nˈuz. | 1.83 | 2.68 |
 | Why do you look so sad? | wˌI dˈu ju lˈʊk sˌO sˈæd? | 1.55 | 2.23 |
 | This movie has a sad ending. | ðˌɪs mˈuvi hæz ɐ sˈæd ˈɛndɪŋ. | 2.13 | 3.18 |
-| afraid | əfɹˈAd | 1.06 | 1.81 |
+| afraid | əfɹˈAd | 1.06 | 1.80 |
 | afraid of dogs | əfɹˈAd ʌv dˈɔɡz | 1.40 | 2.18 |
 | I'm afraid of big dogs. | ˌIm əfɹˈAd ʌv bˈɪɡ dˈɔɡz. | 1.83 | 2.67 |
 | My sister is afraid of the dark. | mˌI sˈɪstəɹ ɪz əfɹˈAd ʌv ðə dˈɑɹk. | 2.40 | 3.60 |
@@ -50,7 +50,7 @@
 | I'm afraid ... | ˌIm əfɹˈAd ... | 1.22 | 1.87 |
 | I'm afraid I can't come. | ˌIm əfɹˈAd ˌI kˈænt kˈʌm. | 1.73 | 2.53 |
 | I'm afraid the shop is closed. | ˌIm əfɹˈAd ðə ʃˈɑp ɪz klˈOzd. | 1.97 | 2.91 |
-| laugh | lˈæf | 0.92 | 1.48 |
+| laugh | lˈæf | 0.92 | 1.49 |
 | laugh out loud | lˈæf ˈWt lˈWd | 1.33 | 2.08 |
 | Everyone laughed at his joke. | ˈɛvɹiwən lˈæft æt hɪz ʤˈOk. | 1.83 | 2.69 |
 | The children laughed at the clown. | ðə ʧˈɪldɹᵊn lˈæft æt ðə klˈWn. | 1.96 | 2.89 |
@@ -64,7 +64,7 @@
 | The baby is crying. | ðə bˈAbi ɪz kɹˈIɪŋ. | 1.51 | 2.38 |
 | I cried at the end of the movie. | ˌI kɹˈId æt ði ˈɛnd ʌv ðə mˈuvi. | 1.94 | 2.85 |
 | Why are you crying? | wˌI ɑɹ ju kɹˈIɪŋ? | 1.34 | 2.06 |
-| anything | ˈɛniθˌɪŋ | 1.07 | 1.83 |
+| anything | ˈɛniθˌɪŋ | 1.07 | 1.82 |
 | anything else? | ˈɛniθˌɪŋ ˈɛls? | 1.22 | 1.85 |
 | Do you need anything else? | dˈu ju nˈid ˈɛniθˌɪŋ ˈɛls? | 1.60 | 2.31 |
 | I didn't eat anything. | ˌI dˈɪdᵊnt ˈit ˈɛniθˌɪŋ. | 1.53 | 2.44 |
@@ -78,7 +78,7 @@
 | Everything is ready. | ˈɛvəɹiθˌɪŋ ɪz ɹˈɛdi. | 1.52 | 2.43 |
 | Thank you for everything. | θˈæŋk ju fɔɹ ˈɛvəɹiθˌɪŋ. | 1.69 | 2.72 |
 | Everything in this shop is cheap. | ˈɛvəɹiθˌɪŋ ɪn ðɪs ʃˈɑp ɪz ʧˈip. | 1.88 | 2.75 |
-| nobody | nˈObˌɑdi | 1.08 | 1.74 |
+| nobody | nˈObˌɑdi | 1.08 | 1.76 |
 | Nobody knows. | nˈObˌɑdi nˈOz. | 1.36 | 2.12 |
 | Nobody was in the room. | nˈObˌɑdi wʌz ɪn ðə ɹˈum. | 1.63 | 2.32 |
 | Nobody knows the answer. | nˈObˌɑdi nˈOz ði ˈænsəɹ. | 1.70 | 2.72 |
@@ -88,7 +88,7 @@
 | None of my friends came. | nˈʌn ʌv mI fɹˈɛndz kˈAm. | 1.67 | 2.40 |
 | There was none left. | ðˌɛɹ wʌz nˈʌn lˈɛft. | 1.43 | 2.23 |
 | None of us knew the answer. | nˈʌn ʌv ˌʌs nˈu ði ˈænsəɹ. | 1.70 | 2.47 |
-| care | kˈɛɹ | 0.86 | 1.38 |
+| care | kˈɛɹ | 0.86 | 1.39 |
 | I don't care. | ˌI dˈOnt kˈɛɹ. | 1.10 | 1.65 |
 | I don't care about money. | ˌI dˈOnt kˈɛɹ əbˈWt mˈʌni. | 1.62 | 2.33 |
 | She really cares about her friends. | ʃˌi ɹˈiᵊli kˈɛɹz əbˈWt hɜɹ fɹˈɛndz. | 2.11 | 3.13 |
@@ -131,7 +131,7 @@
 | I'm thirsty. | ˌIm θˈɜɹsti. | 1.23 | 1.88 |
 | I'm so thirsty. Can I have some water? | ˌIm sˌO θˈɜɹsti. kˌæn ˌI hæv sˌʌm wˈɔɾəɹ? | 2.70 | 4.07 |
 | The dog looks thirsty. | ðə dˈɔɡ lˈʊks θˈɜɹsti. | 1.67 | 2.66 |
-| wish | wˈɪʃ | 0.89 | 1.41 |
+| wish | wˈɪʃ | 0.89 | 1.42 |
 | I wish ... | ˌI wˈɪʃ ... | 1.05 | 1.55 |
 | I wish I could fly. | ˌI wˈɪʃ ˌI kʊd flˈI. | 1.58 | 2.29 |
 | Make a wish! | mˌAk ɐ wˈɪʃ! | 1.20 | 1.81 |
@@ -170,7 +170,7 @@
 | few people | fjˈu pˈipᵊl | 1.14 | 1.72 |
 | Few people came to the park. | fjˈu pˈipᵊl kˈAm tə ðə pˈɑɹk. | 1.90 | 2.77 |
 | Very few people know this place. | vˈɛɹi fjˈu pˈipᵊl nˈO ðɪs plˈAs. | 2.16 | 3.21 |
-| many | mˈɛni | 0.95 | 1.52 |
+| many | mˈɛni | 0.95 | 1.53 |
 | many books | mˈɛni bˈʊks | 1.17 | 1.78 |
 | She has many friends. | ʃˌi hæz mˈɛni fɹˈɛndz. | 1.57 | 2.49 |
 | How many apples do you need? | hˌW mˈɛni ˈæpᵊlz dˈu ju nˈid? | 1.79 | 2.60 |
@@ -230,7 +230,7 @@
 | I heard a strange noise last night. | ˌI hˈɜɹd ɐ stɹˈAnʤ nˈYz lˈæst nˈIt. | 2.24 | 3.33 |
 | That's strange. | ðˌæts stɹˈAnʤ. | 1.29 | 1.99 |
 | There is a strange man at the gate. | ðˌɛɹ ɪz ɐ stɹˈAnʤ mˈæn æt ðə ɡˈAt. | 2.09 | 3.10 |
-| dangerous | dˈAnʤəɹəs | 1.13 | 1.97 |
+| dangerous | dˈAnʤəɹəs | 1.13 | 1.96 |
 | a dangerous road | ɐ dˈAnʤəɹəs ɹˈOd | 1.47 | 2.31 |
 | It's dangerous to swim here. | ˌɪts dˈAnʤəɹəs tə swˈɪm hˈɪɹ. | 1.86 | 2.73 |
 | This road is dangerous at night. | ðˌɪs ɹˈOd ɪz dˈAnʤəɹəs æt nˈIt. | 2.09 | 3.09 |
@@ -269,7 +269,7 @@
 | Do you have any questions? | dˈu ju hæv ˈɛni kwˈɛsʧᵊnz? | 1.70 | 2.46 |
 | I don't have any money. | ˌI dˈOnt hæv ˈɛni mˈʌni. | 1.49 | 2.11 |
 | Are there any eggs in the fridge? | ˌɑɹ ðɛɹ ˈɛni ˈɛɡz ɪn ðə fɹˈɪʤ? | 1.95 | 2.87 |
-| worry | wˈɜɹi | 0.94 | 1.52 |
+| worry | wˈɜɹi | 0.94 | 1.50 |
 | Don't worry. | dˈOnt wˈɜɹi. | 1.06 | 1.53 |
 | Don't worry. You'll be fine. | dˈOnt wˈɜɹi. jˌul bi fˈIn. | 1.86 | 2.68 |
 | I worry about my grandma. | ˌI wˈɜɹi əbˈWt mI ɡɹˈændmˌɑ. | 1.85 | 2.73 |
@@ -279,7 +279,7 @@
 | Please tell me your name. | plˈiz tˈɛl mˌi jʊɹ nˈAm. | 1.51 | 2.16 |
 | She told me a funny story. | ʃˌi tˈOld mˌi ɐ fˈʌni stˈɔɹi. | 1.82 | 2.67 |
 | Can you tell me the way to the station? | kˌæn ju tˈɛl mˌi ðə wˈA tə ðə stˈAʃən? | 2.07 | 3.05 |
-| believe | bəlˈiv | 1.04 | 1.76 |
+| believe | bəlˈiv | 1.04 | 1.77 |
 | believe me | bəlˈiv mˌi | 1.05 | 1.57 |
 | I believe you. | ˌI bəlˈiv ju. | 1.24 | 1.91 |
 | I can't believe it! | ˌI kˈænt bəlˈiv ɪt! | 1.50 | 2.37 |
@@ -342,7 +342,7 @@
 | a TV show | ɐ tˌivˈi ʃˈO | 1.24 | 1.90 |
 | I watched a funny TV show. | ˌI wˈɑʧt ɐ fˈʌni tˌivˈi ʃˈO. | 1.91 | 2.82 |
 | The show starts at eight. | ðə ʃˈO stˈɑɹts æt ˈAt. | 1.65 | 2.37 |
-| see | sˈi | 0.86 | 1.35 |
+| see | sˈi | 0.86 | 1.34 |
 | see the sea | sˈi ðə sˈi | 1.13 | 1.72 |
 | I can see the sea from here. | ˌI kæn sˈi ðə sˈi fɹʌm hˈɪɹ. | 1.79 | 2.63 |
 | See you tomorrow! | sˈi ju təmˈɑɹO! | 1.32 | 2.04 |
@@ -366,7 +366,7 @@
 | I like art class the best. | ˌI lˈIk ˈɑɹt klˈæs ðə bˈɛst. | 1.84 | 2.69 |
 | We went to an art museum. | wˌi wˈɛnt tə ɐn ˈɑɹt mjuzˈiəm. | 1.72 | 2.50 |
 | He is interested in modern art. | hˌi ɪz ˈɪntəɹəstᵻd ɪn mˈɑdəɹn ˈɑɹt. | 2.27 | 3.38 |
-| poem | pˈOəm | 0.91 | 1.47 |
+| poem | pˈOəm | 0.91 | 1.46 |
 | write a poem | ɹˈIt ɐ pˈOəm | 1.18 | 1.79 |
 | She wrote a poem about the sea. | ʃˌi ɹˈOt ɐ pˈOəm əbˈWt ðə sˈi. | 1.84 | 2.69 |
 | We read a poem in class. | wˌi ɹˈɛd ɐ pˈOəm ɪn klˈæs. | 1.76 | 2.57 |
@@ -402,7 +402,7 @@
 | an international school | ɐn ˌɪntəɹnˈæʃᵊnəl skˈul | 1.65 | 2.65 |
 | She works for an international company. | ʃˌi wˈɜɹks fɔɹ ɐn ˌɪntəɹnˈæʃᵊnəl kˈʌmpᵊni. | 2.32 | 3.46 |
 | This is an international airport. | ðˌɪs ɪz ɐn ˌɪntəɹnˈæʃᵊnəl ˈɛɹpˌɔɹt. | 2.34 | 3.48 |
-| soon | sˈun | 0.90 | 1.45 |
+| soon | sˈun | 0.90 | 1.46 |
 | See you soon! | sˈi ju sˈun! | 1.21 | 1.84 |
 | The bus will come soon. | ðə bˈʌs wɪl kˈʌm sˈun. | 1.63 | 2.36 |
 | Dinner will be ready soon. | dˈɪnəɹ wɪl bi ɹˈɛdi sˈun. | 1.71 | 2.47 |
@@ -439,12 +439,12 @@
 | I spent the weekend with my family. | ˌI spˈɛnt ðə wˈikˌɛnd wɪð mI fˈæmᵊli. | 2.26 | 3.36 |
 | She spends a lot of time reading. | ʃˌi spˈɛndz ɐ lˈɑt ʌv tˈIm ɹˈidɪŋ. | 1.98 | 2.92 |
 | We spent two days in Kyoto. | wˌi spˈɛnt tˈu dˈAz ɪn kijˈOɾO. | 2.01 | 2.98 |
-| waste | wˈAst | 0.97 | 1.60 |
+| waste | wˈAst | 0.97 | 1.59 |
 | waste time | wˈAst tˈIm | 1.22 | 1.88 |
 | Don't waste water. | dˈOnt wˈAst wˈɔɾəɹ. | 1.46 | 2.30 |
 | I wasted a lot of time today. | ˌI wˈAstᵻd ɐ lˈɑt ʌv tˈIm tədˈA. | 2.01 | 2.96 |
 | Don't waste your money. | dˈOnt wˈAst jʊɹ mˈʌni. | 1.46 | 2.29 |
-| own | ˈOn | 0.88 | 1.41 |
+| own | ˈOn | 0.88 | 1.40 |
 | my own room | mI ˈOn ɹˈum | 1.17 | 1.77 |
 | I want my own room. | ˌI wˈɑnt mI ˈOn ɹˈum. | 1.49 | 2.13 |
 | Do it on your own. | dˈu ɪt ˌɔn jʊɹ ˈOn. | 1.27 | 1.78 |
@@ -555,21 +555,21 @@
 | live music | lˈIv mjˈuzɪk | 1.26 | 1.91 |
 | I love live music. | ˌI lˈʌv lˈIv mjˈuzɪk. | 1.60 | 2.55 |
 | This is a live broadcast. | ðˌɪs ɪz ɐ lˈIv bɹˈɔdkˌæst. | 1.97 | 2.90 |
-| run | ɹˈʌn | 0.89 | 1.42 |
+| run | ɹˈʌn | 0.89 | 1.43 |
 | run to the station | ɹˈʌn tə ðə stˈAʃən | 1.46 | 2.31 |
 | I ran to the station. | ˌI ɹˈæn tə ðə stˈAʃən. | 1.60 | 2.31 |
 | My dog runs very fast. | mˌI dˈɔɡ ɹˈʌnz vˈɛɹi fˈæst. | 1.99 | 2.93 |
 | run a café | ɹˈʌn ɐ kæfˈA | 1.30 | 2.01 |
 | She runs a small café. | ʃˌi ɹˈʌnz ɐ smˈɔl kæfˈA. | 1.83 | 2.68 |
 | My uncle runs a bike shop. | mˌI ˈʌŋkəl ɹˈʌnz ɐ bˈIk ʃˈɑp. | 1.91 | 2.81 |
-| get | ɡˈɛt | 0.85 | 1.34 |
+| get | ɡˈɛt | 0.85 | 1.35 |
 | get a new bike | ɡɛt ɐ nˈu bˈIk | 1.25 | 1.90 |
 | I got a new bike. | ˌI ɡɑt ɐ nˈu bˈIk. | 1.42 | 2.01 |
 | Did you get my message? | dˈɪd ju ɡɛt mI mˈɛsɪʤ? | 1.66 | 2.41 |
 | get dark | ɡɛt dˈɑɹk | 1.11 | 1.65 |
 | It's getting dark. | ˌɪts ɡˈɛɾɪŋ dˈɑɹk. | 1.35 | 2.09 |
 | I got hungry after school. | ˌI ɡɑt hˈʌŋɡɹi ˈæftəɹ skˈul. | 1.85 | 2.71 |
-| break | bɹˈAk | 0.93 | 1.54 |
+| break | bɹˈAk | 0.93 | 1.53 |
 | break a cup | bɹˈAk ɐ kˈʌp | 1.18 | 1.73 |
 | I broke my favorite cup. | ˌI bɹˈOk mI fˈAvəɹət kˈʌp. | 1.70 | 2.46 |
 | Be careful not to break it. | bˌi kˈɛɹfᵊl nˌɑt tə bɹˈAk ɪt. | 1.84 | 2.70 |

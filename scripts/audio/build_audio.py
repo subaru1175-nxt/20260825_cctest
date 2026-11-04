@@ -184,8 +184,13 @@ def main():
         encode_mp3(np.concatenate(parts), path)
         total += os.path.getsize(path)
 
+    # ファイルの中身が変わったら URL も変わるように、全ファイルの内容から版を作る（古い音声がキャッシュに残らないように）
+    h = hashlib.sha1()
+    for wid in sorted(groups):
+        h.update(open(os.path.join(ROOT, 'audio', wid + '.mp3'), 'rb').read())
     pack = {
         'engine': 'Kokoro-82M',
+        'v': h.hexdigest()[:10],
         'voice': args.voice,
         'accent': 'en-US',
         'base': 'audio/',
@@ -197,7 +202,7 @@ def main():
     with open(os.path.join(ROOT, 'js', 'audio-pack.js'), 'w', encoding='utf-8') as f:
         f.write('/*\n * audio-pack.js — 高品質な音声（音声パック）の目録\n'
                 ' * scripts/audio/build_audio.py で自動生成。直接は編集しないでください。\n'
-                ' * clips: { "n|英語": [ファイル名, 開始秒, 終了秒] }（n=通常, s=ゆっくり）\n */\n'
+                ' * clips: { "n|英語": [ファイル名, 開始秒, 終了秒] }（n=通常, s=ゆっくり）。v はファイルの版（URL の ?v=）\n */\n'
                 '(function (root) {\n  root.CIF = root.CIF || {};\n  root.CIF.audioPack = ' +
                 json.dumps(pack, ensure_ascii=False, separators=(',', ':')) + ';\n})(this);\n')
 
