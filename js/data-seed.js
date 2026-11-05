@@ -680,7 +680,7 @@
           pos: 'preposition',
           role: 'relation',
           cue: 'on the wall',
-          ipa: { uk: '/ɒn/', us: '/ɑːn/' },
+          ipa: { uk: '/ɒn/', us: '/ɑːn, ɔːn/' },
           nuance: '「何かの面に、ぴたっとくっついている」って感じ',
           scene: {
             emoji: '🖼️',
@@ -750,5 +750,5 @@
   const fromNotebook = (notebook && notebook.words) || [];
   // 回（第1回・第2回…）。単語のまとまりで、テストもこの単位で行う。
   const rounds = (notebook && notebook.rounds) || [];
-  return { version: 3, words: fromNotebook.concat(words), rounds, sample: words.map((w) => w.id) };
+  return { version: 4, words: fromNotebook.concat(words), rounds, sample: words.map((w) => w.id) };
 });

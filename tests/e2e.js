@@ -27,14 +27,11 @@ function speechMock(kind) {
     window.__spoken = [];
     window.__clips = [];
     window.__stops = 0;
+    // アプリが鳴らした区間（ファイルとバイトの範囲）を記録する
+    window.addEventListener('cif:clip', (e) => window.__clips.push(e.detail));
     try {
       const P = window.AudioBufferSourceNode && window.AudioBufferSourceNode.prototype;
       if (P) {
-        const orig = P.start;
-        P.start = function (when, offset, duration) {
-          if (offset !== undefined) window.__clips.push({ offset, duration });
-          return orig.apply(this, arguments);
-        };
         const origStop = P.stop;
         P.stop = function () {
           window.__stops += 1;
@@ -121,13 +118,15 @@ const current = async (page) => (await ls(page, 'session')).queue[0];
 const spoken = (page) => page.evaluate(() => window.__spoken.slice());
 const remainText = (page) => page.textContent('.remain b');
 const clips = (page) => page.evaluate(() => window.__clips.slice());
-const packOf = (page, text, slow) => page.evaluate(([t, sl]) => window.CIF.audioPack.clips[(sl ? 's|' : 'n|') + t], [text, !!slow]);
+/** 目録の1件：[ファイル名, 開始バイト, 終了バイト, 長さ（秒）, 英語]。key は単語なら '#用法ID'、フレーズ・文なら英語 */
+const packOf = (page, key, slow) => page.evaluate(([t, sl]) => window.CIF.audioPack.clips[(sl ? 's|' : 'n|') + t], [key, !!slow]);
 const waitClips = (page, n) => page.waitForFunction((k) => window.__clips.length >= k, n, { timeout: 8000 });
-/** 鳴らした区間が、音声パックの「その英語」の区間と一致するか */
-async function sameClip(page, played, text, slow) {
-  const c = await packOf(page, text, slow);
-  ok(c, '音声パックにない: ' + text);
-  ok(Math.abs(played.offset - c[1]) < 0.002 && Math.abs(played.duration - (c[2] - c[1])) < 0.002, (slow ? 'ゆっくり ' : '') + text + ' の区間: ' + JSON.stringify(played) + ' / ' + JSON.stringify(c));
+/** 鳴らした区間が、目録のその1件（ファイルとバイトの範囲）と同じか */
+async function sameClip(page, played, key, slow) {
+  const c = await packOf(page, key, slow);
+  ok(c, '音声パックにない: ' + key);
+  ok(played && played.url.endsWith('/' + c[0]) && played.a === c[1] && played.b === c[2], (slow ? 'ゆっくり ' : '') + key + ' の区間: ' + JSON.stringify(played) + ' / ' + JSON.stringify(c));
+  return c;
 }
 const capOf = (page, sel) => page.textContent(sel + ' .audio-cap');
 /** ホームの上のまとまり：[連続学習, 今日の枚数, ポイント] */
@@ -204,12 +203,11 @@ async function noHScroll(page, label) {
     ok(await page.$('.card-front'), '音声ボタンでは裏返らない');
     ok(!(await page.$('.card-back')));
     let cs = await clips(page);
-    await sameClip(page, cs[0], word, false);
-    await sameClip(page, cs[1], word, true);
+    const n = await sameClip(page, cs[0], '#' + sid, false);
+    const sl = await sameClip(page, cs[1], '#' + sid, true);
+    eq([n[4], sl[4]], [word, word], '単語のボタンは単語だけ（文やフレーズではない）');
     await sameClip(page, cs[2], cue, false);
-    const n = await packOf(page, word, false);
-    const sl = await packOf(page, word, true);
-    ok((sl[2] - sl[1]) / (n[2] - n[1]) > 1.5, 'ゆっくりは、はっきり長い: ' + (n[2] - n[1]).toFixed(2) + '秒 → ' + (sl[2] - sl[1]).toFixed(2) + '秒');
+    ok((sl[3] - 0.42) / (n[3] - 0.42) > 1.9, 'ゆっくりは、はっきり長い: ' + n[3] + '秒 → ' + sl[3] + '秒');
     eq((await spoken(page)).length, 0, 'AI音声があるときは端末の読み上げを使わない');
     await page.click('.card-front .tap-hint');
     await page.waitForSelector('.card-back');
@@ -260,7 +258,7 @@ async function noHScroll(page, label) {
     await ctx.close();
   });
 
-  await test('発音: 品詞で発音が変わる語は、その用法の読み上げ（record / live）', async () => {
+  await test('発音: 品詞で発音が変わる語も、単語だけを、その用法の発音で読む（record / live）', async () => {
     const { ctx, page } = await newPage();
     const wordTexts = async (id) => {
       await page.goto(URL0 + '#word-' + id);
@@ -268,7 +266,7 @@ async function noHScroll(page, label) {
       const out = [];
       for (const card of await page.$$('.sense-card')) {
         const b = await card.$('.audio button[data-slow="0"]');
-        out.push([await b.getAttribute('data-text'), await b.getAttribute('data-kind')]);
+        out.push([await b.getAttribute('data-key'), await b.getAttribute('data-clip'), await b.getAttribute('data-kind')]);
         const n = (await clips(page)).length;
         await b.click();
         await waitClips(page, n + 1); // 新しく押すと前の音は止まるので、鳴り始めてから次へ
@@ -285,17 +283,18 @@ async function noHScroll(page, label) {
     const started = (await clips(page)).length;
     const stopped = await page.evaluate(() => window.__stops);
     ok(started - stopped <= 1, '続けて押すと前の音は止まり、重ならない（鳴り始め ' + started + '・止めた ' + stopped + '）');
-    await sameClip(page, (await clips(page))[started - 1], await two[1].getAttribute('data-text'));
+    await sameClip(page, (await clips(page))[started - 1], await two[1].getAttribute('data-key'));
     await page.evaluate(() => { window.__clips.length = 0; });
     const rec = await wordTexts('w-record');
     const live = await wordTexts('w-live');
-    eq(rec.concat(live), [['a record', 'pack'], ['to record', 'pack'], ['to live', 'pack'], ['live music', 'pack']], 'record（名詞・動詞）と live（動詞・形容詞）');
+    eq(rec.concat(live), [['#s-record-noun', 'record', 'pack'], ['#s-record-verb', 'record', 'pack'], ['#s-live-verb', 'live', 'pack'], ['#s-live-adj', 'live', 'pack']], 'record（名詞・動詞）と live（動詞・形容詞）は単語だけ');
     await waitClips(page, 4);
     const cs = await clips(page);
-    await sameClip(page, cs[0], 'a record');
-    await sameClip(page, cs[1], 'to record');
-    await sameClip(page, cs[2], 'to live');
-    await sameClip(page, cs[3], 'live music');
+    const rn = await sameClip(page, cs[0], '#s-record-noun');
+    const rv = await sameClip(page, cs[1], '#s-record-verb');
+    await sameClip(page, cs[2], '#s-live-verb');
+    await sameClip(page, cs[3], '#s-live-adj');
+    ok(rn[1] !== rv[1], '名詞と動詞は別の音（発音が違う）');
     await page.goto(URL0 + '#word-w-record');
     await page.waitForSelector('.sense-card');
     const detail = await page.textContent('.word-detail');
@@ -724,14 +723,12 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.home');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
-    const head = await page.textContent('.card-front .headword');
     await waitClips(page, 1);
-    await sameClip(page, (await clips(page))[0], head);
+    await sameClip(page, (await clips(page))[0], '#' + (await current(page)));
     await flipAndRate(page, 'good');
     await page.waitForSelector('.card-front');
-    const head2 = await page.textContent('.card-front .headword');
     await waitClips(page, 2);
-    await sameClip(page, (await clips(page))[1], head2, false);
+    await sameClip(page, (await clips(page))[1], '#' + (await current(page)), false);
     eq((await clips(page)).length, 2, '1枚につき1回');
     await ctx.close();
   });
@@ -776,15 +773,15 @@ async function noHScroll(page, label) {
     const ex = [];
     for (const c of cards.slice(0, 2)) {
       const b = await c.$('.audio button[data-slow="0"]');
-      ex.push(await b.getAttribute('data-text'));
+      ex.push(await b.getAttribute('data-clip'));
       const n = (await clips(page)).length;
       await b.click();
       await waitClips(page, n + 1);
     }
-    eq(ex, ['Excuse me.', 'an excuse'], 'excuse は用法ごとの発音で読み上げ');
+    eq(ex, ['excuse', 'excuse'], 'excuse は単語だけ');
     await waitClips(page, 2);
-    await sameClip(page, (await clips(page))[0], 'Excuse me.');
-    await sameClip(page, (await clips(page))[1], 'an excuse');
+    await sameClip(page, (await clips(page))[0], '#s-excuse-verb');
+    await sameClip(page, (await clips(page))[1], '#s-excuse-noun');
     await page.goto(URL0 + '#word-w-north');
     await page.waitForSelector('.word-detail .dg');
     ok((await page.getAttribute('.word-detail .dg', 'aria-label')).includes('北'), '方角の図');
@@ -832,8 +829,16 @@ async function noHScroll(page, label) {
       const t = JSON.parse(localStorage.getItem('cif.v1.tests'));
       return t.current ? t.current.questions[t.current.index] : null;
     });
+    let meaningChecked = 0;
     async function answerMcq(right) {
       const q = await cur();
+      if (q.qtype === 'meaning') {
+        // 意味を答える問題：単語のボタンは単語だけ、フレーズは丸いボタン
+        const b = await page.$('.qcard .audio button[data-slow="0"]');
+        eq([await b.getAttribute('data-key'), await b.getAttribute('data-clip')], ['#' + q.senseId, q.prompt.headword], '問題の単語のボタン');
+        if (q.prompt.cue) eq(await page.getAttribute('.qcard .cue-line .speak-one', 'data-clip'), q.prompt.cue.trim(), '問題のフレーズのボタン');
+        meaningChecked += 1;
+      }
       const i = right ? q.answer : (q.answer + 1) % 4;
       await page.click('[data-action="choose"][data-i="' + i + '"]');
       await page.waitForSelector('.feedback');
@@ -962,6 +967,55 @@ async function noHScroll(page, label) {
       await page.waitForTimeout(150);
       await noHScroll(page, h);
     }
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('全単語の点検：どのボタンも、となりに出している英語の音だけを鳴らす（単語は単語だけ・例文はその例文）', async () => {
+    const { ctx, page } = await newPage();
+    const same = (a, b) => String(a).replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase() === String(b).replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+    const problems = [];
+    let checked = 0;
+    for (const w of SEED.words) {
+      await page.goto(URL0 + '#word-' + w.id);
+      await page.waitForSelector('.word-detail');
+      const rows = await page.evaluate(() => Array.from(document.querySelectorAll('.word-detail .audio')).map((g) => {
+        const ex = g.closest('.ex');
+        const card = g.closest('.sense-card');
+        return {
+          kind: g.dataset.kind,
+          btns: Array.from(g.querySelectorAll('button')).map((b) => ({ kind: b.dataset.kind, key: b.dataset.key || '', clip: b.dataset.clip || '', slow: b.dataset.slow })),
+          shown: ex ? ex.querySelector('.ex-en').textContent : document.querySelector('.detail-head .headword').textContent,
+          isEx: !!ex,
+          offCard: !!(card && card.classList.contains('is-off')),
+        };
+      }));
+      const review = w.status === 'needs_review';
+      const wordRows = rows.filter((r) => !r.isEx);
+      if (wordRows.length !== w.senses.length) problems.push(w.headword + ': 単語の音声の数 ' + wordRows.length + ' / 用法 ' + w.senses.length);
+      rows.forEach((r) => {
+        if (review || r.offCard) {
+          if (r.kind !== 'off') problems.push(w.headword + ': 要確認なのに音声がある');
+          return;
+        }
+        r.btns.forEach((b) => {
+          checked += 1;
+          if (b.kind !== 'pack') problems.push(w.headword + ': AI音声でない ' + JSON.stringify(b));
+          else if (!same(b.clip, r.shown)) problems.push(w.headword + ': 「' + r.shown + '」のボタンが「' + b.clip + '」を鳴らす');
+          else if (!r.isEx && !b.key.startsWith('#')) problems.push(w.headword + ': 単語のボタンが単語の音声でない ' + b.key);
+        });
+      });
+      // 単語のボタンは、その用法の音声（用法ごとに、順番どおり）
+      const keys = wordRows.map((r) => r.btns[0].key);
+      const want = w.senses.map((s) => (review || s.status === 'needs_review' ? '' : '#' + s.id));
+      if (!review && JSON.stringify(keys) !== JSON.stringify(want)) problems.push(w.headword + ': 用法と音声の対応 ' + JSON.stringify(keys) + ' / ' + JSON.stringify(want));
+    }
+    eq(problems, [], '点検で見つかった食い違い');
+    // 点検したボタンの数 = 要確認でない単語の（用法の数 + 例文の数）× 2（再生・ゆっくり）
+    const expected = SEED.words.filter((w) => w.status !== 'needs_review')
+      .reduce((n, w) => n + w.senses.filter((s) => s.status !== 'needs_review').reduce((m, s) => m + 1 + s.examples.length, 0), 0) * 2;
+    eq(checked, expected, 'すべてのボタンを点検した');
+    console.log('      （' + SEED.words.length + '語・ボタン ' + checked + '個を点検）');
     eq(page.errors, []);
     await ctx.close();
   });

@@ -722,7 +722,7 @@
      "pos": "adjective",
      "role": "mood",
      "cue": "I'm afraid ...",
-     "speak": "I'm afraid",
+     "speak": "",
      "ipa": {
       "us": "/əˈfreɪd/",
       "uk": "/əˈfreɪd/"
@@ -1782,7 +1782,7 @@
      "pos": "interjection",
      "role": "connector",
      "cue": "Pardon?",
-     "speak": "Pardon?",
+     "speak": "",
      "ipa": {
       "us": "/ˈpɑːrdn/",
       "uk": "/ˈpɑːdn/"
@@ -2694,7 +2694,7 @@
      "pos": "adjective",
      "role": "amount",
      "cue": "a few days",
-     "speak": "a few",
+     "speak": "",
      "ipa": {
       "us": "/fjuː/",
       "uk": "/fjuː/"
@@ -4942,7 +4942,7 @@
      "pos": "adverb",
      "role": "connector",
      "cue": "Sure!",
-     "speak": "Sure!",
+     "speak": "",
      "ipa": {
       "us": "/ʃʊr/",
       "uk": "/ʃʊə(r)/"
@@ -5635,7 +5635,7 @@
      "pos": "verb",
      "role": "state",
      "cue": "I see.",
-     "speak": "I see.",
+     "speak": "",
      "ipa": {
       "us": "/siː/",
       "uk": "/siː/"
@@ -8012,7 +8012,7 @@
      "pos": "auxiliary",
      "role": "mood",
      "cue": "May I come in?",
-     "speak": "May I",
+     "speak": "",
      "ipa": {
       "us": "/meɪ/",
       "uk": "/meɪ/"
@@ -8094,7 +8094,7 @@
      "pos": "auxiliary",
      "role": "mood",
      "cue": "Shall we go?",
-     "speak": "Shall we",
+     "speak": "",
      "ipa": {
       "us": "/ʃæl/",
       "uk": "/ʃæl/"
@@ -8182,7 +8182,7 @@
      "pos": "auxiliary",
      "role": "mood",
      "cue": "Would you ...?",
-     "speak": "Would you",
+     "speak": "",
      "ipa": {
       "us": "/wʊd/",
       "uk": "/wʊd/"
@@ -8230,7 +8230,7 @@
      "pos": "auxiliary",
      "role": "mood",
      "cue": "I would like ...",
-     "speak": "I would like",
+     "speak": "",
      "ipa": {
       "us": "/wʊd/",
       "uk": "/wʊd/"
@@ -8312,7 +8312,7 @@
      "pos": "auxiliary",
      "role": "mood",
      "cue": "You should ...",
-     "speak": "You should",
+     "speak": "",
      "ipa": {
       "us": "/ʃʊd/",
       "uk": "/ʃʊd/"

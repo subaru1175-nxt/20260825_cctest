@@ -171,7 +171,8 @@ class G2P:
         return None
 
     # ---------- 文 ----------
-    def __call__(self, text, isolated=False):
+    def __call__(self, text, isolated=False, tag=None):
+        """tag: 1語だけを読むときの品詞（'NOUN' 'VERB' 'ADJ' 'ADV'）。品詞で読みが変わる語に使う"""
         tokens = []
         for m in TOKEN_RE.finditer(text):
             tokens.append({'text': m.group(0), 'start': m.start(), 'end': m.end()})
@@ -209,8 +210,8 @@ class G2P:
             elif lw == 'am':
                 ps = 'æm' if future_vowel is None else 'ɐm'
             else:
-                tag = self.tag_for(lw, prev, nxt, text)
-                ps = self.word(t, tag, at_end)
+                tg = tag if (tag and isolated and n == 1) else self.tag_for(lw, prev, nxt, text)
+                ps = self.word(t, tg, at_end)
                 if ps is None:
                     unknown.append(t)
                     ps = ''

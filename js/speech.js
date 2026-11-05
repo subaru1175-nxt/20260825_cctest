@@ -6,7 +6,8 @@
  *   AI音声 … あらかじめ作った高品質な音声（音声パック js/audio-pack.js。Kokoro・アメリカ英語）
  *   端末   … 端末のブラウザの読み上げ機能（合成音声）
  *
- * 音声パックは単語ごとの1本のファイルに入っているので、Web Audio で必要な部分だけを切り出して鳴らす。
+ * 音声パックは単語ごとの1本のファイルに入っている。中身は「1つの英語 × 速さ」ごとに別々に作った MP3 を
+ * つないだもので、バイトの範囲で1つを取り出して、それだけを Web Audio で鳴らす（時間の位置は使わない）。
  * （iPhone ではマナーモードでも鳴るように audioSession を playback にする）
  *
  * 端末の読み上げでは、アメリカ英語（en-US）の声を最優先し、その中でも
@@ -111,7 +112,6 @@
     let timer = null;
     let actx = null;
     let curSrc = null;
-    let rafId = 0;
     const decoded = new Map();
 
     /** Web Audio を準備する（最初はボタンを押したときに呼ぶ） */
@@ -141,54 +141,81 @@
       return actx;
     }
 
-    function loadBuffer(url) {
-      if (decoded.has(url)) {
-        const p = decoded.get(url);
-        decoded.delete(url);
-        decoded.set(url, p);
+    /** ファイル全体（バイト列）。単語ごとに1本。最近使ったものだけ残す */
+    const files = new Map();
+    function loadFile(url) {
+      if (files.has(url)) {
+        const p = files.get(url);
+        files.delete(url);
+        files.set(url, p);
         return p;
       }
-      const p = win.fetch(url)
-        .then((r) => {
-          if (!r.ok) throw new Error('http ' + r.status);
-          return r.arrayBuffer();
-        })
-        .then((ab) => new Promise((res, rej) => {
-          const q = actx.decodeAudioData(ab, res, rej);
-          if (q && q.then) q.then(res, rej);
-        }));
-      p.catch(() => decoded.delete(url));
-      decoded.set(url, p);
-      while (decoded.size > 12) decoded.delete(decoded.keys().next().value);
+      const p = win.fetch(url).then((r) => {
+        if (!r.ok) throw new Error('http ' + r.status);
+        return r.arrayBuffer();
+      });
+      p.catch(() => files.delete(url));
+      files.set(url, p);
+      while (files.size > 16) files.delete(files.keys().next().value);
       return p;
     }
 
     /**
-     * 次に使いそうなファイルを先に読み込む。
-     * 一度ボタンを押したあと（Web Audio の準備ができたあと）は、音として使える形にまでしておく。
-     * それまではファイルを取ってくるだけ（ブラウザのキャッシュに入れておく）。
+     * 1つの区間（バイトの a〜b）を、音として使える形にする。
+     * 区間は、それだけで再生できる MP3 なので、時間の位置に頼らない（となりの音が鳴ることがない）。
      */
-    const warmed = new Set();
-    function preload(url) {
-      if (!url || !win.fetch || api.packFailed) return;
-      if (actx) {
-        loadBuffer(url).catch(() => {});
-        return;
+    function loadClip(url, a, b) {
+      const key = url + '#' + a + '-' + b;
+      if (decoded.has(key)) {
+        const p = decoded.get(key);
+        decoded.delete(key);
+        decoded.set(key, p);
+        return p;
       }
-      if (warmed.has(url)) return;
-      warmed.add(url);
-      try { win.fetch(url).catch(() => {}); } catch (e) { /* noop */ }
+      const p = loadFile(url).then((ab) => {
+        if (!(a >= 0 && b > a && b <= ab.byteLength)) throw new Error('range');
+        const part = ab.slice(a, b); // 写しを渡す（decodeAudioData は渡したものを使えなくすることがある）
+        return new Promise((res, rej) => {
+          const q = actx.decodeAudioData(part, res, rej);
+          if (q && q.then) q.then(res, rej);
+        });
+      });
+      p.catch(() => decoded.delete(key));
+      decoded.set(key, p);
+      while (decoded.size > 48) decoded.delete(decoded.keys().next().value);
+      return p;
     }
 
-    /** 音声パックの一部分（start〜end 秒）を鳴らす */
-    function playClip(url, start, end, opts) {
+    /**
+     * 次に使いそうな音を先に読み込む。
+     * ボタンを一度押したあと（Web Audio の準備ができたあと）は、区間を音の形にまでしておく。
+     * それまではファイルを取ってくるだけ。
+     */
+    function preload(url, a, b) {
+      if (!url || !win.fetch || api.packFailed) return;
+      if (actx && a != null && b != null) {
+        loadClip(url, a, b).catch(() => {});
+        return;
+      }
+      loadFile(url).catch(() => {});
+    }
+
+    /** 再生した区間を知らせる（画面のテストで、どの音が鳴ったかを確かめるため） */
+    function announce(url, a, b) {
+      try {
+        if (typeof win.CustomEvent === 'function' && win.dispatchEvent) win.dispatchEvent(new win.CustomEvent('cif:clip', { detail: { url, a, b } }));
+      } catch (e) { /* noop */ }
+    }
+
+    /** AI音声の1つの区間（バイトの a〜b）を鳴らす */
+    function playClip(url, a, b, opts) {
       const o = opts || {};
       const cb = o.onState || function () {};
       stop();
       const my = ++token;
       const ctx = audioCtx(true);
-      if (!ctx || !win.fetch) return playFragment(url, start, end, cb, my);
-      loadBuffer(url).then((buf) => {
+      if (!ctx || !win.fetch) return playBlob(url, a, b, cb, my);
+      loadClip(url, a, b).then((buf) => {
         if (my !== token) return;
         const src = ctx.createBufferSource();
         src.buffer = buf;
@@ -200,54 +227,49 @@
           }
         };
         curSrc = src;
-        src.start(0, start, Math.max(0.05, end - start));
-        cb('playing');
+        src.start(0);
+        announce(url, a, b);
+        cb('playing', buf.duration);
       }).catch(() => {
-        if (my === token) playFragment(url, start, end, cb, my);
+        if (my === token) playBlob(url, a, b, cb, my);
       });
       return true;
     }
 
-    /** Web Audio が使えないときの予備：audio 要素で一部分だけ鳴らす */
-    function playFragment(url, start, end, cb, my) {
-      let a;
-      try {
-        a = new win.Audio(url + '#t=' + start.toFixed(2) + ',' + end.toFixed(2));
-      } catch (e) {
+    /** Web Audio が使えないときの予備：その区間だけを取り出して audio 要素で鳴らす */
+    function playBlob(url, a, b, cb, my) {
+      const fail = () => {
+        if (my !== token) return;
         api.packFailed = true;
         cb('error', 'pack');
+      };
+      if (!win.fetch || !win.Blob || !win.URL || !win.Audio) {
+        fail();
         return false;
       }
-      audioEl = a;
-      const guard = () => {
-        if (my !== token || !audioEl) return;
-        if (a.currentTime >= end - 0.02) {
-          a.pause();
-          cb('ended');
-          return;
-        }
-        rafId = (win.requestAnimationFrame || setTimeout)(guard, 16);
-      };
-      a.onplaying = () => {
+      loadFile(url).then((ab) => {
         if (my !== token) return;
-        if (a.currentTime < start - 0.05) {
-          try { a.currentTime = start; } catch (e) { /* noop */ }
-        }
-        cb('playing');
-        guard();
-      };
-      a.onended = () => my === token && cb('ended');
-      a.onerror = () => {
-        if (my !== token) return;
-        api.packFailed = true;
-        cb('error', 'pack');
-      };
-      const p = a.play();
-      if (p && p.catch) p.catch(() => {
-        if (my !== token) return;
-        api.packFailed = true;
-        cb('error', 'pack');
-      });
+        if (!(a >= 0 && b > a && b <= ab.byteLength)) throw new Error('range');
+        const u = win.URL.createObjectURL(new win.Blob([ab.slice(a, b)], { type: 'audio/mpeg' }));
+        const el = new win.Audio(u);
+        audioEl = el;
+        const done = () => { try { win.URL.revokeObjectURL(u); } catch (e) { /* noop */ } };
+        el.onplaying = () => {
+          if (my !== token) return;
+          announce(url, a, b);
+          cb('playing', el.duration);
+        };
+        el.onended = () => {
+          done();
+          if (my === token) cb('ended');
+        };
+        el.onerror = () => {
+          done();
+          fail();
+        };
+        const q = el.play();
+        if (q && q.catch) q.catch(() => { done(); fail(); });
+      }).catch(fail);
       return true;
     }
 
@@ -299,7 +321,6 @@
     function stop() {
       token += 1;
       clearTimeout(timer);
-      try { (win.cancelAnimationFrame || clearTimeout)(rafId); } catch (e) { /* noop */ }
       if (curSrc) {
         try { curSrc.stop(); } catch (e) { /* noop */ }
         curSrc = null;

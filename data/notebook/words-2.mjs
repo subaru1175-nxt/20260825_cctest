@@ -90,7 +90,7 @@ export default [
     groups: { A: 'どちらも「数が少ない」few。a がつくかどうかで、「少しある」と「ほとんどない」に分かれます。' },
     senses: [
       {
-        k: 'afew', p: 'adjective', r: 'amount', cue: 'a few days', sp: 'a few',
+        k: 'afew', p: 'adjective', r: 'amount', cue: 'a few days',
         nu: '「少しだけど、ちゃんとある」って感じ', em: '🍪', dg: 'few-a',
         sc: 'お皿にクッキーが2、3枚残っていて、「まだあるね」とうれしい。', m: '（a few で）少しの、2、3の',
         rt: '「数・量」を表す言葉です（形容詞）。数えられるものに使い、a few 〜 で「少しある」という前向きな感じになります。',

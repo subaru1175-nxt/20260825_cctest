@@ -102,7 +102,7 @@ export default [
         ev: { wn: ['adj', 'filled with fear'] },
       },
       {
-        k: 'sorry', p: 'adjective', r: 'mood', cue: "I'm afraid ...", sp: "I'm afraid",
+        k: 'sorry', p: 'adjective', r: 'mood', cue: "I'm afraid ...",
         nu: '「言いにくいことを、やわらかく切り出す」って感じ', em: '🙇',
         sc: '誘いを断るとき、「残念だけど…」と前置きする。', m: '（残念ながら）〜だと思う、あいにく',
         rt: '話し手の気持ちを表す使い方です（形容詞）。I\'m afraid 〜 の形で文の前に置き、よくないことをていねいに伝えます。',
@@ -283,7 +283,7 @@ export default [
     w: 'pardon', ipa: ['/ˈpɑːrdn/', '/ˈpɑːdn/'], st: 'PAR·don',
     web: [{ label: "Oxford Learner's Dictionaries: pardon（感嘆詞・Web検索で照合）", url: 'https://www.oxfordlearnersdictionaries.com/definition/english/pardon_3' }],
     senses: [{
-      p: 'interjection', r: 'connector', cue: 'Pardon?', sp: 'Pardon?',
+      p: 'interjection', r: 'connector', cue: 'Pardon?',
       nu: '「今のところ、もう一度お願いします」って感じ', em: '👂',
       sc: '電話の声が小さくて聞き取れず、「もう一度言ってもらえますか？」と聞き返す。', m: '（Pardon? で）もう一度言ってください',
       rt: '気持ちを伝える言葉です（間投詞）。聞き取れなかったときに、語尾を上げて Pardon? と言います。よりていねいには I beg your pardon?',

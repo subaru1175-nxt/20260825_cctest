@@ -18,8 +18,11 @@ build_audio.py — 高品質な音声パック（アメリカ英語・Kokoro af_
   Kokoro 自体に遅く話させる方法（speed 0.5）と Rubber Band での引き伸ばしは、音がくずれやすいので使わない。
 
 出力
-  audio/<単語ID>.mp3   … 単語ごとに、読み上げる英語（通常・ゆっくり）を1本につないだファイル
-  js/audio-pack.js     … 「どの英語が、どのファイルの何秒から何秒か」の目録
+  audio/<単語ID>.<版>.mp3 … 単語ごとのファイル。中身は「1つの英語 × ふつう／ゆっくり」ごとに別々に作った MP3 を
+                             つないだもの。アプリはバイトの範囲で1つを取り出して、それだけを再生する
+                             （時間の位置を使わないので、ブラウザによる MP3 の読み方の違いで、となりの音が鳴ることがない）。
+                             版はファイルの中身から作るので、作り直すと名前が変わり、古い音声がキャッシュから鳴らない。
+  js/audio-pack.js     … 目録 { "n|キー": [ファイル名, 開始バイト, 終了バイト, 長さ（秒）, 英語] }
   data/audio-report.md … 発音記号と長さの一覧
 """
 import argparse
@@ -46,7 +49,7 @@ SLOW_PHRASE = 1.8    # 2〜4語（WSOLA）
 SLOW_SENTENCE = 1.6  # 5語以上（WSOLA）
 LEAD = 0.12                # 音の前の無音（秒）
 TAIL = 0.22                # 音の後の無音
-GAP = 0.35                 # ファイルの中で、次の音までの無音
+
 TARGET_RMS = 0.085         # 音量をそろえる（声のある部分の平均）
 PEAK = 0.89
 
@@ -120,6 +123,18 @@ def silence(sec):
     return np.zeros(int(round(sec * SAMPLE_RATE)), dtype=np.float32)
 
 
+def mp3_bytes(samples):
+    """1つの区間を、それだけで再生できる MP3（バイト列）にする"""
+    pcm = np.clip(samples, -1, 1).astype(np.float32).tobytes()
+    return subprocess.run([
+        'ffmpeg', '-hide_banner', '-loglevel', 'error',
+        '-f', 'f32le', '-ar', str(SAMPLE_RATE), '-ac', '1', '-i', 'pipe:0',
+        '-codec:a', 'libmp3lame', '-b:a', '48k', '-ar', str(SAMPLE_RATE), '-ac', '1',
+        '-map_metadata', '-1', '-id3v2_version', '0', '-write_id3v1', '0',
+        '-f', 'mp3', 'pipe:1',
+    ], input=pcm, capture_output=True, check=True).stdout
+
+
 def encode_mp3(samples, path):
     pcm = np.clip(samples, -1, 1).astype(np.float32).tobytes()
     subprocess.run([
@@ -127,6 +142,9 @@ def encode_mp3(samples, path):
         '-f', 'f32le', '-ar', str(SAMPLE_RATE), '-ac', '1', '-i', 'pipe:0',
         '-codec:a', 'libmp3lame', '-b:a', '48k', '-ar', str(SAMPLE_RATE), '-ac', '1', path,
     ], input=pcm, check=True)
+
+
+POS_TAG = {'noun': 'NOUN', 'verb': 'VERB', 'adjective': 'ADJ', 'adverb': 'ADV'}
 
 
 def main():
@@ -152,71 +170,83 @@ def main():
         np.save(f, w)
         return w
 
-    groups = {}
+    made = {}      # (英語, 発音記号) → {'n': (MP3, 秒), 's': (MP3, 秒)}（同じ音は1回だけ作る）
+    groups = {}    # 単語ID → [(キー, 英語, 発音記号)]
     report = []
     t0 = time.time()
     for n, t in enumerate(texts):
-        ph = g2p(t['text'], isolated=(t['kind'] == 'word'))
-        normal = level(trim(synth(ph, SPEED_NORMAL)))
-        slow = level(trim(make_slow(normal, t['text'])))
-        clips = {v: np.concatenate([silence(LEAD), w, silence(TAIL)]) for v, w in (('n', normal), ('s', slow))}
-        groups.setdefault(t['wordId'], []).append((t['text'], clips))
-        report.append((t['text'], ph, len(clips['n']) / SAMPLE_RATE, len(clips['s']) / SAMPLE_RATE))
+        word = t['kind'] == 'word'
+        ph = g2p(t['text'], isolated=word, tag=POS_TAG.get(t['pos']) if word else None)
+        if (t['text'], ph) not in made:
+            normal = level(trim(synth(ph, SPEED_NORMAL)))
+            slow = level(trim(make_slow(normal, t['text'])))
+            made[(t['text'], ph)] = {
+                v: (mp3_bytes(np.concatenate([silence(LEAD), w, silence(TAIL)])), (len(w) / SAMPLE_RATE) + LEAD + TAIL)
+                for v, w in (('n', normal), ('s', slow))
+            }
+        groups.setdefault(t['wordId'], []).append((t['key'], t['text'], ph))
+        c = made[(t['text'], ph)]
+        report.append((t['key'], t['text'], ph, c['n'][1], c['s'][1]))
         if (n + 1) % 50 == 0:
             print(f'{n + 1}/{len(texts)} … {time.time() - t0:.0f}s', flush=True)
 
-    os.makedirs(os.path.join(ROOT, 'audio'), exist_ok=True)
+    audio_dir = os.path.join(ROOT, 'audio')
+    os.makedirs(audio_dir, exist_ok=True)
     index = {}
+    names = set()
     total = 0
     for wid, items in groups.items():
-        parts = []
-        pos = 0.0
-        for text, clips in items:
-            for variant in ('n', 's'):
-                c = clips[variant]
-                start = pos
-                parts.append(c)
-                pos += len(c) / SAMPLE_RATE
-                index[variant + '|' + text] = [wid, round(start, 3), round(pos, 3)]
-                parts.append(silence(GAP))
-                pos += GAP
-        path = os.path.join(ROOT, 'audio', wid + '.mp3')
-        encode_mp3(np.concatenate(parts), path)
-        total += os.path.getsize(path)
+        blob = bytearray()
+        where = {}  # (英語, 発音記号, 速さ) → (開始, 終了)。同じ音は1か所にまとめる
+        plan = []
+        for key, text, ph in items:
+            for v in ('n', 's'):
+                if (text, ph, v) not in where:
+                    data, dur = made[(text, ph)][v]
+                    where[(text, ph, v)] = (len(blob), len(blob) + len(data))
+                    blob += data
+                plan.append((v + '|' + key, (text, ph, v), text))
+        name = wid + '.' + hashlib.sha1(bytes(blob)).hexdigest()[:8] + '.mp3'
+        with open(os.path.join(audio_dir, name), 'wb') as f:
+            f.write(blob)
+        names.add(name)
+        total += len(blob)
+        for k, ref, text in plan:
+            a, b = where[ref]
+            index[k] = [name, a, b, round(made[(ref[0], ref[1])][ref[2]][1], 3), text]
+    # 前の版のファイル（もう使わない名前）を片づける
+    for fn in os.listdir(audio_dir):
+        if fn.endswith('.mp3') and fn not in names:
+            os.remove(os.path.join(audio_dir, fn))
 
-    # ファイルの中身が変わったら URL も変わるように、全ファイルの内容から版を作る（古い音声がキャッシュに残らないように）
-    h = hashlib.sha1()
-    for wid in sorted(groups):
-        h.update(open(os.path.join(ROOT, 'audio', wid + '.mp3'), 'rb').read())
     pack = {
         'engine': 'Kokoro-82M',
-        'v': h.hexdigest()[:10],
         'voice': args.voice,
         'accent': 'en-US',
         'base': 'audio/',
-        'ext': '.mp3',
         'pad': [LEAD, TAIL],
         'slow': {'1': SLOW_WORD, '2-4': SLOW_PHRASE, '5+': SLOW_SENTENCE},
         'clips': index,
     }
     with open(os.path.join(ROOT, 'js', 'audio-pack.js'), 'w', encoding='utf-8') as f:
-        f.write('/*\n * audio-pack.js — 高品質な音声（音声パック）の目録\n'
+        f.write('/*\n * audio-pack.js — AI音声の目録\n'
                 ' * scripts/audio/build_audio.py で自動生成。直接は編集しないでください。\n'
-                ' * clips: { "n|英語": [ファイル名, 開始秒, 終了秒] }（n=通常, s=ゆっくり）。v はファイルの版（URL の ?v=）\n */\n'
+                ' * clips: { "n|キー": [ファイル名, 開始バイト, 終了バイト, 長さ（秒）, 英語] }（n=ふつう, s=ゆっくり）\n'
+                ' *   キー：単語は "#用法ID"（見出し語だけを、その用法の発音で読む）、フレーズと文は英語そのもの\n */\n'
                 '(function (root) {\n  root.CIF = root.CIF || {};\n  root.CIF.audioPack = ' +
                 json.dumps(pack, ensure_ascii=False, separators=(',', ':')) + ';\n})(this);\n')
 
     os.makedirs(os.path.join(ROOT, 'data'), exist_ok=True)
     with open(os.path.join(ROOT, 'data', 'audio-report.md'), 'w', encoding='utf-8') as f:
         f.write('# 音声パックの一覧\n\n自動生成：`scripts/audio/build_audio.py`\n\n')
-        f.write(f'- 声：Kokoro-82M / {args.voice}（アメリカ英語）\n- 英語 {len(texts)}件 × 通常・ゆっくり\n')
+        f.write(f'- 声：Kokoro-82M / {args.voice}（アメリカ英語）\n- 英語 {len(texts)}件 × ふつう・ゆっくり（単語は用法ごとに、見出し語だけを読む）\n')
         f.write(f'- 速さ：ふつう Kokoro speed {SPEED_NORMAL}。ゆっくりは、ふつうの音声を音の高さを変えずに引き伸ばしたもの'
                 f'（1語 {SLOW_WORD}倍 PSOLA・2〜4語 {SLOW_PHRASE}倍 WSOLA・5語以上 {SLOW_SENTENCE}倍 WSOLA）\n')
-        f.write(f'- ファイル：{len(groups)}本・合計 {total / 1e6:.1f} MB\n\n')
-        f.write('| 英語 | 発音記号（Kokoro） | 通常（秒） | ゆっくり（秒） |\n| --- | --- | --- | --- |\n')
-        for text, ph, dn, ds in report:
-            f.write(f'| {text} | {ph} | {dn:.2f} | {ds:.2f} |\n')
-    print(f'done: {len(texts)} texts, {len(groups)} files, {total / 1e6:.1f} MB, {time.time() - t0:.0f}s')
+        f.write(f'- ファイル：{len(groups)}本・合計 {total / 1e6:.1f} MB（区間ごとに別々の MP3）\n\n')
+        f.write('| キー | 英語 | 発音記号（Kokoro） | ふつう（秒） | ゆっくり（秒） |\n| --- | --- | --- | --- | --- |\n')
+        for key, text, ph, dn, ds in report:
+            f.write(f'| {key} | {text} | {ph} | {dn:.2f} | {ds:.2f} |\n')
+    print(f'done: {len(texts)} texts, {len(made)} unique clips x2, {len(groups)} files, {total / 1e6:.1f} MB, {time.time() - t0:.0f}s')
 
 
 if __name__ == '__main__':

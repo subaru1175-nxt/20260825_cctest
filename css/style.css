@@ -6,21 +6,22 @@
  *   青い光沢のボタン（メイン）／縁が青い光沢のボタン（サブ）／一覧の行（›）／切り替え／音声［再生｜ゆっくり］
  */
 :root {
-  --page: #e6e8eb;
-  --page-grad: radial-gradient(140% 520px at 50% -140px, #f6f7f9 0%, rgba(246, 247, 249, 0) 100%);
-  --surface: #f8f9fa;
-  --surface-2: #f0f2f4;
-  --surface-3: #e3e6ea;
-  --card-top: #ffffff;
-  --glass: rgba(246, 247, 249, 0.8);
-  --line: rgba(24, 30, 38, 0.08);
-  --line-2: rgba(24, 30, 38, 0.15);
-  --ink: #191d22;
-  --ink-2: #4a5059;
-  --ink-3: #848b94;
-  --accent: #36628e;
-  --accent-2: #8eaed0;
-  --accent-soft: #e1e9f2;
+  --page: #c9cdd3;
+  --page-grad: radial-gradient(140% 520px at 50% -140px, #d5d8dd 0%, rgba(213, 216, 221, 0) 100%);
+  --surface: #dfe2e6;
+  --surface-2: #d5d9de;
+  --surface-3: #c8cdd3;
+  --card-top: #e8eaed;
+  --glass: rgba(201, 205, 211, 0.86);
+  --line: rgba(20, 26, 34, 0.11);
+  --line-2: rgba(20, 26, 34, 0.19);
+  --ink: #14181d;
+  --ink-2: #3a414a;
+  --ink-3: #5c636d;
+  --on-page: #454c55;
+  --accent: #2c5784;
+  --accent-2: #7f9fc2;
+  --accent-soft: #cbd7e4;
   --accent-ink: #ffffff;
   --metal: linear-gradient(135deg, #9fbddd 0%, #5b88b6 20%, #335f8b 46%, #284f7a 56%, #557fae 76%, #a2bfdd 100%);
   --metal-line: linear-gradient(135deg, #cddcec 0%, #7aa1c9 28%, #3a6794 52%, #6d97c3 76%, #c4d6ea 100%);
@@ -32,18 +33,18 @@
   --ng-soft: #f5e8e7;
   --warn: #87682c;
   --warn-soft: #f3ede1;
-  --hl: #d9e4f0;
-  --lv1: #c6d4e5;
-  --lv2: #83a3c9;
-  --lv3: #36628e;
-  --sky: #dbe4ee;
+  --hl: #c4d3e4;
+  --lv1: #b2c3d8;
+  --lv2: #7493bb;
+  --lv3: #2c5784;
+  --sky: #c7d3e0;
   --night: #2c3440;
   --moon: #e6dfc4;
-  --paper-2: #e6e9ed;
-  --sheen: rgba(255, 255, 255, 0.6);
-  --hi: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --shadow-1: 0 1px 1px rgba(16, 22, 30, 0.04), 0 3px 10px -2px rgba(16, 22, 30, 0.07);
-  --shadow-2: 0 2px 4px rgba(16, 22, 30, 0.05), 0 16px 36px -12px rgba(16, 22, 30, 0.2);
+  --paper-2: #d2d6db;
+  --sheen: rgba(255, 255, 255, 0.32);
+  --hi: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  --shadow-1: 0 1px 1px rgba(16, 22, 30, 0.06), 0 3px 10px -2px rgba(16, 22, 30, 0.11);
+  --shadow-2: 0 2px 4px rgba(16, 22, 30, 0.08), 0 16px 36px -12px rgba(16, 22, 30, 0.3);
   --shadow-blue: 0 10px 24px -10px rgba(40, 79, 122, 0.55);
   --font-ui: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
   --font-en: "Source Serif 4", "Source Serif Pro", "Iowan Old Style", Georgia, serif;
@@ -56,18 +57,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --page: #0e1013;
-    --page-grad: radial-gradient(140% 520px at 50% -140px, #22262c 0%, rgba(34, 38, 44, 0) 100%);
-    --surface: #1a1d21;
-    --surface-2: #212429;
-    --surface-3: #2a2e34;
-    --card-top: #20242a;
-    --glass: rgba(24, 27, 31, 0.82);
+    --page: #16191d;
+    --page-grad: radial-gradient(140% 520px at 50% -140px, #262a30 0%, rgba(38, 42, 48, 0) 100%);
+    --surface: #202328;
+    --surface-2: #272a30;
+    --surface-3: #30343a;
+    --card-top: #282c32;
+    --glass: rgba(30, 33, 38, 0.86);
     --line: rgba(255, 255, 255, 0.07);
     --line-2: rgba(255, 255, 255, 0.14);
     --ink: #eef1f4;
     --ink-2: #b0b7c0;
-    --ink-3: #7c838c;
+    --ink-3: #8a919a;
+    --on-page: #8a919a;
     --accent: #93b9e0;
     --accent-2: #4c739d;
     --accent-soft: #1d2835;
@@ -98,18 +100,19 @@
 }
 
 :root[data-theme="dark"] {
-  --page: #0e1013;
-  --page-grad: radial-gradient(140% 520px at 50% -140px, #22262c 0%, rgba(34, 38, 44, 0) 100%);
-  --surface: #1a1d21;
-  --surface-2: #212429;
-  --surface-3: #2a2e34;
-  --card-top: #20242a;
-  --glass: rgba(24, 27, 31, 0.82);
+  --page: #16191d;
+  --page-grad: radial-gradient(140% 520px at 50% -140px, #262a30 0%, rgba(38, 42, 48, 0) 100%);
+  --surface: #202328;
+  --surface-2: #272a30;
+  --surface-3: #30343a;
+  --card-top: #282c32;
+  --glass: rgba(30, 33, 38, 0.86);
   --line: rgba(255, 255, 255, 0.07);
   --line-2: rgba(255, 255, 255, 0.14);
   --ink: #eef1f4;
   --ink-2: #b0b7c0;
-  --ink-3: #7c838c;
+  --ink-3: #8a919a;
+  --on-page: #8a919a;
   --accent: #93b9e0;
   --accent-2: #4c739d;
   --accent-soft: #1d2835;
@@ -193,15 +196,15 @@ body[data-route="result"] .screen { padding-bottom: calc(36px + env(safe-area-in
 .home-head { flex-direction: column; align-items: flex-start; gap: 2px; padding-top: 6px; }
 .home-head .eyebrow { letter-spacing: 0.08em; }
 .lead { font-size: 0.9rem; color: var(--ink-2); line-height: 1.75; }
-.lead.center { text-align: center; margin-top: -12px; color: var(--ink-3); font-size: 0.82rem; letter-spacing: 0.04em; }
-.eyebrow { font-size: 0.76rem; color: var(--ink-3); font-weight: 500; letter-spacing: 0.04em; }
+.lead.center { text-align: center; margin-top: -12px; color: var(--on-page); font-size: 0.82rem; letter-spacing: 0.04em; }
+.eyebrow { font-size: 0.76rem; color: var(--on-page); font-weight: 500; letter-spacing: 0.04em; }
 .fine { font-size: 0.78rem; color: var(--ink-3); line-height: 1.7; }
 .muted { color: var(--ink-3); }
 
 /* ---------- まとまり ---------- */
 .section { display: flex; flex-direction: column; gap: 10px; }
 .section-title {
-  font-size: 0.74rem; font-weight: 600; color: var(--ink-3); letter-spacing: 0.14em;
+  font-size: 0.74rem; font-weight: 600; color: var(--on-page); letter-spacing: 0.14em;
   padding: 0 6px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
   font-feature-settings: "palt" 1;
 }
@@ -215,7 +218,7 @@ body[data-route="result"] .screen { padding-bottom: calc(36px + env(safe-area-in
   display: flex; flex-direction: column; gap: 16px;
 }
 .group.tight { padding: 0; gap: 0; overflow: hidden; }
-.section-note { font-size: 0.78rem; color: var(--ink-3); padding: 0 6px; line-height: 1.7; }
+.section-note { font-size: 0.78rem; color: var(--on-page); padding: 0 6px; line-height: 1.7; }
 
 /* 一覧の行 */
 .list {
@@ -455,7 +458,7 @@ details.plain > summary::-webkit-details-marker { display: none; }
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   min-height: 52px; border-radius: 18px;
-  color: var(--ink-3); text-decoration: none; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--on-page); text-decoration: none; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.04em;
 }
 .nav-item .ic { width: 22px; height: 22px; }
 .nav-item.is-current { color: var(--accent); background: var(--accent-soft); }
@@ -470,10 +473,10 @@ details.plain > summary::-webkit-details-marker { display: none; }
 }
 .topbar .icon-btn { box-shadow: none; }
 .topbar .t-mid { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-.topbar .t-label { font-size: 0.72rem; color: var(--ink-3); font-weight: 500; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.progress { height: 5px; border-radius: 999px; background: var(--surface-3); overflow: hidden; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06); }
+.topbar .t-label { font-size: 0.72rem; color: var(--on-page); font-weight: 500; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progress { height: 5px; border-radius: 999px; background: var(--line-2); overflow: hidden; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.08); }
 .progress > span { display: block; height: 100%; background: var(--metal); border-radius: inherit; transition: width 0.35s ease; }
-.remain { font-size: 0.76rem; color: var(--ink-3); white-space: nowrap; min-width: 54px; text-align: right; letter-spacing: 0.04em; }
+.remain { font-size: 0.76rem; color: var(--on-page); white-space: nowrap; min-width: 54px; text-align: right; letter-spacing: 0.04em; }
 .remain b { font-size: 1.15rem; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; margin-right: 1px; }
 
 .card {
@@ -567,7 +570,7 @@ details.more[open] > summary::after { transform: rotate(-135deg); }
 .answer-bar > * { max-width: 560px; margin-left: auto; margin-right: auto; }
 .bar-row { display: flex; align-items: center; gap: 8px; }
 .bar-row .btn.primary { flex: 1; }
-.rate-q { text-align: center; font-size: 0.74rem; font-weight: 500; color: var(--ink-3); margin-bottom: 9px; letter-spacing: 0.1em; }
+.rate-q { text-align: center; font-size: 0.74rem; font-weight: 500; color: var(--on-page); margin-bottom: 9px; letter-spacing: 0.1em; }
 .rate-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
 .rate {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;

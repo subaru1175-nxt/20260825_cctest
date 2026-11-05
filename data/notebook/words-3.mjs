@@ -114,7 +114,7 @@ export default [
         ev: { wn: ['adj', 'having or feeling no doubt or uncertainty'] },
       },
       {
-        k: 'reply', p: 'adverb', r: 'connector', cue: 'Sure!', sp: 'Sure!',
+        k: 'reply', p: 'adverb', r: 'connector', cue: 'Sure!',
         nu: '「もちろん、いいよ」と気持ちよく引き受けるって感じ', em: '🙆',
         sc: '「ペン貸してくれる？」「いいよ！」と笑顔で渡す。', m: '（返事で）もちろん、いいよ',
         rt: '返事に使う言葉です（副詞）。頼みごとに「いいよ」と答えるときに、会話でよく使います。',
@@ -237,7 +237,7 @@ export default [
         ev: { wn: ['verb', 'perceive by sight'] },
       },
       {
-        k: 'understand', p: 'verb', r: 'state', cue: 'I see.', sp: 'I see.',
+        k: 'understand', p: 'verb', r: 'state', cue: 'I see.',
         nu: '「目で見えるように、話がはっきり分かった」って感じ', em: '💡',
         sc: '先生の説明を聞いて、「なるほど、そういうことか」とうなずく。', m: '分かる、理解する（I see. で「なるほど」）',
         rt: '「状態」を表す言葉です（動詞）。I see.（なるほど・分かりました）の形で、あいづちによく使います。',
@@ -628,7 +628,7 @@ export default [
         ev: { web: 1, what: 'possibility（〜かもしれない）' },
       },
       {
-        k: 'permission', p: 'auxiliary', r: 'mood', cue: 'May I come in?', sp: 'May I',
+        k: 'permission', p: 'auxiliary', r: 'mood', cue: 'May I come in?',
         nu: '「〜してもよろしいですか？」と、ていねいに許しをもらうって感じ', em: '🙏',
         sc: '職員室の前で、「入ってもよろしいですか？」とたずねる。', m: '〜してもよい（May I 〜? で「〜してもいいですか」）',
         rt: '話し手の気持ち（許可）を表す言葉です（助動詞）。May I 〜? は Can I 〜? よりていねいな言い方です。',
@@ -642,7 +642,7 @@ export default [
     w: 'shall', ipa: ['/ʃæl/', '/ʃæl/'],
     web: [{ label: "Oxford Learner's Dictionaries: shall（Web検索で照合）", url: 'https://www.oxfordlearnersdictionaries.com/definition/english/shall' }],
     senses: [{
-      p: 'auxiliary', r: 'mood', cue: 'Shall we go?', sp: 'Shall we',
+      p: 'auxiliary', r: 'mood', cue: 'Shall we go?',
       nu: '「いっしょに〜しようか？」と、提案や申し出をするって感じ', em: '🙌',
       sc: '晴れた放課後、「公園に行かない？」と友だちを誘う。', m: '（Shall I 〜? で）〜しましょうか、（Shall we 〜? で）〜しませんか',
       rt: '話し手の気持ち（申し出・提案）を表す言葉です（助動詞）。今はおもに Shall I 〜? / Shall we 〜? の形で使います。',
@@ -662,7 +662,7 @@ export default [
     groups: { A: '「ひかえめに、ていねいに」言う would。' },
     senses: [
       {
-        k: 'request', p: 'auxiliary', r: 'mood', cue: 'Would you ...?', sp: 'Would you',
+        k: 'request', p: 'auxiliary', r: 'mood', cue: 'Would you ...?',
         nu: '「よかったら〜してもらえますか」と、ていねいにお願いするって感じ', em: '🙇',
         sc: 'お店で店員さんに、ていねいに「袋をいただけますか」と頼む。', m: '（Would you 〜? で）〜していただけますか',
         rt: '話し手の気持ち（ていねいなお願い）を表す言葉です（助動詞）。Will you 〜? よりやわらかく、ていねいです。',
@@ -671,7 +671,7 @@ export default [
         ev: { web: 0, what: 'polite requests（Would you mind ...?）' },
       },
       {
-        k: 'like', p: 'auxiliary', r: 'mood', cue: 'I would like ...', sp: 'I would like',
+        k: 'like', p: 'auxiliary', r: 'mood', cue: 'I would like ...',
         nu: '「〜がほしいです」と、やわらかく伝えるって感じ', em: '☕',
         sc: 'カフェで、「コーヒーをお願いします」と注文する。', m: '（would like で）〜がほしい、〜したい',
         rt: '話し手の気持ちを表す言葉です（助動詞）。I would like 〜（短くすると I\'d like 〜）で「〜がほしいです」、Would you like 〜? で「〜はいかがですか」。want のていねいな言い方です。',
@@ -686,7 +686,7 @@ export default [
     unverified: "Oxford Learner's Dictionaries の should の項目は、Web検索では確認できませんでした（文法解説サイトの説明でのみ照合）。",
     web: [{ label: '3.4 Requesting Information, Making Suggestions, and Giving Advice（You should は助言の言い方）', url: 'https://open-exam-prep.com/study-guides/eclt/listening-conversations/requests-suggestions-advice' }],
     senses: [{
-      p: 'auxiliary', r: 'mood', cue: 'You should ...', sp: 'You should',
+      p: 'auxiliary', r: 'mood', cue: 'You should ...',
       nu: '「〜したほうがいいよ」と、おすすめや助言をするって感じ', em: '💡',
       sc: 'せきが止まらない友だちに、「病院に行ったほうがいいよ」とすすめる。', m: '〜したほうがいい、〜すべきだ',
       rt: '話し手の気持ち（助言・おすすめ）を表す言葉です（助動詞）。should ＋ 動詞の元の形。',

@@ -314,20 +314,26 @@
     return (accent === 'uk' ? ipa.uk || ipa.us : ipa.us || ipa.uk) || '';
   }
 
-  function speakTextOf(item) {
-    return item.sense.speak || item.word.headword;
-  }
-
   /* ----- 音声 ----- */
 
   /** AI音声（音声パック）の中の、この英語の部分（ファイル・開始秒・終了秒） */
-  function packClip(text, slow) {
+  /** 英語を比べるための形（大文字・小文字、’ と '、空白の違いを無視） */
+  function sameText(a, b) {
+    const f = (x) => String(x || '').replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+    return f(a) === f(b);
+  }
+
+  /**
+   * AI音声の中の1つの区間。key は単語なら '#用法ID'、フレーズ・文なら英語そのもの。
+   * expect：画面でボタンのとなりに出している英語。目録の英語と同じときだけ使う（違う音は鳴らさない）。
+   */
+  function packClip(key, slow, expect) {
     const pack = C.audioPack;
     if (!pack || !pack.clips || (speech && speech.packFailed)) return null;
-    const c = pack.clips[(slow ? 's|' : 'n|') + String(text || '').trim()];
-    if (!c) return null;
-    // ?v= はファイルの版。作り直したときに、古い音声がキャッシュから鳴らないようにする
-    return { url: (pack.base || '') + c[0] + (pack.ext || '') + (pack.v ? '?v=' + pack.v : ''), start: c[1], end: c[2] };
+    const c = pack.clips[(slow ? 's|' : 'n|') + String(key || '').trim()];
+    if (!c || c.length < 5 || !(c[2] > c[1])) return null;
+    if (expect != null && !sameText(c[4], expect)) return null;
+    return { url: (pack.base || '') + c[0], a: c[1], b: c[2], dur: c[3], text: c[4], key: String(key).trim() };
   }
 
   function packCount() {
@@ -335,16 +341,38 @@
     return pack && pack.clips ? Object.keys(pack.clips).filter((k) => k.indexOf('n|') === 0).length : 0;
   }
 
-  /** 使う音声の種類：録音 → AI音声 → 端末の読み上げ（synthOnly: 端末の読み上げを試すとき） */
-  function audioSource(text, recorded, synthOnly) {
-    if (synthOnly) return { kind: 'synth' };
-    if (recorded) return { kind: 'rec' };
-    const n = packClip(text, false);
-    if (n) return { kind: 'pack', n, s: packClip(text, true) || n };
+  /**
+   * 使う音声の種類：録音 → AI音声 → 端末の読み上げ
+   * o: { text（端末の読み上げで読む英語）, key（AI音声のキー。なければ text）, expect（となりに出している英語。なければ text）,
+   *      src（録音URL）, synth（端末の読み上げを試すとき）, off（要確認などで鳴らさない） }
+   */
+  function audioSource(o) {
+    if (o.off) return { kind: 'off' };
+    if (o.synth) return { kind: 'synth' };
+    if (o.src) return { kind: 'rec' };
+    const key = o.key || o.text;
+    const expect = o.expect != null ? o.expect : o.text;
+    const n = packClip(key, false, expect);
+    const s = n && packClip(key, true, expect);
+    if (n && s) return { kind: 'pack', n, s };
     return { kind: 'synth' };
   }
 
+  /** 単語の音声：用法ごとに、見出し語だけを、その用法の発音で（AI音声のキー '#用法ID'） */
+  function wordAudio(item) {
+    const s = item.sense;
+    return {
+      key: '#' + s.id,
+      expect: item.word.headword,
+      // 端末の読み上げは発音を指定できないので、品詞で読みが変わる語だけ、その発音になる語句（speak）を読む
+      text: s.speak || item.word.headword,
+      src: s.audio && s.audio.word,
+      off: !isStudyable(item.word, s),
+    };
+  }
+
   function capText(kind) {
+    if (kind === 'off') return '要確認のため、音声はありません';
     if (kind === 'rec') return '録音（人の声）';
     if (kind === 'pack') return 'AI音声・アメリカ英語';
     if (speech && speech.canSynth()) return '端末の読み上げ';
@@ -358,7 +386,7 @@
     if (src.kind === 'rec') a += ' data-src="' + esc(recorded) + '"';
     if (src.kind === 'pack') {
       const c = slow ? src.s : src.n;
-      a += ' data-src="' + esc(c.url) + '" data-start="' + c.start + '" data-end="' + c.end + '"';
+      a += ' data-src="' + esc(c.url) + '" data-a="' + c.a + '" data-b="' + c.b + '" data-dur="' + c.dur + '" data-key="' + esc(c.key) + '" data-clip="' + esc(c.text) + '"';
     }
     return a;
   }
@@ -370,14 +398,14 @@
    */
   function audioCtl(opts) {
     const text = String(opts.text || '').trim();
-    const src = audioSource(text, opts.src, opts.synth);
-    const enabled = src.kind !== 'synth' || !!(speech && speech.canSynth());
+    const src = audioSource(Object.assign({}, opts, { text }));
+    const enabled = src.kind === 'pack' || src.kind === 'rec' || (src.kind === 'synth' && !!(speech && speech.canSynth()));
     const what = opts.what || '英語';
     const kindName = src.kind === 'rec' ? '録音' : src.kind === 'pack' ? 'AI音声' : '端末の読み上げ';
     const btn = (slow) => '<button type="button"' + audioAttrs(src, text, slow, opts.src) +
       ' aria-label="' + esc(what + 'を' + (slow ? 'ゆっくり' : '') + '再生（' + kindName + '）') + '"' + (enabled ? '' : ' disabled') + '>' +
       icon(enabled ? (slow ? 'slow' : 'speaker') : 'mute') + '<span>' + (slow ? 'ゆっくり' : '再生') + '</span></button>';
-    const showCap = opts.cap === true || (opts.cap === 'auto' && src.kind !== 'pack');
+    const showCap = opts.cap === true || (opts.cap === 'auto' && src.kind !== 'pack') || src.kind === 'off';
     const cap = capText(src.kind);
     // 種類の表示は、AI音声の例文などではふだん隠し、再生中だけ「何倍で再生しているか」を出す
     return '<div class="audio-wrap' + (opts.left ? ' left' : '') + '">' +
@@ -396,9 +424,9 @@
   function playingText(btn, kind, slow) {
     if (kind === 'pack') {
       const pad = ((C.audioPack && C.audioPack.pad) || [0, 0]).reduce((x, y) => x + y, 0);
-      const sec = Math.max(0.1, Number(btn.dataset.end) - Number(btn.dataset.start) - pad).toFixed(1);
+      const sec = Math.max(0.1, Number(btn.dataset.dur) - pad).toFixed(1);
       if (!slow) return '再生中（' + sec + '秒）';
-      const f = slowFactor(btn.dataset.text);
+      const f = slowFactor(btn.dataset.clip || btn.dataset.text);
       return 'ゆっくり再生中（' + (f ? 'ふつうの' + f + '倍・' : '') + sec + '秒）';
     }
     if (!slow) return '再生中';
@@ -420,10 +448,10 @@
   }
 
   /** 丸い再生ボタン（表面のフレーズ用） */
-  function speakOne(text, what) {
+  function speakOne(text, what, off) {
     const t = String(text || '').trim();
-    const src = audioSource(t, '');
-    const enabled = src.kind !== 'synth' || !!(speech && speech.canSynth());
+    const src = audioSource({ text: t, off });
+    const enabled = src.kind === 'pack' || (src.kind === 'synth' && !!(speech && speech.canSynth()));
     return '<button type="button" class="speak-one"' + audioAttrs(src, t, false, '') +
       ' aria-label="' + esc((what || 'フレーズ') + 'を再生') + '"' + (enabled ? '' : ' disabled') + '>' + icon(enabled ? 'speaker' : 'mute') + '</button>';
   }
@@ -479,7 +507,7 @@
       const g = b.closest('.audio');
       if (!g) return;
       // 再生の長さだけ進む線（AI音声は長さが分かる。それ以外は動き続ける線）
-      const dur = kind === 'pack' ? Number(b.dataset.end) - Number(b.dataset.start) : 0;
+      const dur = kind === 'pack' ? Number(b.dataset.dur) : 0;
       g.style.setProperty('--dur', (dur || 1.2) + 's');
       g.classList.toggle('timed', !!dur);
       g.classList.add('run');
@@ -510,7 +538,7 @@
       toast(audioError(detail, kind === 'rec'));
     };
     let ok;
-    if (kind === 'pack') ok = speech.playClip(btn.dataset.src, Number(btn.dataset.start), Number(btn.dataset.end), { onState });
+    if (kind === 'pack') ok = speech.playClip(btn.dataset.src, Number(btn.dataset.a), Number(btn.dataset.b), { onState });
     else if (kind === 'rec') ok = speech.play(btn.dataset.src, { slow, isSlowFile: false, onState });
     else ok = speech.speak(text, { slow, onState });
     if (!ok) toast(speech.message() || '音声を再生できません。');
@@ -527,11 +555,14 @@
   /** 次に出るカードの音声を先に読み込んでおく */
   function preloadStudy(s) {
     if (!s || !speech || !s.queue) return;
-    s.queue.slice(0, 2).forEach((sid) => {
+    s.queue.slice(0, 2).forEach((sid, i) => {
       const it = index.senses.get(sid);
       if (!it) return;
-      const c = packClip(speakTextOf(it), false);
-      if (c) speech.preload(c.url);
+      [false, true].forEach((slow) => {
+        if (slow && i > 0) return;
+        const c = packClip('#' + sid, slow, it.word.headword);
+        if (c) speech.preload(c.url, c.a, c.b);
+      });
     });
   }
 
@@ -559,14 +590,16 @@
     return '<div class="ex">' +
       '<p class="ex-en" lang="en">' + util.markedHtml(ex.en) + '</p>' +
       (ex.ja ? '<p class="ex-ja">' + esc(ex.ja) + '</p>' : '') +
-      audioCtl({ text: util.plainSentence(ex.en), src, what: '例文', sm: true, left: true, cap: 'auto' }) +
+      audioCtl({ text: util.plainSentence(ex.en), src, what: '例文', sm: true, left: true, cap: 'auto', off: !isStudyable(item.word, item.sense) }) +
       '</div>';
   }
 
+  /** 端末の読み上げで、品詞で読みが変わる語を語句で読むときだけ、そのことを書く */
   function speakNote(item) {
     const sp = item.sense.speak;
-    if (!sp || sp.toLowerCase() === item.word.headword.toLowerCase()) return '';
-    return '<p class="speak-note">音声は「<span lang="en">' + esc(sp) + '</span>」（この用法の発音）</p>';
+    if (!sp || sameText(sp, item.word.headword)) return '';
+    if (audioSource(wordAudio(item)).kind !== 'synth') return '';
+    return '<p class="speak-note">端末の読み上げでは、この用法の発音にするため「<span lang="en">' + esc(sp) + '</span>」と読みます</p>';
   }
 
   /** 場面→英語の練習用に、例文の単語を空欄にする（空欄にできない例文は英語を出さない） */
@@ -742,7 +775,7 @@
     }
     const res = s.results[sid];
     const repeat = !!(res && res.first);
-    const kind = audioSource(speakTextOf(item), item.sense.audio && item.sense.audio.word).kind;
+    const kind = audioSource(wordAudio(item)).kind;
 
     let html = '<main class="screen study" id="main">';
     html += topbar('quit', scopeLabel(s.scope) + '・' + SS.MODES[s.mode].label, SS.progressRatio(s), '残り <b>' + SS.remaining(s) + '</b>枚', 'セットの進み具合');
@@ -767,7 +800,7 @@
       '<div class="front-body">' +
       '<h2 class="headword" lang="en">' + esc(w.headword) + '</h2>' +
       (ipa ? '<p class="ipa" lang="en">' + esc(ipa) + '</p>' : '') +
-      audioCtl({ text: speakTextOf(item), src: sense.audio && sense.audio.word, what: '単語', cap: true }) +
+      audioCtl(Object.assign(wordAudio(item), { what: '単語', cap: true })) +
       speakNote(item) +
       (sense.cue ? '<div class="cue-line"><p class="cue" lang="en">' + esc(sense.cue) + '</p>' + speakOne(sense.cue, 'フレーズ') + '</div>' : '') +
       '</div>' +
@@ -801,7 +834,7 @@
     let html = '<article class="card card-back" aria-label="カードの裏">' + meta;
     html += '<div class="back-head"><div class="bh-line"><h2 class="headword sm" lang="en">' + esc(w.headword) + '</h2>' +
       (ipa ? '<span class="ipa" lang="en">' + esc(ipa) + '</span>' : '') + '</div>' +
-      audioCtl({ text: speakTextOf(item), src: sense.audio && sense.audio.word, what: '単語', cap: true, left: true }) +
+      audioCtl(Object.assign(wordAudio(item), { what: '単語', cap: true, left: true })) +
       speakNote(item) +
       (mode === 'rev' && sense.cue ? '<div class="cue-line"><p class="cue" lang="en">' + esc(sense.cue) + '</p>' + speakOne(sense.cue, 'フレーズ') + '</div>' : '') +
       '</div>';
@@ -858,7 +891,7 @@
     let html = rows.length ? '<ul class="pron">' + rows.join('') + '</ul>' : '<p class="muted">発音記号は未入力です。</p>';
     const stress = stressHtml(sense.stress);
     if (stress) html += '<p class="stress-line">強く読む位置：' + stress + '</p>';
-    const kind = audioSource(speakTextOf(item), sense.audio && sense.audio.word).kind;
+    const kind = audioSource(wordAudio(item)).kind;
     html += '<p class="fine">音声：' + (kind === 'rec' ? '録音（人の声）'
       : kind === 'pack' ? 'AI音声（アメリカ英語）'
       : speech && speech.canSynth() ? '端末の読み上げ（' + esc(speech.currentLabel()) + '）' : '端末の読み上げ（この端末では使えません）') + '</p>';
@@ -1229,9 +1262,12 @@
     const p = q.prompt;
     let body = '<p class="q-label">' + esc(Q.QTYPE[q.qtype]) + '</p>';
     if (q.qtype === 'meaning') {
+      // 単語のボタンは単語だけ、フレーズは丸いボタンで（カードの表と同じ形）
+      const it = index.senses.get(q.senseId);
+      const wa = it ? wordAudio(it) : { key: '#' + q.senseId, expect: p.headword, text: p.speak || p.headword };
       body += '<h2 class="headword q-word" lang="en">' + esc(p.headword) + '</h2>' +
-        (p.cue ? '<p class="cue" lang="en">' + esc(p.cue) + '</p>' : '') +
-        audioCtl({ text: p.cue || p.speak, what: 'フレーズ', sm: true, cap: 'auto' }) +
+        audioCtl(Object.assign(wa, { what: '単語', sm: true, cap: 'auto' })) +
+        (p.cue ? '<div class="cue-line"><p class="cue" lang="en">' + esc(p.cue) + '</p>' + speakOne(p.cue, 'フレーズ') + '</div>' : '') +
         '<p class="q-text">この使い方の意味は？</p>';
     } else if (q.qtype === 'scene') {
       body += (p.diagram && DG.has(p.diagram) ? '<div class="scene-art has-dg">' + DG.get(p.diagram) + '</div>' : '') +
@@ -1509,7 +1545,7 @@
     html += '<header class="page-head sub"><div class="side"><button type="button" class="icon-btn" data-action="back" data-fallback="words" aria-label="戻る">' + icon('back') + '</button></div><h1 class="sr-only">' + esc(w.headword) + '</h1>' +
       '<div class="side right"><a class="btn text" href="#edit-' + esc(w.id) + '">編集</a></div></header>';
     html += '<div class="detail-head"><p class="headword" lang="en">' + esc(w.headword) + '</p>' + (w.status === 'verified' ? '' : statusBadge(w.status)) +
-      (firstItem && w.senses.length === 1 ? audioCtl({ text: speakTextOf(firstItem), src: firstSense.audio && firstSense.audio.word, what: '単語', cap: true }) : '') +
+      (firstItem && w.senses.length === 1 ? audioCtl(Object.assign(wordAudio(firstItem), { what: '単語', cap: true })) : '') +
       '</div>';
 
     if (w.status === 'needs_review') {
@@ -1533,7 +1569,7 @@
           '<div class="sense-head"><span class="chip">' + esc(posLabel(s.pos)) + '</span>' +
           (s.cue ? '<span class="cue" lang="en">' + esc(s.cue) + '</span>' : '<span></span>') +
           (s.status === 'needs_review' ? '<span class="badge st-needs_review">要確認</span>' : '') + '</div>' +
-          (w.senses.length > 1 ? audioCtl({ text: speakTextOf(item), src: s.audio && s.audio.word, what: '単語', sm: true, left: true, cap: true }) : '') +
+          (w.senses.length > 1 ? audioCtl(Object.assign(wordAudio(item), { what: '単語', sm: true, left: true, cap: true })) : '') +
           senseBody(item, {}) +
           '<div class="learn"><p class="sec-label">学習の記録</p>' +
           '<div class="learn-row"><span class="mini-label">英語 → 場面</span>' + levelChip(fwd) + '<span class="learn-next">' + (fwd && fwd.reps ? '次の復習：' + esc(util.formatDue(fwd.due, now)) : 'まだ学習していません') + '</span></div>' +
@@ -1721,7 +1757,7 @@
         field('発音記号（イギリス）', p + 'ipa.uk', s.ipa.uk, { half: true, lang: 'en', en: true, placeholder: '/ˈprɪti/' }) +
         '</div>' +
         field('強く読む位置（任意）', p + 'stress', s.stress, { lang: 'en', en: true, placeholder: 're·CORD', help: '音節を「·」で区切り、強く読む音節を大文字にします。' }) +
-        field('単語ボタンで読み上げる英語（任意）', p + 'speak', s.speak, { lang: 'en', en: true, placeholder: '空欄なら見出し語', help: '品詞で発音が変わる語は「to record」「a record」のように、この用法の発音になる語句にします。' }) +
+        field('端末の読み上げで読む語句（任意）', p + 'speak', s.speak, { lang: 'en', en: true, placeholder: '空欄なら見出し語', help: 'AI音声がない単語を、端末の読み上げで読むときだけ使います。品詞で発音が変わる語は「to record」「a record」のように、この用法の発音になる語句にします。AI音声がある単語は、いつも見出し語だけを、その用法の発音で読みます。' }) +
         field('録音音声のURL（任意）', p + 'audio.word', s.audio.word, { en: true, placeholder: 'https://… または audio/xxx.mp3', help: '登録すると AI音声より優先して再生し、「録音」と表示します。' }) +
         '</div>' +
         field('補足（任意）', p + 'note', s.note, { textarea: true, rows: 2 }) +

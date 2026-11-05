@@ -227,9 +227,22 @@
     return '学習データを保存できませんでした。ブラウザの設定（プライベートモードなど）を確認してください。';
   }
 
-  /** 新しいバージョンで増えた初期単語を追加（ユーザーが削除したものは戻さない） */
+  /**
+   * 新しいバージョンの初期データを反映する
+   *  - 増えた初期単語を追加（ユーザーが削除したものは戻さない）
+   *  - 自分で編集していない初期単語は、新しい版の内容に入れかえる（直したところを届ける。学習記録は用法IDのままなので残る）
+   */
   function mergeNewSeedWords(words, seed, meta) {
     if (!seed || !(seed.version > (meta.seedVersion || 0))) return { words, added: 0 };
+    const fresh = new Map(seed.words.map((w) => [w.id, w]));
+    let refreshed = 0;
+    words = words.map((w) => {
+      const s = fresh.get(w.id);
+      if (!s || w.updatedAt) return w;
+      const nw = normalizeWord(s).word;
+      if (JSON.stringify(nw) !== JSON.stringify(w)) refreshed += 1;
+      return nw;
+    });
     const have = new Set(words.map((w) => w.id));
     const deleted = new Set(meta.deletedSeed || []);
     const add = seed.words.filter((w) => !have.has(w.id) && !deleted.has(w.id)).map((w) => normalizeWord(w).word);
@@ -237,7 +250,7 @@
     const order = new Map(seed.words.map((w, i) => [w.id, i]));
     const merged = words.concat(add).map((w, i) => ({ w, k: order.has(w.id) ? order.get(w.id) : seed.words.length + i }));
     merged.sort((a, b) => a.k - b.k);
-    return { words: merged.map((x) => x.w), added: add.length };
+    return { words: merged.map((x) => x.w), added: add.length + refreshed };
   }
 
   /* ---------- データの整形・チェック ---------- */

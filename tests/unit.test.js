@@ -495,70 +495,101 @@ function loadPack() {
   return root.CIF.audioPack;
 }
 
-test('AI音声: アプリで読み上げる英語は、すべて通常とゆっくりの音声がある', () => {
+const sameText = (a, b) => String(a).replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase() === String(b).replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+
+test('AI音声: 単語のボタンは見出し語だけ・フレーズと文は、そのとおりの英語。すべて、ふつうとゆっくりがある', () => {
   const pack = loadPack();
   assert.equal(pack.accent, 'en-US');
-  const need = new Set(['Hello! This is how I sound.']);
+  const problems = [];
+  const need = (key, text) => {
+    for (const v of ['n', 's']) {
+      const c = pack.clips[v + '|' + key];
+      if (!c) problems.push('ない: ' + v + '|' + key);
+      else if (!sameText(c[4], text)) problems.push('英語が違う: ' + v + '|' + key + ' = ' + c[4] + '（' + text + ' のはず）');
+    }
+  };
+  need('Hello! This is how I sound.', 'Hello! This is how I sound.');
   seed.words.forEach((w) => {
     if (w.status === 'needs_review') return;
     w.senses.forEach((s) => {
       if (s.status === 'needs_review') return;
-      need.add(s.speak || w.headword);
-      if (s.cue) need.add(s.cue);
-      (s.examples || []).forEach((e) => need.add(util.plainSentence(e.en)));
-      if (s.test) need.add(util.plainSentence(s.test.en));
+      need('#' + s.id, w.headword); // 単語は、見出し語だけ（文やフレーズにしない）
+      if (s.cue) need(s.cue.trim(), s.cue.trim());
+      (s.examples || []).forEach((e) => need(util.plainSentence(e.en), util.plainSentence(e.en)));
+      if (s.test) need(util.plainSentence(s.test.en), util.plainSentence(s.test.en));
     });
   });
-  const missing = [...need].filter((t) => !pack.clips['n|' + t] || !pack.clips['s|' + t]);
-  assert.deepEqual(missing, []);
+  assert.deepEqual(problems, []);
+  // 単語のキーの英語は、すべて見出し語（1つの単語、または a lot・as well のような見出し語そのもの）
+  const heads = new Set(seed.words.map((w) => w.headword.toLowerCase()));
+  Object.keys(pack.clips).filter((k) => k.slice(2).startsWith('#')).forEach((k) => assert.ok(heads.has(pack.clips[k][4].toLowerCase()), k));
   // 日本語は読み上げない
-  assert.ok(Object.keys(pack.clips).every((k) => !/[぀-ヿ一-鿿]/.test(k)));
+  assert.ok(Object.values(pack.clips).every((c) => !/[぀-ヿ一-鿿]/.test(c[4])));
 });
 
-test('AI音声: ファイルがそろい、区間は正しく、ゆっくりははっきり長い', () => {
+test('AI音声: 区間は、それぞれ独立した MP3。ファイル名は中身の版で、範囲はファイルの中', () => {
   const fs = require('fs');
   const path = require('path');
+  const crypto = require('crypto');
   const pack = loadPack();
-  const files = new Set();
-  const pad = (pack.pad || [0, 0])[0] + (pack.pad || [0, 0])[1];
-  const ratio = { one: [], short: [], long: [] };
+  const bytes = {};
   Object.keys(pack.clips).forEach((k) => {
-    const [file, a, b] = pack.clips[k];
-    files.add(file);
-    assert.ok(a >= 0 && b > a + 0.2, k);
-    if (k.startsWith('n|')) {
-      const t = k.slice(2);
-      const s = pack.clips['s|' + t];
-      // 前後の無音を除いた、声の部分の長さの比
-      const r = (s[2] - s[1] - pad) / (b - a - pad);
-      const n = t.split(' ').length;
-      (n === 1 ? ratio.one : n <= 4 ? ratio.short : ratio.long).push(r);
+    const [file, a, b, dur, text] = pack.clips[k];
+    if (!bytes[file]) {
+      bytes[file] = fs.readFileSync(path.join(__dirname, '..', pack.base, file));
+      const hash = crypto.createHash('sha1').update(bytes[file]).digest('hex').slice(0, 8);
+      assert.ok(file.endsWith('.' + hash + '.mp3'), 'ファイル名の版が中身と合う: ' + file);
     }
+    assert.ok(Number.isInteger(a) && Number.isInteger(b) && a >= 0 && b > a + 500 && b <= bytes[file].length, k);
+    assert.ok(dur > 0.3 && dur < 12, k + ' ' + dur);
+    assert.ok(typeof text === 'string' && text.length > 0, k);
+    // 区間の先頭は MP3 の始まり（フレームの同期）＝ それだけで再生できる
+    const head = bytes[file].subarray(a, a + 2);
+    assert.ok(head[0] === 0xff && (head[1] & 0xe0) === 0xe0, k + ' は MP3 の始まりから');
   });
-  files.forEach((f) => assert.ok(fs.statSync(path.join(__dirname, '..', pack.base, f + pack.ext)).size > 1000, f));
-  const median = (xs) => xs.slice().sort((x, y) => x - y)[Math.floor(xs.length / 2)];
-  assert.ok(pad > 0.2, '前後の無音の長さが目録にある');
-  // ゆっくりは、1語 2倍・2〜4語 約1.8倍・5語以上 約1.6倍
-  assert.ok(median(ratio.one) > 1.85, '1語 ' + median(ratio.one));
-  assert.ok(median(ratio.short) > 1.65, '2〜4語 ' + median(ratio.short));
-  assert.ok(median(ratio.long) > 1.45, '5語以上 ' + median(ratio.long));
-  assert.ok(Math.min(...ratio.one) > 1.7, '1語はどれもはっきり遅い');
 });
 
-test('AI音声: 品詞で読みが変わる語は、その用法の発音で作っている', () => {
+test('AI音声: ゆっくりははっきり長い（1語 2.2倍・2〜4語 1.8倍・5語以上 1.6倍）', () => {
+  const pack = loadPack();
+  assert.deepEqual(pack.slow, { '1': 2.2, '2-4': 1.8, '5+': 1.6 });
+  const pad = pack.pad[0] + pack.pad[1] + 0.08; // 前後の無音と、声の前後の短い余白（引き伸ばさない）
+  const ratio = { one: [], short: [], long: [] };
+  Object.keys(pack.clips).filter((k) => k.startsWith('n|')).forEach((k) => {
+    const n = pack.clips[k];
+    const s = pack.clips['s' + k.slice(1)];
+    const r = (s[3] - pad) / (n[3] - pad);
+    const w = n[4].split(/\s+/).length;
+    (w === 1 ? ratio.one : w <= 4 ? ratio.short : ratio.long).push(r);
+  });
+  const median = (xs) => xs.slice().sort((x, y) => x - y)[Math.floor(xs.length / 2)];
+  assert.ok(median(ratio.one) > 2.05 && median(ratio.one) < 2.35, '1語 ' + median(ratio.one));
+  assert.ok(median(ratio.short) > 1.65, '2〜4語 ' + median(ratio.short));
+  assert.ok(median(ratio.long) > 1.45, '5語以上 ' + median(ratio.long));
+  assert.ok(Math.min(...ratio.one) > 1.9, '1語はどれもはっきり遅い ' + Math.min(...ratio.one));
+});
+
+test('AI音声: 品詞で読みが変わる語は、単語だけを、その用法の発音で読む', () => {
   const report = require('fs').readFileSync(require('path').join(__dirname, '..', 'data', 'audio-report.md'), 'utf8');
-  const ph = (text) => {
-    const line = report.split('\n').find((l) => l.startsWith('| ' + text + ' |'));
-    assert.ok(line, text);
-    return line.split('|')[2].trim();
+  const row = (key) => {
+    const line = report.split('\n').find((l) => l.startsWith('| ' + key + ' |'));
+    assert.ok(line, key);
+    const cells = line.split('|').map((c) => c.trim());
+    return { text: cells[2], ph: cells[3] };
   };
-  assert.match(ph('a record'), /ɹˈɛkəɹd/); // 名詞 REcord
-  assert.match(ph('to record'), /ɹəkˈɔɹd/); // 動詞 reCORD
-  assert.match(ph('to live'), /lˈɪv/); // 動詞 /lɪv/
-  assert.match(ph('live music'), /lˈIv/); // 形容詞 /laɪv/
-  assert.match(ph('Excuse me.'), /ɪkskjˈuz/); // 動詞 /z/
-  assert.match(ph('an excuse'), /ɪkskjˈus/); // 名詞 /s/
-  assert.match(ph('We read a poem in class.'), /ɹˈɛd/); // 過去形 /red/
+  const cases = [
+    ['#s-record-noun', 'record', /^ɹˈɛkəɹd$/], // 名詞 REcord
+    ['#s-record-verb', 'record', /^ɹəkˈɔɹd$/], // 動詞 reCORD
+    ['#s-live-verb', 'live', /^lˈɪv$/], // 動詞 /lɪv/
+    ['#s-live-adj', 'live', /^lˈIv$/], // 形容詞 /laɪv/
+    ['#s-excuse-verb', 'excuse', /^ɪkskjˈuz$/], // 動詞 /z/
+    ['#s-excuse-noun', 'excuse', /^ɪkskjˈus$/], // 名詞 /s/
+  ];
+  for (const [key, text, re] of cases) {
+    const r = row(key);
+    assert.equal(r.text, text, key + ' は単語だけ');
+    assert.match(r.ph, re, key);
+  }
+  assert.match(row('We read a poem in class.').ph, /ɹˈɛd/); // 過去形 /red/
 });
 
 test('設定: 出題のしかた（英語→場面／場面→英語）を覚えておく', () => {
@@ -567,13 +598,21 @@ test('設定: 出題のしかた（英語→場面／場面→英語）を覚え
   assert.equal(ST.normalizeSettings({ studyMode: 'x' }).studyMode, 'fwd');
 });
 
-test('AI音声: ゆっくりの倍率（1語 2.2倍・2〜4語 1.8倍・5語以上 1.6倍）が目録にある', () => {
-  const pack = loadPack();
-  assert.deepEqual(pack.slow, { '1': 2.2, '2-4': 1.8, '5+': 1.6 });
-  const pad = pack.pad[0] + pack.pad[1];
-  // 声の前後には、引き伸ばさない短い余白（各 0.04 秒）があるので、それも除いて比べる
-  const len = (k) => pack.clips[k][2] - pack.clips[k][1] - pad - 0.08;
-  // begin は 1語なので約2.2倍
-  const r = len('s|begin') / len('n|begin');
-  assert.ok(r > 2.05 && r < 2.4, 'begin ' + r.toFixed(2));
+test('初期データの更新：編集していない初期単語は新しい版に入れかわり、編集した単語は残る', async () => {
+  const backend = ST.memoryBackend();
+  const old = seed.words.map((w) => ST.normalizeWord(w).word);
+  const afraid = old.find((w) => w.id === 'w-afraid');
+  afraid.senses.find((s) => s.id === 's-afraid-sorry').speak = "I'm afraid"; // 前の版の内容
+  const may = old.find((w) => w.id === 'w-may');
+  may.senses.find((s) => s.id === 's-may-permission').speak = 'May I';
+  may.updatedAt = 12345; // 自分で編集した単語
+  await backend.save('words', old);
+  await backend.save('meta', { seedVersion: 3, deletedSeed: [] });
+  const st = ST.createStore(backend);
+  await st.init(seed);
+  const get = (wid, sid) => st.state.words.find((w) => w.id === wid).senses.find((s) => s.id === sid);
+  assert.equal(get('w-afraid', 's-afraid-sorry').speak, '', '編集していない単語は新しい版の内容');
+  assert.equal(get('w-may', 's-may-permission').speak, 'May I', '編集した単語はそのまま');
+  assert.equal(st.state.meta.seedVersion, seed.version);
+  assert.equal(st.state.words.length, seed.words.length);
 });
