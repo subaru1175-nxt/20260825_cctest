@@ -3,35 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>コアイメージ単語帳</title>
-<meta name="theme-color" content="#c9cdd3">
+<title>暗記CARD</title>
+<meta name="theme-color" content="#e8eaee">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2I0MDQ4Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iIzI2MmEzMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxYTFkMjEiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2Q3ZTVmNCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuMyIgc3RvcC1jb2xvcj0iIzdhYTFjOSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiMzYTY3OTQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjgiIHN0b3AtY29sb3I9IiM3ZWE2Y2YiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjY2RkY2VjIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJnbG93IiBjeD0iMC43OCIgY3k9IjAuMTIiIHI9IjAuNyI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzhmYjZkZCIgc3RvcC1vcGFjaXR5PSIwLjM1Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzhmYjZkZCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0idXJsKCNiZykiLz4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0idXJsKCNnbG93KSIvPgogIDxyZWN0IHg9IjEwNCIgeT0iMTM4IiB3aWR0aD0iMzA0IiBoZWlnaHQ9IjIzNiIgcng9IjMwIiBmaWxsPSIjZjhmOWZhIiBzdHJva2U9InVybCgjbWV0YWwpIiBzdHJva2Utd2lkdGg9IjEwIi8+CiAgPHJlY3QgeD0iMTQ2IiB5PSIyMTIiIHdpZHRoPSIxNTgiIGhlaWdodD0iMTgiIHJ4PSI5IiBmaWxsPSJ1cmwoI21ldGFsKSIvPgogIDxyZWN0IHg9IjE0NiIgeT0iMjYyIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjEwIiByeD0iNSIgZmlsbD0iI2M5Y2VkNiIvPgogIDxyZWN0IHg9IjE0NiIgeT0iMjk2IiB3aWR0aD0iMTY4IiBoZWlnaHQ9IjEwIiByeD0iNSIgZmlsbD0iI2M5Y2VkNiIvPgo8L3N2Zz4K">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <style>
 /*
- * コアイメージ単語帳 — スタイル
- * テーマ：グラファイト（グレー）× メタリックブルー
- *   地はやわらかいグレー、面は少し明るいグレー、大事なところだけメタリックブルーの光沢。
+ * 暗記CARD — スタイル
+ * テーマ：ライトグレー × メタリックブルー（暗い画面の設定ではグラファイト）
+ *   地は明るいライトグレー、面はさらに明るいグレー、大事なところだけメタリックブルーの光沢。
  * 部品は少なく、どの画面でも同じ形：
  *   青い光沢のボタン（メイン）／縁が青い光沢のボタン（サブ）／一覧の行（›）／切り替え／音声［再生｜ゆっくり］
  */
 :root {
-  --page: #c9cdd3;
-  --page-grad: radial-gradient(140% 520px at 50% -140px, #d5d8dd 0%, rgba(213, 216, 221, 0) 100%);
-  --surface: #dfe2e6;
-  --surface-2: #d5d9de;
-  --surface-3: #c8cdd3;
-  --card-top: #e8eaed;
-  --glass: rgba(201, 205, 211, 0.86);
-  --line: rgba(20, 26, 34, 0.11);
-  --line-2: rgba(20, 26, 34, 0.19);
-  --ink: #14181d;
-  --ink-2: #3a414a;
-  --ink-3: #5c636d;
-  --on-page: #454c55;
+  --page: #e8eaee;
+  --page-grad: radial-gradient(140% 520px at 50% -140px, #f5f6f8 0%, rgba(245, 246, 248, 0) 100%);
+  --surface: #f6f7f9;
+  --surface-2: #eef0f3;
+  --surface-3: #e0e3e8;
+  --card-top: #fcfcfd;
+  --glass: rgba(232, 234, 238, 0.86);
+  --line: rgba(20, 26, 34, 0.09);
+  --line-2: rgba(20, 26, 34, 0.17);
+  --ink: #15191e;
+  --ink-2: #3c434c;
+  --ink-3: #626b75;
+  --on-page: #525a64;
   --accent: #2c5784;
   --accent-2: #7f9fc2;
-  --accent-soft: #cbd7e4;
+  --accent-soft: #d8e3ef;
   --accent-ink: #ffffff;
   --metal: linear-gradient(135deg, #9fbddd 0%, #5b88b6 20%, #335f8b 46%, #284f7a 56%, #557fae 76%, #a2bfdd 100%);
   --metal-line: linear-gradient(135deg, #cddcec 0%, #7aa1c9 28%, #3a6794 52%, #6d97c3 76%, #c4d6ea 100%);
@@ -40,22 +40,32 @@
   --on-graphite: #f1f3f6;
   --on-graphite-2: #a5adb7;
   --ng: #ad4741;
-  --ng-soft: #f5e8e7;
+  --ng-soft: #f8ebea;
   --warn: #87682c;
-  --warn-soft: #f3ede1;
-  --hl: #c4d3e4;
-  --lv1: #b2c3d8;
+  --warn-soft: #f6f0e3;
+  --hl: #d3dfec;
+  --lv1: #b9c9dc;
   --lv2: #7493bb;
   --lv3: #2c5784;
-  --sky: #c7d3e0;
+  --sky: #d5dfea;
   --night: #2c3440;
   --moon: #e6dfc4;
-  --paper-2: #d2d6db;
-  --sheen: rgba(255, 255, 255, 0.32);
-  --hi: inset 0 1px 0 rgba(255, 255, 255, 0.42);
-  --shadow-1: 0 1px 1px rgba(16, 22, 30, 0.06), 0 3px 10px -2px rgba(16, 22, 30, 0.11);
-  --shadow-2: 0 2px 4px rgba(16, 22, 30, 0.08), 0 16px 36px -12px rgba(16, 22, 30, 0.3);
-  --shadow-blue: 0 10px 24px -10px rgba(40, 79, 122, 0.55);
+  --paper-2: #e3e6ea;
+  --sheen: rgba(255, 255, 255, 0.6);
+  --hi: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --shadow-1: 0 1px 1px rgba(16, 22, 30, 0.04), 0 3px 10px -2px rgba(16, 22, 30, 0.08);
+  --shadow-2: 0 2px 4px rgba(16, 22, 30, 0.05), 0 16px 36px -12px rgba(16, 22, 30, 0.22);
+  --shadow-blue: 0 10px 24px -10px rgba(40, 79, 122, 0.5);
+  --hero-bg: linear-gradient(155deg, #ffffff 0%, #f1f3f6 46%, #e2e6eb 100%);
+  --hero-ink: #15191e;
+  --hero-ink-2: #5c656f;
+  --ring-track: rgba(20, 26, 34, 0.08);
+  --ring-1: #a9c5e2;
+  --ring-2: #5b88b6;
+  --ring-3: #2f5b88;
+  --ring-4: #8fb0d3;
+  --hero-glow: rgba(122, 161, 201, 0.22);
+  --title-glow: #ffffff;
   --font-ui: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
   --font-en: "Source Serif 4", "Source Serif Pro", "Iowan Old Style", Georgia, serif;
   --font-ipa: "Noto Sans", "Lucida Sans Unicode", "Segoe UI", "Arial Unicode MS", sans-serif;
@@ -105,6 +115,16 @@
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-2: 0 18px 40px -16px rgba(0, 0, 0, 0.7);
     --shadow-blue: 0 10px 24px -12px rgba(0, 0, 0, 0.7);
+    --hero-bg: var(--graphite);
+    --hero-ink: #f1f3f6;
+    --hero-ink-2: #a5adb7;
+    --ring-track: rgba(255, 255, 255, 0.1);
+    --ring-1: #e3eef9;
+    --ring-2: #8fb6dd;
+    --ring-3: #4f7fae;
+    --ring-4: #c3d8ee;
+    --hero-glow: rgba(143, 182, 221, 0.26);
+    --title-glow: rgba(70, 78, 90, 0.55);
     color-scheme: dark;
   }
 }
@@ -148,6 +168,16 @@
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-2: 0 18px 40px -16px rgba(0, 0, 0, 0.7);
   --shadow-blue: 0 10px 24px -12px rgba(0, 0, 0, 0.7);
+  --hero-bg: var(--graphite);
+  --hero-ink: #f1f3f6;
+  --hero-ink-2: #a5adb7;
+  --ring-track: rgba(255, 255, 255, 0.1);
+  --ring-1: #e3eef9;
+  --ring-2: #8fb6dd;
+  --ring-3: #4f7fae;
+  --ring-4: #c3d8ee;
+  --hero-glow: rgba(143, 182, 221, 0.26);
+  --title-glow: rgba(70, 78, 90, 0.55);
   color-scheme: dark;
 }
 
@@ -424,31 +454,35 @@ details.plain > summary::-webkit-details-marker { display: none; }
   position: relative; overflow: hidden;
   display: grid; grid-template-columns: 122px 1fr; gap: 20px; align-items: center;
   padding: 22px 22px 22px 20px; border-radius: 26px;
-  background: var(--graphite); color: var(--on-graphite);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--shadow-2);
+  background: var(--hero-bg); color: var(--hero-ink);
+  box-shadow: var(--hi), var(--shadow-2);
 }
 .hero::before {
   content: ""; position: absolute; inset: -60% -35% auto auto; width: 80%; height: 170%;
-  background: radial-gradient(closest-side, rgba(143, 182, 221, 0.26), rgba(143, 182, 221, 0));
+  background: radial-gradient(closest-side, var(--hero-glow), rgba(143, 182, 221, 0));
   pointer-events: none;
 }
 .hero::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: var(--metal-soft); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0.55; pointer-events: none; }
 .hero-ring { position: relative; width: 122px; height: 122px; }
 .hero-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
-.ring-track { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 9; }
+.ring-track { fill: none; stroke: var(--ring-track); stroke-width: 9; }
+.ring-s1 { stop-color: var(--ring-1); }
+.ring-s2 { stop-color: var(--ring-2); }
+.ring-s3 { stop-color: var(--ring-3); }
+.ring-s4 { stop-color: var(--ring-4); }
 .ring-fill { fill: none; stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset 0.7s ease; }
 .ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
 .ring-text b { font-size: 2.2rem; font-weight: 600; letter-spacing: -0.02em; }
-.ring-text span { font-size: 0.74rem; color: var(--on-graphite-2); margin-top: 6px; letter-spacing: 0.06em; }
+.ring-text span { font-size: 0.74rem; color: var(--hero-ink-2); margin-top: 6px; letter-spacing: 0.06em; }
 .hero-side { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.hero-label { font-size: 0.74rem; letter-spacing: 0.16em; color: var(--on-graphite-2); display: flex; align-items: center; gap: 8px; }
+.hero-label { font-size: 0.74rem; letter-spacing: 0.16em; color: var(--hero-ink-2); display: flex; align-items: center; gap: 8px; }
 .hero-done { padding: 1px 9px; border-radius: 999px; background: var(--metal); color: #0b131c; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; }
 .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .hero-stats div { display: flex; flex-direction: column; gap: 2px; }
-.hero-stats dt { font-size: 0.7rem; color: var(--on-graphite-2); letter-spacing: 0.06em; }
+.hero-stats dt { font-size: 0.7rem; color: var(--hero-ink-2); letter-spacing: 0.06em; }
 .hero-stats dd { font-size: 1.6rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
-.hero-stats dd small { font-size: 0.8rem; color: var(--on-graphite-2); margin-left: 2px; font-weight: 500; }
-.hero-note { font-size: 0.72rem; color: var(--on-graphite-2); letter-spacing: 0.04em; }
+.hero-stats dd small { font-size: 0.8rem; color: var(--hero-ink-2); margin-left: 2px; font-weight: 500; }
+.hero-note { font-size: 0.72rem; color: var(--hero-ink-2); letter-spacing: 0.04em; }
 
 /* ---------- 下のメニュー（浮いたバー） ---------- */
 .bottom-nav {
@@ -850,6 +884,112 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   .done-mark path { stroke-dashoffset: 0; }
   .audio.run button.playing::after { opacity: 0.85; transform: scaleX(1); }
 }
+
+/* ---------- タイトル ---------- */
+body[data-route="title"] { background-image: radial-gradient(120% 70% at 50% 0%, var(--title-glow) 0%, transparent 70%), var(--page-grad); }
+.title-screen {
+  min-height: 100vh; min-height: 100dvh; max-width: none;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) 24px calc(30px + env(safe-area-inset-bottom, 0px));
+  align-items: center; justify-content: center; gap: 0; text-align: center; cursor: pointer;
+  -webkit-user-select: none; user-select: none; outline: none;
+}
+.title-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.title-cards { position: relative; width: 128px; height: 88px; margin-bottom: 26px; }
+.title-cards span {
+  position: absolute; inset: 0; border-radius: 16px; border: 1.5px solid transparent;
+  background: linear-gradient(180deg, var(--card-top), var(--surface)) padding-box, var(--metal-line) border-box;
+  box-shadow: var(--shadow-2);
+}
+.title-cards span:nth-child(1) { transform: rotate(-10deg) translate(-16px, 6px); opacity: 0.55; }
+.title-cards span:nth-child(2) { transform: rotate(7deg) translate(14px, 2px); opacity: 0.8; }
+.title-cards span:nth-child(3)::before { content: ""; position: absolute; left: 18px; top: 22px; width: 54px; height: 9px; border-radius: 5px; background: var(--metal); }
+.title-cards span:nth-child(3)::after { content: ""; position: absolute; left: 18px; top: 44px; width: 86px; height: 6px; border-radius: 3px; background: var(--line-2); box-shadow: 0 13px 0 var(--line); }
+.title-date { font-size: 0.78rem; color: var(--on-page); letter-spacing: 0.14em; }
+.wordmark, .brand { display: flex; align-items: baseline; justify-content: center; gap: 0.08em; line-height: 1; font-weight: 800; }
+.wordmark { font-size: clamp(3rem, 16vw, 4.4rem); letter-spacing: 0.02em; }
+.wm-ja { color: var(--ink); }
+.wm-en {
+  font-family: var(--font-ui); font-weight: 800; letter-spacing: 0.06em;
+  background: var(--metal); background-size: 160% 160%; background-position: 30% 40%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.title-tag { font-size: 0.84rem; color: var(--on-page); letter-spacing: 0.2em; margin-top: 4px; }
+.title-status { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 18px; max-width: 340px; }
+.title-status span { padding: 5px 13px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--hi), var(--shadow-1); font-size: 0.76rem; color: var(--ink-2); letter-spacing: 0.04em; }
+.title-tap { font-size: 0.8rem; font-weight: 600; color: var(--accent); letter-spacing: 0.16em; }
+.title-tap span { display: inline-block; padding: 10px 22px; border-radius: 999px; border: 1px solid transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--metal-line) border-box; box-shadow: var(--shadow-1); animation: tap-pulse 2.4s ease-in-out infinite; }
+@keyframes tap-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* ホームの見出し（小さいロゴ） */
+.home-head .brand { justify-content: flex-start; font-size: 1.75rem; letter-spacing: 0.02em; }
+
+/* ---------- 今日の学習（5つの手順） ---------- */
+.steps { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--hi), var(--shadow-1); overflow: hidden; }
+.step { position: relative; }
+.step + .step::before { content: ""; position: absolute; top: 0; left: 64px; right: 0; height: 1px; background: var(--line); z-index: 1; }
+.step-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 66px; padding: 13px 16px 13px 18px; background: transparent; border: 0; text-align: left; color: inherit; font: inherit; }
+button.step-row { cursor: pointer; touch-action: manipulation; }
+button.step-row:active { background: var(--surface-2); }
+.step-row > .ic { color: var(--ink-3); opacity: 0.55; width: 17px; height: 17px; flex: none; }
+.step-no {
+  width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: 0.88rem; font-variant-numeric: tabular-nums; color: var(--ink-3);
+  background: var(--surface); border: 1.5px solid var(--line-2);
+}
+.step-no .ic { width: 16px; height: 16px; stroke-width: 2.4; }
+.st-done .step-no { color: var(--accent); border-color: transparent; background: linear-gradient(var(--accent-soft), var(--accent-soft)) padding-box, var(--metal-line) border-box; }
+.step.is-current { background: linear-gradient(100deg, var(--accent-soft) 0%, transparent 75%); }
+.step.is-current::after { content: ""; position: absolute; left: 0; top: 16px; height: 34px; width: 3px; border-radius: 0 3px 3px 0; background: var(--metal); }
+.step.is-current .step-no { color: var(--accent-ink); border-color: transparent; background: var(--metal); box-shadow: var(--shadow-blue); }
+.step-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.step-title { font-size: 1rem; font-weight: 600; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-feature-settings: "palt" 1; }
+.step-mode { font-size: 0.74rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.04em; }
+.step-sub { font-size: 0.79rem; color: var(--ink-3); line-height: 1.55; }
+.st-wait .step-title, .st-none .step-title { color: var(--ink-2); font-weight: 500; }
+.step-tag { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; background: var(--surface-3); color: var(--ink-2); white-space: nowrap; }
+.step-tag .ic { width: 13px; height: 13px; }
+.step-tag.ok { background: var(--accent-soft); color: var(--accent); }
+.btn.step-go { margin: 0 16px 16px 64px; width: calc(100% - 80px); }
+.step-wait { margin: -2px 16px 16px 64px; display: flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 600; color: var(--accent); }
+.step-wait .ic { width: 16px; height: 16px; }
+.steps-done { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 0.84rem; font-weight: 600; color: var(--accent); padding: 2px 6px; }
+
+/* ---------- テスト（ホーム） ---------- */
+.test-window > .ic { width: 22px; height: 22px; color: var(--ink-3); opacity: 1; }
+.test-window .r-title { font-weight: 600; }
+.test-window.is-open > .ic, .test-window.is-open .r-title { color: var(--accent); }
+.row.dim .r-title { color: var(--ink-2); font-weight: 500; }
+.badge.must { background: var(--ng-soft); color: var(--ng); }
+.next-note { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 0.88rem; font-weight: 600; color: var(--accent); }
+.miss-due { color: var(--accent); font-weight: 600; }
+.sched-list li { font-size: 0.82rem; }
+
+/* ---------- ③ ミスを確認 ---------- */
+.check-list li { display: flex; flex-direction: column; gap: 7px; padding: 16px 18px; position: relative; }
+.check-list li + li::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; height: 1px; background: var(--line); }
+.ci-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ci-word b { font-family: var(--font-en); font-size: 1.4rem; font-weight: 600; color: var(--ink); }
+.ci-meaning { font-weight: 600; line-height: 1.6; }
+.ci-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 0.75rem; color: var(--ink-3); }
+.ci-ans { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-size: 0.88rem; }
+.ci-ans span:lang(en) { font-size: 1.02rem; }
+.ci-ans.ng span:last-child { color: var(--ng); }
+.ci-nuance { font-size: 0.86rem; color: var(--ink-2); }
+.check-item .ex-en { font-size: 1.04rem; }
+.check-item .ex-ja { font-size: 0.8rem; }
+
+/* ---------- テストの新しい形式 ---------- */
+.ch-en { display: block; font-family: var(--font-en); font-size: 0.9rem; color: var(--ink-3); margin-top: 1px; }
+.ch-ic.say { color: var(--ink-3); opacity: 0.7; width: 18px; height: 18px; }
+.choices.long .ch-text { font-size: 0.95rem; line-height: 1.6; }
+.listen-box { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6px 0 2px; }
+.listen-ic { width: 44px; height: 44px; color: var(--accent); stroke-width: 1.4; }
+.listen-text { font-size: 1.16rem; }
+.spell-meaning { font-size: 1.22rem; font-weight: 700; line-height: 1.6; }
+.q-count { margin-left: 8px; font-size: 0.78rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.04em; }
+.tile.letter { min-width: 44px; justify-content: center; padding: 6px 10px; font-size: 1.32rem; }
+.spell-answer { justify-content: center; gap: 5px; }
+.fb-spell { font-family: var(--font-en); font-size: 1.7rem; font-weight: 600; letter-spacing: 0.02em; }
 
 </style>
 </head>
@@ -1512,13 +1652,298 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
 </script>
 <script>
 /*
- * quiz.js — 回ごとのテストと「覚えていないリスト」
+ * schedule.js — 1日の区切りと、テストの時間割
  *
- * テストは2部構成（合計100点）
- *   1. 内容理解（50点）… 4択。意味／場面→単語／例文の空所 を回ごとに順番に出す
- *   2. 文章作成・応用（50点）… カードにない新しい例文を、単語を並べ替えて作る
- * 間違えた問題は「覚えていないリスト」にたまっていく（回をまたいで蓄積）。
- * あとで同じ問題（同じ用法・同じ部）に正解すると「克服」になるが、記録は消さない。
+ *   1日の区切り … 朝 4:00。夜ふかしの時間（0:00〜4:00）は前の日として数える
+ *   毎日のテスト … 毎日 testTime（はじめは 20:00）から、次の朝 4:00 まで受けられる
+ *   再テスト     … テストで間違えた問題は「次の日のテストの時間」に必須。また間違えたら、その次の日も（満点まで続く）
+ *   まとめテスト … 使いはじめた日を1日目として、5日目・10日目…の日のテストの時間から。前の回のあとに学習した単語を、応用の形式で
+ *   月のまとめ   … 毎月1日のテストの時間から。先月に学習した単語を、応用の形式で約50問
+ *   通知         … カレンダーの予定（.ics）にして、端末のカレンダーから時間に通知が来るようにする
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('./util.js'));
+  } else {
+    root.CIF = root.CIF || {};
+    root.CIF.schedule = factory(root.CIF.util);
+  }
+})(this, function (util) {
+  'use strict';
+
+  const HOUR = 60 * util.MINUTE;
+  const DAY_START = 4;
+  const SUMMARY_EVERY = 5;
+  const DEFAULT_TIME = '20:00';
+  const TIMES = ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'];
+
+  function parseTime(t) {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || ''));
+    if (!m) return { h: 20, m: 0 };
+    return { h: Math.min(23, Number(m[1])), m: Math.min(59, Number(m[2])) };
+  }
+
+  /** 選べる時刻（TIMES）にそろえる。それ以外は 20:00 */
+  function normalizeTime(t) {
+    const p = parseTime(t);
+    const s = String(p.h).padStart(2, '0') + ':' + String(p.m).padStart(2, '0');
+    return TIMES.includes(s) ? s : DEFAULT_TIME;
+  }
+
+  /** その日（dayTs の日）の h:m の時刻 */
+  function timeOn(dayTs, testTime) {
+    const { h, m } = parseTime(testTime);
+    const d = new Date(util.startOfDay(dayTs));
+    d.setHours(h, m, 0, 0);
+    return d.getTime();
+  }
+
+  function at4(dayTs) {
+    const d = new Date(util.startOfDay(dayTs));
+    d.setHours(DAY_START, 0, 0, 0);
+    return d.getTime();
+  }
+
+  /** 日付の数え方に使う時刻（朝4:00より前は前の日になる）。学習記録の日付・連続日数に使う */
+  function dayClock(now) {
+    return now - DAY_START * HOUR;
+  }
+
+  /** いまの「学習の日」（その日の 0:00）。朝4:00より前は前の日 */
+  function studyDay(now) {
+    return util.startOfDay(dayClock(now));
+  }
+
+  /** いまの学習の日の範囲：その日の朝4:00 〜 次の日の朝4:00 */
+  function dayRange(now) {
+    const day = studyDay(now);
+    return { day, from: at4(day), to: at4(util.addDays(day, 1)) };
+  }
+
+  /**
+   * いまのテストの時間帯
+   *   open  … いまテストを受けられるか（テストの時刻から、次の朝4:00まで）
+   *   day   … 学習の日（0:00）
+   *   start … その日のテストの時刻
+   *   end   … 受けられる時間の終わり（次の朝4:00）
+   */
+  function windowAt(now, testTime) {
+    const r = dayRange(now);
+    const start = timeOn(r.day, testTime);
+    return { open: now >= start && now < r.to, day: r.day, start, end: r.to };
+  }
+
+  /** 間違えた問題の再テストの時刻：次の日のテストの時間 */
+  function retestDue(now, testTime) {
+    return timeOn(util.addDays(studyDay(now), 1), testTime);
+  }
+
+  /** startDayTs から数えて k 回目のまとめテストの日 */
+  function summaryDay(startDayTs, k) {
+    return util.addDays(util.startOfDay(startDayTs), k * SUMMARY_EVERY - 1);
+  }
+
+  /**
+   * まとめテスト（5日ごと）。いま受けられる（または受けた）いちばん新しい回。まだなければ null。
+   *   from〜to … この回で出す単語を学習した時間（前の回が始まってから、この回が始まるまで）
+   */
+  function summaryPeriod(now, testTime, startDayTs) {
+    const n = util.daysBetween(util.startOfDay(startDayTs), studyDay(now)) + 1;
+    let k = Math.floor(n / SUMMARY_EVERY);
+    if (k >= 1 && now < timeOn(summaryDay(startDayTs, k), testTime)) k -= 1;
+    if (k < 1) return null;
+    const dueDay = summaryDay(startDayTs, k);
+    const opensAt = timeOn(dueDay, testTime);
+    return {
+      key: util.dayKey(dueDay),
+      no: k,
+      dueDay,
+      opensAt,
+      from: k === 1 ? 0 : timeOn(summaryDay(startDayTs, k - 1), testTime),
+      to: opensAt,
+      firstDay: k === 1 ? util.startOfDay(startDayTs) : util.addDays(dueDay, -(SUMMARY_EVERY - 1)),
+    };
+  }
+
+  /** 次のまとめテストの日（今日がその日で、まだテストの時間前なら今日） */
+  function nextSummaryDay(now, testTime, startDayTs) {
+    const n = util.daysBetween(util.startOfDay(startDayTs), studyDay(now)) + 1;
+    let k = Math.max(1, Math.ceil(n / SUMMARY_EVERY));
+    if (now >= timeOn(summaryDay(startDayTs, k), testTime)) k += 1;
+    return summaryDay(startDayTs, k);
+  }
+
+  function monthKey(ts) {
+    const d = new Date(ts);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+
+  function firstOfMonth(ts, add) {
+    const d = new Date(ts);
+    return new Date(d.getFullYear(), d.getMonth() + (add || 0), 1).getTime();
+  }
+
+  /**
+   * 月のまとめテスト：毎月1日のテストの時間から、先月の分。
+   * 1日のテストの時間より前なら、まだ前の月の回（その前の月の分）。
+   */
+  function monthlyPeriod(now, testTime) {
+    let first = firstOfMonth(studyDay(now));
+    if (now < timeOn(first, testTime)) first = firstOfMonth(first, -1);
+    const prev = firstOfMonth(first, -1);
+    return {
+      key: monthKey(prev),
+      month: new Date(prev).getMonth() + 1,
+      opensAt: timeOn(first, testTime),
+      from: at4(prev),
+      to: at4(first),
+    };
+  }
+
+  /** 次の月のまとめテストの日（今日が1日で、まだテストの時間前なら今日） */
+  function nextMonthlyDay(now, testTime) {
+    const first = firstOfMonth(studyDay(now));
+    if (now < timeOn(first, testTime)) return first;
+    return firstOfMonth(first, 1);
+  }
+
+  /** from〜to のあいだに学習した（カードで評価した）用法 */
+  function studiedBetween(items, progress, from, to) {
+    return (items || []).filter((it) => ['fwd', 'rev'].some((mode) => {
+      const st = progress && progress[it.sense.id] && progress[it.sense.id][mode];
+      return st && Array.isArray(st.history) && st.history.some((h) => h.t >= from && h.t < to);
+    }));
+  }
+
+  /** 時刻の表示（「20:00」） */
+  function clock(ts) {
+    const d = new Date(ts);
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  /** あとどのくらいか（「2時間5分」「15分」） */
+  function untilText(ms) {
+    const min = Math.max(1, Math.ceil(ms / util.MINUTE));
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return h ? h + '時間' + (m ? m + '分' : '') : m + '分';
+  }
+
+  /* ---------- 通知（カレンダーの予定） ---------- */
+
+  function icsText(s) {
+    return String(s).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/([,;])/g, '\\$1');
+  }
+
+  /** 端末の時刻のまま書く（タイムゾーンを書かない） */
+  function localStamp(ts) {
+    const d = new Date(ts);
+    const p = (n) => String(n).padStart(2, '0');
+    return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + 'T' + p(d.getHours()) + p(d.getMinutes()) + '00';
+  }
+
+  function utcStamp(ts) {
+    return new Date(ts).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  }
+
+  /** 1行75バイトまで（それより長い行は折り返す） */
+  function fold(line) {
+    const out = [];
+    let cur = '';
+    let bytes = 0;
+    for (const ch of line) {
+      const cp = ch.codePointAt(0);
+      const b = cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4;
+      if (bytes + b > (out.length ? 74 : 75)) {
+        out.push(cur);
+        cur = '';
+        bytes = 0;
+      }
+      cur += ch;
+      bytes += b;
+    }
+    out.push(cur);
+    return out.join('\r\n ');
+  }
+
+  /** カレンダーに入れる予定：毎日のテスト・まとめテスト（5日ごと）・月のまとめテスト（毎月1日） */
+  function events(opts) {
+    const now = opts.now || Date.now();
+    const t = normalizeTime(opts.testTime);
+    const name = opts.appName || '暗記CARD';
+    return [
+      { uid: 'daily-test', day: studyDay(now), rule: 'FREQ=DAILY', title: name + '　テストの時間', text: '今日のテストと、必須の再テストを受けましょう（再テストは満点まで毎日続きます）。' },
+      { uid: 'summary-test', day: nextSummaryDay(now, t, opts.startDay || now), rule: 'FREQ=DAILY;INTERVAL=' + SUMMARY_EVERY, title: name + '　まとめテスト（5日ごと）', text: 'この5日間に学習した単語の、まとめテストの日です。' },
+      { uid: 'monthly-test', day: nextMonthlyDay(now, t), rule: 'FREQ=MONTHLY;BYMONTHDAY=1', title: name + '　月のまとめテスト', text: '先月に学習した単語の、まとめテスト（約50問）の日です。' },
+    ].map((e) => Object.assign(e, { start: timeOn(e.day, t) }));
+  }
+
+  /** 端末のカレンダーに入れる予定（.ics）。どれも、その時刻に通知する */
+  function calendar(opts) {
+    const now = opts.now || Date.now();
+    const name = opts.appName || '暗記CARD';
+    const url = opts.url || '';
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ankicard//JP', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + icsText(name)];
+    events(opts).forEach((e) => {
+      lines.push(
+        'BEGIN:VEVENT',
+        'UID:' + e.uid + '@ankicard',
+        'DTSTAMP:' + utcStamp(now),
+        'DTSTART:' + localStamp(e.start),
+        'DURATION:PT30M',
+        'RRULE:' + e.rule,
+        'SUMMARY:' + icsText(e.title),
+        'DESCRIPTION:' + icsText(e.text + (url ? '\n' + url : '')),
+        'BEGIN:VALARM',
+        'ACTION:DISPLAY',
+        'TRIGGER:PT0M',
+        'DESCRIPTION:' + icsText(e.title),
+        'END:VALARM',
+        'END:VEVENT'
+      );
+    });
+    lines.push('END:VCALENDAR');
+    return lines.map(fold).join('\r\n') + '\r\n';
+  }
+
+  /** Googleカレンダーの「予定を作る」画面（uid：daily-test / summary-test / monthly-test） */
+  function googleCalendarUrl(opts, uid) {
+    const e = events(opts).find((x) => x.uid === (uid || 'daily-test'));
+    const q = [
+      ['action', 'TEMPLATE'],
+      ['text', e.title],
+      ['dates', localStamp(e.start) + '/' + localStamp(e.start + 30 * util.MINUTE)],
+      ['recur', 'RRULE:' + e.rule],
+      ['details', e.text + (opts.url ? '\n' + opts.url : '')],
+    ];
+    return 'https://calendar.google.com/calendar/render?' + q.map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
+  }
+
+  return {
+    HOUR, DAY_START, SUMMARY_EVERY, DEFAULT_TIME, TIMES,
+    parseTime, normalizeTime, timeOn, dayClock, studyDay, dayRange, windowAt, retestDue,
+    summaryDay, summaryPeriod, nextSummaryDay, monthKey, monthlyPeriod, nextMonthlyDay, studiedBetween,
+    clock, untilText, events, calendar, googleCalendarUrl,
+  };
+});
+
+</script>
+<script>
+/*
+ * quiz.js — テストと「覚えていないリスト」
+ *
+ * テストの種類（kind）
+ *   round    … 回のテスト（全範囲・合計100点）
+ *                1. 内容理解（50点）… 4択。意味／場面→単語／例文の空所 を回ごとに順番に出す
+ *                2. 文章作成・応用（50点）… カードにない新しい例文を、単語を並べ替えて作る
+ *   daily    … 今日のテスト。今日学習した単語を、回のテストと同じ形で（合計100点）
+ *   retest   … 再テスト。間違えた問題を、間違えたときと同じ形式で、次の日のテストの時間に（満点まで毎日）
+ *   summary  … まとめテスト（5日ごと）。応用の形式（聞き取り・新しい文の空所・つづり・並べ替え）
+ *   monthly  … 月のまとめテスト（毎月1日、先月の分を約50問）。形式は summary と同じ
+ *   practice … 間違えた問題の練習。いつでも解ける。覚えていないリストは変えない（記録には入れない）
+ *   review   … 前の版の「解き直し」（記録を読むためだけに残す）
+ * 間違えた問題は「覚えていないリスト」にたまっていく（回をまたいで蓄積）。dueAt は再テストの時刻。
+ * 再テストの時刻を過ぎてから正解すると「克服」になる（同じ日のうちの正解では克服にしない）。記録は消さない。
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
@@ -1539,7 +1964,14 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     scene: '場面から単語を選ぶ',
     cloze: '例文の空所',
     order: '並べ替えて英文を作る',
+    listen: '聞いて意味を選ぶ',
+    context: '新しい文の空所',
+    spell: 'つづりを組み立てる',
   };
+  const KINDS = ['round', 'daily', 'retest', 'summary', 'monthly', 'practice', 'review'];
+  const KIND_LABEL = { round: '回のテスト', daily: '今日のテスト', retest: '再テスト', summary: 'まとめテスト', monthly: '月のまとめテスト', practice: '練習', review: '解き直し' };
+  /** 内容理解・文章作成をそれぞれ50点にして合計する種類（それ以外は正解の割合で100点） */
+  const HALF_SCORED = ['round', 'daily'];
 
   /** 再現できる乱数（同じ seed なら同じ並び） */
   function rng(seed) {
@@ -1607,6 +2039,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return util.shuffle(list, r).slice(0, n);
   }
 
+  /** 意味の選択肢（3つ）。{ text, sid }。sid はその意味の用法 */
   function meaningChoices(item, pool, r) {
     const correct = item.sense.meaning;
     const used = new Set([correct]);
@@ -1614,7 +2047,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     // 同じ単語のほかの用法は、見分ける練習になるので1つ入れる
     item.word.senses.forEach((s) => {
       if (out.length < 1 && s.id !== item.sense.id && s.meaning && !used.has(s.meaning) && s.status !== 'needs_review') {
-        out.push(s.meaning);
+        out.push({ text: s.meaning, sid: s.id });
         used.add(s.meaning);
       }
     });
@@ -1623,7 +2056,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     [pick(same, 12, r), pick(others, 12, r)].forEach((cands) => {
       cands.forEach((p) => {
         if (out.length < 3 && !used.has(p.sense.meaning)) {
-          out.push(p.sense.meaning);
+          out.push({ text: p.sense.meaning, sid: p.sense.id });
           used.add(p.sense.meaning);
         }
       });
@@ -1631,6 +2064,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return out;
   }
 
+  /** 単語の選択肢（3つ）。{ text, sid }。sid はその単語の用法の1つ */
   function wordChoices(item, pool, r) {
     const used = new Set([item.word.headword.toLowerCase()]);
     const out = [];
@@ -1640,12 +2074,21 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       cands.forEach((p) => {
         const h = p.word.headword;
         if (out.length < 3 && !used.has(h.toLowerCase())) {
-          out.push(h);
+          out.push({ text: h, sid: p.sense.id });
           used.add(h.toLowerCase());
         }
       });
     });
     return out;
+  }
+
+  /** 正解と選択肢をまぜて、問題の形にする */
+  function withChoices(q, correct, others, r) {
+    const all = util.shuffle(others.concat([correct]), r);
+    q.choices = all.map((c) => c.text);
+    q.choiceIds = all.map((c) => c.sid);
+    q.answer = all.indexOf(correct);
+    return q;
   }
 
   /** 空所問題に使える例文（[ ] の語が見出し語そのままのもの） */
@@ -1657,20 +2100,21 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     }) || null;
   }
 
-  function understandQuestion(item, index, attemptNo, pool, r) {
+  /** 内容理解の問題。want を渡すと、その形式で（作れないときは順番の形式） */
+  function understandQuestion(item, index, attemptNo, pool, r, want) {
     const types = ['meaning'];
     if (item.sense.nuance || (item.sense.scene && item.sense.scene.text)) types.push('scene');
     const cz = clozeExample(item);
     if (cz) types.push('cloze');
-    const qtype = types[(index + attemptNo) % types.length];
+    const qtype = types.includes(want) ? want : types[(index + attemptNo) % types.length];
     let choices;
     let correct;
     const prompt = { headword: item.word.headword, cue: item.sense.cue, speak: item.sense.speak || item.word.headword, ipa: item.sense.ipa };
     if (qtype === 'meaning') {
-      correct = item.sense.meaning;
+      correct = { text: item.sense.meaning, sid: item.sense.id };
       choices = meaningChoices(item, pool, r);
     } else {
-      correct = item.word.headword;
+      correct = { text: item.word.headword, sid: item.sense.id };
       choices = wordChoices(item, pool, r);
       if (qtype === 'scene') {
         prompt.scene = (item.sense.scene && item.sense.scene.text) || '';
@@ -1683,17 +2127,129 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         prompt.exJa = cz.ja;
       }
     }
-    const all = util.shuffle(choices.concat([correct]), r);
-    return {
+    return withChoices({
       id: 'u-' + item.sense.id,
       part: 'understand',
       qtype,
       senseId: item.sense.id,
       wordId: item.word.id,
       prompt,
-      choices: all,
-      answer: all.indexOf(correct),
+    }, correct, choices, r);
+  }
+
+  /* ---------- 応用の形式（まとめテスト・月のまとめテスト） ---------- */
+
+  /** 新しい文（テスト用の例文）の空所に入る単語を選ぶ。[ ] が見出し語1つのときだけ */
+  function contextQuestion(item, pool, r, n) {
+    const t = item.sense.test;
+    if (!t || !t.en) return null;
+    const hits = util.parseMarked(t.en).filter((p) => p.hit);
+    if (hits.length !== 1 || hits[0].t.toLowerCase() !== item.word.headword.toLowerCase()) return null;
+    return withChoices({
+      id: 'x' + n + '-' + item.sense.id,
+      part: 'understand',
+      qtype: 'context',
+      senseId: item.sense.id,
+      wordId: item.word.id,
+      prompt: { headword: item.word.headword, exEn: t.en, exJa: t.ja },
+    }, { text: item.word.headword, sid: item.sense.id }, wordChoices(item, pool, r), r);
+  }
+
+  /** 英文（テスト用の例文）を聞いて、合う日本語訳を選ぶ */
+  function listenQuestion(item, pool, r, n) {
+    const t = testSentence(item.sense);
+    if (!t || !t.ja) return null;
+    const used = new Set([t.ja]);
+    const others = [];
+    pick(pool.filter((p) => p.sense.id !== item.sense.id), 30, r).forEach((p) => {
+      const o = testSentence(p.sense);
+      if (others.length < 3 && o && o.ja && !used.has(o.ja)) {
+        others.push({ text: o.ja, sid: p.sense.id });
+        used.add(o.ja);
+      }
+    });
+    if (others.length < 3) return null;
+    return withChoices({
+      id: 'l' + n + '-' + item.sense.id,
+      part: 'understand',
+      qtype: 'listen',
+      senseId: item.sense.id,
+      wordId: item.word.id,
+      prompt: { headword: item.word.headword, sentence: t.en, plain: util.plainSentence(t.en) },
+    }, { text: t.ja, sid: item.sense.id }, others, r);
+  }
+
+  /** 説明の中に答えの単語が書いてあるときは、伏せる（「（Excuse me. で）」→「（＿＿＿ me. で）」） */
+  function maskWord(text, head) {
+    if (!text) return '';
+    const re = new RegExp('\\b' + head.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+    return String(text).replace(re, '＿＿＿');
+  }
+
+  /** 意味と場面を見て、英単語のつづりを文字から組み立てる（1語で、英字だけの単語） */
+  function spellQuestion(item, r, n) {
+    const head = item.word.headword;
+    if (!/^[A-Za-z]{3,}$/.test(head)) return null;
+    const letters = head.split('');
+    let order = util.shuffle(letters.map((_, i) => i), r);
+    for (let k = 0; k < 5 && order.map((i) => letters[i]).join('') === letters.join(''); k++) order = util.shuffle(order, r);
+    if (order.map((i) => letters[i]).join('') === letters.join('')) order = order.slice(1).concat(order[0]);
+    return {
+      id: 's' + n + '-' + item.sense.id,
+      part: 'compose',
+      qtype: 'spell',
+      senseId: item.sense.id,
+      wordId: item.word.id,
+      prompt: {
+        headword: head,
+        meaning: maskWord(item.sense.meaning, head),
+        nuance: maskWord(item.sense.nuance, head),
+        scene: maskWord((item.sense.scene && item.sense.scene.text) || '', head),
+        pos: item.sense.pos,
+        role: item.sense.role,
+      },
+      tokens: letters,
+      order,
+      end: '',
+      answers: [letters.join('').toLowerCase()],
     };
+  }
+
+  const APPLIED = ['context', 'listen', 'spell', 'order'];
+
+  /** 応用の問題を1つ。type が作れないときは、ほかの形式で作る（avoid の形式は使わない） */
+  function appliedQuestion(item, type, pool, r, n, avoid) {
+    const tries = [type].concat(APPLIED.filter((t) => t !== type)).filter((t) => !avoid || !avoid.has(t));
+    for (const t of tries) {
+      let q = null;
+      if (t === 'context') q = contextQuestion(item, pool, r, n);
+      else if (t === 'listen') q = listenQuestion(item, pool, r, n);
+      else if (t === 'spell') q = spellQuestion(item, r, n);
+      else {
+        q = composeQuestion(item, r);
+        if (q) q.id = 'o' + n + '-' + item.sense.id;
+      }
+      if (q) return q;
+    }
+    return null;
+  }
+
+  /**
+   * 再テスト・練習の問題：間違えたときと同じ形式で作る（作れないときは、その部のふつうの形式）
+   *   part … 'understand' / 'compose'、qtype … 間違えたときの形式
+   */
+  function retestQuestion(item, part, qtype, index, attemptNo, pool, r) {
+    let q = null;
+    if (part === 'understand') {
+      if (qtype === 'listen') q = listenQuestion(item, pool, r, 0);
+      else if (qtype === 'context') q = contextQuestion(item, pool, r, 0);
+      if (!q) q = understandQuestion(item, index, attemptNo, pool, r, qtype);
+    } else {
+      if (qtype === 'spell') q = spellQuestion(item, r, 0);
+      if (!q) q = composeQuestion(item, r);
+      if (!q && qtype !== 'spell') q = spellQuestion(item, r, 0);
+    }
+    return q;
   }
 
   function composeQuestion(item, r) {
@@ -1720,29 +2276,62 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
 
   /**
    * テスト1回分を作る。
-   *   kind 'round'  … 回のテスト（内容理解 → 文章作成。それぞれ全用法）
-   *   kind 'review' … 覚えていないリストの解き直し（まだ克服していない問題だけ）
+   *   kind 'round' / 'daily' … 内容理解 → 文章作成。それぞれ items の全用法
+   *   kind 'retest' / 'practice' … only の「用法|部」だけ。qtypes（「用法|部」→ 形式）があれば、その形式で
+   *   kind 'summary' / 'monthly' … 応用の形式。perItem：1つの用法から何問、size：最大の問題数
    */
   function createAttempt(opts) {
     const now = opts.now || Date.now();
-    const seed = hash((opts.roundId || 'review') + ':' + (opts.no || 0) + ':' + now);
+    const kind = KINDS.includes(opts.kind) ? opts.kind : 'round';
+    const seed = hash(kind + ':' + (opts.roundId || opts.period || '') + ':' + (opts.no || 0) + ':' + now);
     const r = rng(seed);
-    const items = opts.items || [];
+    // 回のテストは回の順に。ほかは順番をまぜる（学習した順と同じにならないように）
+    const items = kind === 'round' ? opts.items || [] : util.shuffle(opts.items || [], r);
     const pool = opts.pool && opts.pool.length >= 4 ? opts.pool : items;
-    const want = opts.only ? new Set(opts.only) : null; // 'senseId|part'
     const u = [];
     const c = [];
-    items.forEach((item, i) => {
-      if (!want || want.has(item.sense.id + '|understand')) u.push(understandQuestion(item, i, opts.no || 1, pool, r));
-      if (!want || want.has(item.sense.id + '|compose')) {
-        const q = composeQuestion(item, r);
-        if (q) c.push(q);
+    if (kind === 'summary' || kind === 'monthly') {
+      const perItem = Math.max(1, Math.min(APPLIED.length, opts.perItem || 1));
+      const size = opts.size || 50;
+      // 1つの単語から2問なら「わかる（空所・聞き取り）」と「書ける（つづり・並べ替え）」を1問ずつ
+      const OFFSET = [0, 2, 1, 3];
+      const used = {};
+      for (let k = 0; k < perItem; k++) {
+        items.forEach((item, i) => {
+          if (u.length + c.length >= size) return;
+          const avoid = used[item.sense.id] || (used[item.sense.id] = new Set());
+          const q = appliedQuestion(item, APPLIED[(i + OFFSET[k]) % APPLIED.length], pool, r, k, avoid);
+          if (!q) return;
+          avoid.add(q.qtype);
+          (q.part === 'understand' ? u : c).push(q);
+        });
       }
-    });
+    } else if (kind === 'retest' || kind === 'practice') {
+      const want = new Set(opts.only || []); // 'senseId|part'
+      const qtypes = opts.qtypes || {};
+      items.forEach((item, i) => {
+        ['understand', 'compose'].forEach((part) => {
+          const key = item.sense.id + '|' + part;
+          if (!want.has(key)) return;
+          const q = retestQuestion(item, part, qtypes[key], i, opts.no || 1, pool, r);
+          if (q) (q.part === 'understand' ? u : c).push(q);
+        });
+      });
+    } else {
+      const want = opts.only ? new Set(opts.only) : null; // 'senseId|part'
+      items.forEach((item, i) => {
+        if (!want || want.has(item.sense.id + '|understand')) u.push(understandQuestion(item, i, opts.no || 1, pool, r));
+        if (!want || want.has(item.sense.id + '|compose')) {
+          const q = composeQuestion(item, r);
+          if (q) c.push(q);
+        }
+      });
+    }
     return {
       id: util.randomId('test'),
-      kind: opts.kind === 'review' ? 'review' : 'round',
+      kind,
       roundId: opts.roundId || '',
+      period: opts.period || '',
       no: opts.no || 0,
       startedAt: now,
       updatedAt: now,
@@ -1760,11 +2349,15 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return !attempt || attempt.index >= attempt.questions.length;
   }
 
-  /** 回答を判定する（response: 4択は番号、並べ替えは語の番号の並び、null は「わからない」） */
+  /** 回答を判定する（response: 4択は番号、並べ替え・つづりは番号の並び、null は「わからない」） */
   function judge(q, response) {
     if (q.part === 'understand') {
       const ok = response === q.answer;
       return { correct: ok, given: response == null ? '（わからない）' : q.choices[response] || '', expected: q.choices[q.answer] };
+    }
+    if (q.qtype === 'spell') {
+      const word = Array.isArray(response) ? response.map((i) => q.tokens[i]).join('') : '';
+      return { correct: !!word && q.answers.includes(word.toLowerCase()), given: word || '（わからない）', expected: q.prompt.headword };
     }
     const built = Array.isArray(response) ? response.map((i) => q.tokens[i]).join(' ') : '';
     const ok = !!built && q.answers.includes(normText(built));
@@ -1777,9 +2370,12 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
 
   /**
    * 回答を記録する。attempt / tests は書き換えずに新しいものを返す。
-   * 間違えた問題はすぐに覚えていないリストへ入れる（途中でやめても残る）。
+   * 間違えた問題はすぐに覚えていないリストへ入れる（途中でやめても残る）。dueAt は再テストの時刻（opts.nextDue）。
+   * 正解でも、再テストの時刻より前なら克服にしない（次の日にもう一度確かめる）。
+   * 練習（practice）は、覚えていないリストを変えない。
    */
-  function answer(tests, attempt, response, now) {
+  function answer(tests, attempt, response, now, opts) {
+    const nextDue = (opts && opts.nextDue) || now + util.DAY;
     const q = current(attempt);
     if (!q) throw new Error('no question');
     const res = judge(q, response);
@@ -1791,15 +2387,18 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     t.current = a;
     const key = q.senseId + '|' + q.part;
     const m = t.misses[key];
-    if (!res.correct) {
-      const e = m || { senseId: q.senseId, part: q.part, roundIds: [], count: 0, firstAt: now, lastAt: 0, solvedAt: 0, last: {} };
+    if (attempt.kind === 'practice') {
+      // 練習は記録しない
+    } else if (!res.correct) {
+      const e = m || { senseId: q.senseId, part: q.part, roundIds: [], count: 0, firstAt: now, lastAt: 0, solvedAt: 0, dueAt: 0, last: {} };
       e.count += 1;
       e.lastAt = now;
       e.solvedAt = 0;
+      e.dueAt = nextDue;
       if (attempt.roundId && !e.roundIds.includes(attempt.roundId)) e.roundIds.push(attempt.roundId);
       e.last = { qtype: q.qtype, given: res.given, answer: res.expected };
       t.misses[key] = e;
-    } else if (m && !m.solvedAt) {
+    } else if (m && !m.solvedAt && now >= (m.dueAt || 0)) {
       m.solvedAt = now;
     }
     return { tests: t, attempt: a, result: Object.assign({ question: q }, res) };
@@ -1824,7 +2423,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
           part: q.part,
           qtype: q.qtype,
           given: r ? r.given : '（未回答）',
-          answer: q.part === 'understand' ? q.choices[q.answer] : util.plainSentence(q.prompt.sentence),
+          answer: q.part === 'understand' ? q.choices[q.answer] : q.qtype === 'spell' ? q.prompt.headword : util.plainSentence(q.prompt.sentence),
         });
       }
     });
@@ -1832,12 +2431,13 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     const correct = parts.understand.correct + parts.compose.correct;
     let score;
     if (total && correct === total) score = 100;
-    else if (attempt.kind === 'round') score = partScore(parts.understand.correct, parts.understand.total) + partScore(parts.compose.correct, parts.compose.total);
+    else if (HALF_SCORED.includes(attempt.kind)) score = partScore(parts.understand.correct, parts.understand.total) + partScore(parts.compose.correct, parts.compose.total);
     else score = total ? Math.floor((100 * correct) / total) : 0;
     const summary = {
       id: attempt.id,
       kind: attempt.kind,
       roundId: attempt.roundId,
+      period: attempt.period || '',
       no: attempt.no,
       startedAt: attempt.startedAt,
       finishedAt: now,
@@ -1894,10 +2494,63 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return missList(tests, { status: 'open', roundId }).map((e) => e.key);
   }
 
+  /** 再テストが必要な問題（まだ克服していない）。now を渡すと、いま受ける時刻になったものだけ */
+  function dueKeys(tests, now) {
+    return missList(tests, { status: 'open' }).filter((e) => now == null || (e.dueAt || 0) <= now).map((e) => e.key);
+  }
+
+  /** 次の再テストの時刻（まだ時刻前のものの中で、いちばん早いもの） */
+  function nextRetestAt(tests, now) {
+    const later = missList(tests, { status: 'open' }).map((e) => e.dueAt || 0).filter((t) => t > now);
+    return later.length ? Math.min.apply(null, later) : 0;
+  }
+
+  /** その種類・期間の、受け終えたテスト（いちばん新しいもの）。なければ null */
+  function takenAttempt(tests, kind, period) {
+    const list = ((tests && tests.attempts) || []).filter((a) => a.kind === kind && a.period === period);
+    return list.length ? list[list.length - 1] : null;
+  }
+
+  /** その種類・期間のテストを、もう受け終えたか */
+  function hasTaken(tests, kind, period) {
+    return !!takenAttempt(tests, kind, period);
+  }
+
+  /** since より後に、その種類のテストで満点を取ったときの記録 */
+  function lastPerfect(tests, kind, since) {
+    const list = ((tests && tests.attempts) || []).filter((a) => a.kind === kind && a.finishedAt >= (since || 0) && a.score === 100);
+    return list.length ? list[list.length - 1] : null;
+  }
+
+  /** その種類で、いちばん新しく受け終えたテスト（since より後だけ） */
+  function lastTaken(tests, kind, since) {
+    const list = ((tests && tests.attempts) || []).filter((a) => a.kind === kind && a.finishedAt >= (since || 0));
+    return list.length ? list.reduce((x, y) => (y.finishedAt > x.finishedAt ? y : x)) : null;
+  }
+
+  /** 覚えていないリストの問題を、再テスト・練習で同じ形式にするための表（「用法|部」→ 形式） */
+  function missTypes(tests) {
+    const out = {};
+    missList(tests, { status: 'all' }).forEach((e) => { if (e.last && e.last.qtype) out[e.key] = e.last.qtype; });
+    return out;
+  }
+
+  /** 選択肢の用法ID（前の版で作った問題にはないので、文字から探す） */
+  function choiceSense(q, i, items) {
+    if (Array.isArray(q.choiceIds) && q.choiceIds[i]) return q.choiceIds[i];
+    const text = q.choices && q.choices[i];
+    if (!text) return '';
+    const word = (items || []).find((it) => it.word.headword.toLowerCase() === String(text).toLowerCase());
+    if (word) return word.sense.id;
+    const meaning = (items || []).find((it) => it.sense.meaning === text);
+    return meaning ? meaning.sense.id : '';
+  }
+
   return {
-    PARTS, QTYPE, rng, hash, roundItems, testSentence, tokenize, normText,
-    createAttempt, current, isDone, judge, answer, finish,
-    roundAttempts, nextNo, roundStats, missList, missCounts, openKeys,
+    PARTS, QTYPE, KINDS, KIND_LABEL, HALF_SCORED, APPLIED, rng, hash, roundItems, testSentence, tokenize, normText,
+    maskWord, createAttempt, current, isDone, judge, answer, finish,
+    roundAttempts, nextNo, roundStats, missList, missCounts, openKeys, dueKeys, nextRetestAt,
+    takenAttempt, hasTaken, lastTaken, lastPerfect, missTypes, choiceSense,
   };
 });
 
@@ -1913,12 +2566,12 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
-    module.exports = factory(require('./util.js'));
+    module.exports = factory(require('./util.js'), require('./schedule.js'));
   } else {
     root.CIF = root.CIF || {};
-    root.CIF.storage = factory(root.CIF.util);
+    root.CIF.storage = factory(root.CIF.util, root.CIF.schedule);
   }
-})(this, function (util) {
+})(this, function (util, sched) {
   'use strict';
 
   const PREFIX = 'cif.v1.';
@@ -1958,6 +2611,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     accent: 'us',
     autoplay: false,
     studyMode: 'fwd',
+    testTime: '20:00',
   };
 
   /* ---------- 保存先 ---------- */
@@ -2412,6 +3066,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   /* ---------- テストの記録 ---------- */
 
   const PARTS = ['understand', 'compose'];
+  const TEST_KINDS = ['round', 'daily', 'retest', 'summary', 'monthly', 'practice', 'review'];
 
   function emptyTests() {
     return { attempts: [], current: null, misses: {} };
@@ -2426,8 +3081,9 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     });
     out.attempts = (Array.isArray(t.attempts) ? t.attempts : []).slice(-500).filter((a) => a && typeof a === 'object').map((a) => ({
       id: str(a.id, 40),
-      kind: a.kind === 'review' ? 'review' : 'round',
+      kind: TEST_KINDS.includes(a.kind) ? a.kind : 'round',
       roundId: str(a.roundId, 40),
+      period: str(a.period, 20),
       no: Math.max(0, Math.floor(num(a.no, 0))),
       startedAt: num(a.startedAt, 0),
       finishedAt: num(a.finishedAt, 0),
@@ -2454,6 +3110,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         firstAt: num(e.firstAt, 0),
         lastAt: num(e.lastAt, 0),
         solvedAt: e.solvedAt ? num(e.solvedAt, 0) : 0,
+        dueAt: num(e.dueAt, 0),
         last: e.last && typeof e.last === 'object'
           ? { qtype: str(e.last.qtype, 20), given: str(e.last.given, 300), answer: str(e.last.answer, 300) }
           : { qtype: '', given: '', answer: '' },
@@ -2474,6 +3131,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     out.accent = s.accent === 'uk' ? 'uk' : 'us';
     out.autoplay = !!s.autoplay;
     out.studyMode = s.studyMode === 'rev' ? 'rev' : 'fwd';
+    out.testTime = sched.normalizeTime(s.testTime);
     return out;
   }
 
@@ -12456,9 +13114,15 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
 <script>
 /*
  * app.js — 画面の表示と操作
- * 画面: ホーム / 回 / カード学習 / 学習結果 / テスト / テスト結果 / 覚えていないリスト / 単語一覧 / 単語詳細 / 単語の編集 / 設定
- * URL の # で画面を切り替える（#home, #round-<id>, #study, #result, #test, #score-<id>, #misses,
+ * 画面: タイトル / ホーム（今日の学習・テスト）/ 回 / カード学習 / 学習結果 / ミスの確認 / テスト / テスト結果 /
+ *       覚えていないリスト / 単語一覧 / 単語詳細 / 単語の編集 / 設定
+ * URL の # で画面を切り替える（タイトルは # なし, #home, #round-<id>, #study, #result, #check, #test, #score-<id>, #misses,
  *   #words, #word-<id>, #edit-<id>, #new-word, #options）
+ *
+ * 毎日の順番（ホームの「今日の学習」）
+ *   ① 単語を覚える（英語 → 場面）② 逆から思い出す（場面 → 英語）③ ミスを確認 ④ 間違えた問題を解く（練習）⑤ テスト（20:00 から）
+ * テスト：今日のテスト／再テスト（必須。満点になるまで毎日）／まとめテスト（5日ごと）／月のまとめテスト（毎月1日）。
+ * 1日の区切りは朝4:00（夜ふかしの時間は前の日）。時刻の決まりは schedule.js
  *
  * 操作の決まり（どの画面でも同じ形にする）
  *   青いボタン     … そのまとまりでいちばん大事な操作（1つだけ）
@@ -12477,6 +13141,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   const ST = C.storage;
   const DG = C.diagrams;
   const Q = C.quiz;
+  const Sched = C.schedule;
   const esc = util.esc;
 
   const $app = document.getElementById('app');
@@ -12484,6 +13149,10 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   const $toast = document.getElementById('toast');
 
   const SAMPLE_TEXT = 'Hello! This is how I sound.';
+  const APP_NAME = '暗記CARD';
+  const DAILY_MAX = 20; // 今日のテストに出す単語の上限
+  const SUMMARY_MIN = 3; // まとめテストに必要な単語の数
+  const STEP_NO = ['①', '②', '③', '④', '⑤'];
 
   let store = null;
   let speech = null;
@@ -12515,6 +13184,8 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     fbTimer: null,
     editRound: '',
     deviceOpen: false,
+    listenPlayed: '',
+    alertTimer: null,
   };
 
   /* ================= アイコン ================= */
@@ -12534,6 +13205,9 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
     chevron: '<path d="M9 5l7 7-7 7"/>',
     share: '<path d="M8.5 9H7a1.5 1.5 0 0 0-1.5 1.5v8A1.5 1.5 0 0 0 7 20h10a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 17 9h-1.5"/><path d="M12 3.5v10M8.8 6.6L12 3.4l3.2 3.2"/>',
+    calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+    bell: '<path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 1.5H5l1.5-1.5z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>',
+    clock: '<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>',
   };
 
   function icon(name, cls) {
@@ -12548,6 +13222,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     store = ST.createStore(backend);
     await store.init(C.seed);
     rebuildIndex();
+    ensureStartDay();
     if (store.state.session) {
       const fixed = SS.sanitize(store.state.session, store.state.words);
       store.set('session', fixed);
@@ -12567,6 +13242,9 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     document.addEventListener('keydown', onKey);
     document.addEventListener('toggle', onToggle, true);
     document.addEventListener('submit', (e) => e.preventDefault());
+    document.addEventListener('visibilitychange', onVisible);
+    setInterval(tick, 30000);
+    scheduleAlert();
     onRoute(true);
   }
 
@@ -12593,8 +13271,9 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   function parseHash() {
     let h = '';
     try { h = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (e) { h = ''; }
-    if (!h || h === 'home') return { route: 'home', param: '' };
-    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses'].includes(h)) return { route: h, param: '' };
+    if (!h || h === 'title') return { route: 'title', param: '' };
+    if (h === 'home') return { route: 'home', param: '' };
+    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses', 'check'].includes(h)) return { route: h, param: '' };
     if (h.indexOf('word-') === 0) return { route: 'word', param: h.slice(5) };
     if (h.indexOf('round-') === 0) return { route: 'round', param: h.slice(6) };
     if (h.indexOf('score-') === 0) return { route: 'score', param: h.slice(6) };
@@ -12622,6 +13301,8 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       ui.hint = false;
       if (r.route === 'edit' || r.route === 'new-word') prepareEditor();
       if (r.route !== 'options') ui.importPreview = null;
+      // ③ ミスを確認：この画面を開いたら「確認した」にする
+      if (r.route === 'check') store.set('meta', Object.assign({}, store.state.meta, { checkAt: Date.now() }));
     }
     render(true);
   }
@@ -12646,6 +13327,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   function render(resetScroll) {
     let html = null;
     switch (ui.route) {
+      case 'title': html = viewTitle(); break;
       case 'study': html = viewStudy(); break;
       case 'result': html = viewResult(); break;
       case 'words': html = viewWords(); break;
@@ -12657,10 +13339,11 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       case 'test': html = viewTest(); break;
       case 'score': html = viewScore(); break;
       case 'misses': html = viewMisses(); break;
+      case 'check': html = viewCheck(); break;
       default: html = viewHome();
     }
     if (html == null) return;
-    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses'].includes(ui.route);
+    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses', 'check'].includes(ui.route);
     $app.innerHTML = saveBanner() + html + (withNav ? navBar() : '');
     document.body.dataset.route = ui.route;
     if (resetScroll) window.scrollTo(0, 0);
@@ -12683,11 +13366,21 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       const h = document.getElementById('result-title');
       if (h) h.focus({ preventScroll: true });
     }
+    if (ui.route === 'test') {
+      // 聞き取りの問題は、出したときに英文を1回鳴らす
+      const a = store.state.tests.current;
+      const q = a && !ui.testFeedback ? Q.current(a) : null;
+      if (q && q.qtype === 'listen' && ui.listenPlayed !== a.id + q.id) {
+        ui.listenPlayed = a.id + q.id;
+        const btn = $app.querySelector('.qcard .audio button[data-slow="0"]:not([disabled])');
+        if (btn) playFrom(btn);
+      }
+    }
   }
 
   function navBar() {
     const item = (route, hash, ic, label) => {
-      const cur = ui.route === route || (route === 'words' && ui.route === 'word') || (route === 'home' && (ui.route === 'round' || ui.route === 'score'));
+      const cur = ui.route === route || (route === 'words' && ui.route === 'word') || (route === 'home' && ['round', 'score', 'check'].includes(ui.route));
       return '<a class="nav-item' + (cur ? ' is-current' : '') + '" href="#' + hash + '"' + (cur ? ' aria-current="page"' : '') + '>' +
         icon(ic) + '<span>' + label + '</span></a>';
     };
@@ -13095,6 +13788,371 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return '<svg class="done-mark" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-15"/></svg>';
   }
 
+  /* ================= 1日の流れ・テストの時間 ================= */
+
+  function testTime() {
+    return Sched.normalizeTime(store.state.settings.testTime);
+  }
+
+  /** 学習記録の日付に使う時刻（朝4:00より前は前の日として数える） */
+  function dnow(now) {
+    return Sched.dayClock(now);
+  }
+
+  /** 使いはじめた日（まとめテストを数える1日目） */
+  function startDayTs() {
+    const k = store.state.meta && store.state.meta.startDay;
+    return /^\d{4}-\d{2}-\d{2}$/.test(k || '') ? util.parseDayKey(k) : Sched.studyDay(Date.now());
+  }
+
+  /** 使いはじめた日がまだ決まっていなければ、いちばん古い学習記録の日（なければ今日）にする */
+  function ensureStartDay() {
+    const meta = store.state.meta || {};
+    if (/^\d{4}-\d{2}-\d{2}$/.test(meta.startDay || '')) return;
+    const today = util.dayKey(Sched.studyDay(Date.now()));
+    const days = Object.keys((store.state.log && store.state.log.days) || {}).filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(k) && k <= today).sort();
+    store.set('meta', Object.assign({}, meta, { startDay: days.length ? days[0] : today }));
+  }
+
+  function studyableItems() {
+    return SS.studyable(store.state.words).filter((it) => it.sense.meaning);
+  }
+
+  /** 覚えていないリストのキー（用法|部）が、いま出題できる用法か */
+  function liveKey(k) {
+    const it = index.senses.get(String(k).split('|')[0]);
+    return !!(it && isStudyable(it.word, it.sense) && it.sense.meaning);
+  }
+
+  /** 「今日 20:00」「明日 20:00」「11月8日（日） 20:00」（カレンダーの日付で） */
+  function whenLabel(ts, now) {
+    const d = util.daysBetween(now, ts);
+    const t = Sched.clock(ts);
+    if (d === 0) return '今日 ' + t;
+    if (d === 1) return '明日 ' + t;
+    return todayLabel(ts) + ' ' + t;
+  }
+
+  function shortDate(ts) {
+    const d = new Date(ts);
+    return (d.getMonth() + 1) + '/' + d.getDate();
+  }
+
+  /** 今日（学習の日）のカード学習：学習した用法と、最初に「思い出せなかった・あいまい」だった用法 */
+  function dayInfo(now) {
+    const st = store.state;
+    const range = Sched.dayRange(now);
+    const out = { range, fwd: [], rev: [], weak: [], studied: [], lastAt: 0 };
+    SS.studyable(st.words).forEach((it) => {
+      const sid = it.sense.id;
+      let any = false;
+      ['fwd', 'rev'].forEach((mode) => {
+        const s = SS.stateOf(st.progress, sid, mode);
+        const h = ((s && s.history) || []).filter((x) => x.t >= range.from && x.t < range.to && x.t <= now);
+        if (!h.length) return;
+        any = true;
+        out[mode].push(sid);
+        let first = h[0];
+        h.forEach((x) => {
+          if (x.t < first.t) first = x;
+          if (x.t > out.lastAt) out.lastAt = x.t;
+        });
+        if (first.r === 'again' || first.r === 'hard') out.weak.push({ sid, mode, r: first.r, t: first.t });
+      });
+      if (any) out.studied.push(sid);
+    });
+    return out;
+  }
+
+  /**
+   * ② で出す用法
+   *   routine … 今日 ① で覚えて、まだ ② をしていないもの
+   *   review  … 場面→英語の復習の時期になったもの（前の日までに学習したもの）
+   *   relearn … 今日 ② で思い出せず、もう一度の時期になったもの（してもしなくてもよい）
+   */
+  function revPlan(now, d) {
+    const st = store.state;
+    const fwd = new Set(d.fwd);
+    const rev = new Set(d.rev);
+    const out = { routine: [], review: [], relearn: [] };
+    SS.studyable(st.words).forEach((it) => {
+      if (!SS.eligible(it, st.progress, 'rev')) return;
+      const sid = it.sense.id;
+      const r = SS.stateOf(st.progress, sid, 'rev');
+      const due = !!(r && r.reps && r.due <= now);
+      if (fwd.has(sid) && !rev.has(sid)) out.routine.push(sid);
+      else if (due && !rev.has(sid)) out.review.push(sid);
+      else if (due) out.relearn.push(sid);
+    });
+    out.must = out.routine.concat(out.review);
+    out.all = out.must.concat(out.relearn);
+    return out;
+  }
+
+  /** ② のセットに入れる用法（しなければいけないもの → もう一度のもの） */
+  function revTargets(now, d) {
+    return revPlan(now, d).all;
+  }
+
+  /** ③④ のミス：テストで間違えた問題（まだ克服していない）と、今日のカードで最初に思い出せなかった・あいまいだった単語 */
+  function mistakes(now, d) {
+    const st = store.state;
+    const test = Q.missList(st.tests, { status: 'open' }).filter((e) => liveKey(e.key));
+    const seen = new Set();
+    const weak = d.weak.filter((w) => {
+      const it = index.senses.get(w.sid);
+      if (!it || !it.sense.meaning || seen.has(w.sid)) return false;
+      seen.add(w.sid);
+      return true;
+    });
+    const keys = test.map((e) => e.key);
+    const types = Q.missTypes(st.tests);
+    weak.forEach((w) => {
+      const k = w.sid + '|understand';
+      if (keys.includes(k)) return;
+      keys.push(k);
+      types[k] = w.mode === 'rev' ? 'scene' : 'meaning';
+    });
+    const lastAt = Math.max(0, ...test.map((e) => e.lastAt || 0), ...weak.map((w) => w.t));
+    return { test, weak, keys, types, lastAt };
+  }
+
+  /** 今日のテストに出す単語：前の「今日のテスト」（または回のテスト）のあとに学習した用法（新しい順に最大20） */
+  function dailyItems(now) {
+    const st = store.state;
+    const lastD = Q.lastTaken(st.tests, 'daily');
+    const lastR = Q.lastTaken(st.tests, 'round');
+    const since = Math.max(lastD ? lastD.finishedAt : 0, lastR ? lastR.finishedAt : 0, Sched.dayRange(now).from - 6 * util.DAY);
+    const list = [];
+    studyableItems().forEach((it) => {
+      let t = 0;
+      ['fwd', 'rev'].forEach((mode) => {
+        const s = SS.stateOf(st.progress, it.sense.id, mode);
+        ((s && s.history) || []).forEach((h) => { if (h.t > since && h.t <= now && h.t > t) t = h.t; });
+      });
+      if (t) list.push({ it, t });
+    });
+    list.sort((a, b) => b.t - a.t);
+    return list.slice(0, DAILY_MAX).map((x) => x.it);
+  }
+
+  /** まとめテストの問題の数：1つの単語から何問・最大何問（単語が少ないときは1語から2〜3問） */
+  function summaryPlan(kind, n) {
+    if (kind === 'monthly') {
+      const perItem = Math.min(3, Math.max(1, Math.ceil(50 / Math.max(1, n))));
+      return { perItem, size: 50, count: Math.min(50, n * perItem) };
+    }
+    const perItem = n >= 15 ? 1 : 2;
+    return { perItem, size: 30, count: Math.min(30, n * perItem) };
+  }
+
+  /** テストのようす：いま受けられるか・再テスト・今日のテスト・まとめテスト・月のまとめテスト */
+  function testInfo(now) {
+    const st = store.state;
+    const t = testTime();
+    const win = Sched.windowAt(now, t);
+    const range = Sched.dayRange(now);
+    const openList = Q.missList(st.tests, { status: 'open' }).filter((e) => liveKey(e.key));
+    const due = openList.filter((e) => (e.dueAt || 0) <= now).map((e) => e.key);
+    const tonight = openList.filter((e) => (e.dueAt || 0) <= win.start).map((e) => e.key);
+    const items = studyableItems();
+    const sp = Sched.summaryPeriod(now, t, startDayTs());
+    const summary = {
+      period: sp,
+      next: Sched.nextSummaryDay(now, t, startDayTs()),
+      items: sp ? Sched.studiedBetween(items, st.progress, sp.from, sp.to) : [],
+      taken: sp ? Q.takenAttempt(st.tests, 'summary', sp.key) : null,
+    };
+    summary.ready = !!sp && !summary.taken && summary.items.length >= SUMMARY_MIN;
+    const mp = Sched.monthlyPeriod(now, t);
+    const monthly = {
+      period: mp,
+      next: Sched.nextMonthlyDay(now, t),
+      items: Sched.studiedBetween(items, st.progress, mp.from, mp.to),
+      taken: Q.takenAttempt(st.tests, 'monthly', mp.key),
+    };
+    monthly.ready = !monthly.taken && monthly.items.length >= SUMMARY_MIN;
+    const today = (st.tests.attempts || []).filter((a) => a.finishedAt >= range.from && a.finishedAt < range.to && a.kind !== 'practice');
+    return { win, range, open: openList.map((e) => e.key), due, tonight, daily: dailyItems(now), summary, monthly, today };
+  }
+
+  /** 今日の学習の5つの手順。state：todo（これから）/ done（終わった）/ locked（時間前）/ wait（前の手順のあと）/ none（今日はない） */
+  function stepsInfo(now) {
+    const st = store.state;
+    const goal = st.settings.dailyGoal;
+    const tt = testTime();
+    const d = dayInfo(now);
+    const t = testInfo(now);
+    const c = SS.counts(st.words, st.progress, now);
+    const list = [];
+
+    // ① 単語を覚える（英語 → 場面）
+    const left1 = c.newFwd + c.dueFwd;
+    const n1 = d.fwd.length;
+    list.push({
+      title: '単語を覚える', mode: '英語 → 場面',
+      state: n1 >= goal || (n1 > 0 && !left1) ? 'done' : left1 ? 'todo' : 'none',
+      sub: '今日 ' + n1 + ' / ' + goal + '枚' + (c.dueFwd ? '・復習 ' + c.dueFwd + '枚' : '') + (!left1 && !n1 ? '・いまはありません' : ''),
+      act: left1 ? ' data-action="start" data-mode="fwd" data-scope="all"' : '',
+      go: n1 ? '続きを覚える' : '単語を覚える',
+    });
+
+    // ② 逆から思い出す（場面 → 英語）。今日思い出せなかったカードの「もう一度」は、してもしなくてもよい
+    const p2 = revPlan(now, d);
+    const n2 = d.rev.length;
+    list.push({
+      title: '逆から思い出す', mode: '場面 → 英語',
+      state: p2.must.length ? 'todo' : n2 ? 'done' : n1 ? 'none' : 'wait',
+      sub: p2.must.length ? 'あと ' + p2.must.length + '枚' + (n2 ? '・今日 ' + n2 + '枚' : '')
+        : n2 ? '今日 ' + n2 + '枚' + (p2.relearn.length ? '・もう一度 ' + p2.relearn.length + '枚' : '')
+          : n1 ? '場面から出せる単語がありません' : '① で覚えた単語を、場面から思い出します',
+      act: p2.all.length ? ' data-action="start" data-mode="rev" data-scope="today"' : '',
+      go: '逆から思い出す（' + Math.min(SS.SET_SIZE, p2.all.length) + '枚）',
+    });
+
+    // ③ ミスを確認 ④ 間違えた問題を解く（⑤ が終わった日は、その日の分は終わり）
+    const m = mistakes(now, d);
+    const has = m.keys.length > 0;
+    const tested = t.today.length > 0 && !t.due.length && !t.daily.length;
+    const checked = (st.meta.checkAt || 0) >= m.lastAt;
+    const lastP = Q.lastTaken(st.tests, 'practice', m.lastAt);
+    const missSub = (m.test.length ? 'テストのミス ' + m.test.length + '件' : '') + (m.test.length && m.weak.length ? '・' : '') + (m.weak.length ? '今日のカード ' + m.weak.length + '枚' : '');
+    list.push({
+      title: 'ミスを確認', mode: '',
+      state: !has ? (d.studied.length ? 'none' : 'wait') : checked || tested ? 'done' : 'todo',
+      sub: has ? missSub : d.studied.length ? 'ミスはありません' : '思い出せなかった単語と、テストで間違えた問題',
+      act: has ? ' data-action="goto" data-to="check"' : '',
+      go: 'ミスを確認する（' + (m.test.length + m.weak.length) + '件）',
+    });
+    list.push({
+      title: '間違えた問題を解く', mode: '練習',
+      state: !has ? (d.studied.length ? 'none' : 'wait') : (lastP && lastP.score === 100) || tested ? 'done' : 'todo',
+      sub: has ? m.keys.length + '問' + (lastP ? '・前回 ' + lastP.score + '点' : '') + '・何度でも解けます' : '③ のミスを、問題で練習します',
+      act: has ? ' data-action="start-kind" data-kind="practice"' : '',
+      go: (lastP ? 'もう一度解く' : '間違えた問題を解く') + '（' + m.keys.length + '問）',
+    });
+
+    // ⑤ テスト（毎日 20:00 から）
+    let s5;
+    if (!t.win.open) {
+      s5 = {
+        state: 'locked',
+        sub: 'あと <span data-until="' + t.win.start + '">' + esc(Sched.untilText(t.win.start - now)) + '</span>' +
+          (t.tonight.length ? '・再テスト ' + t.tonight.length + '問（必須）' : '') + (t.daily.length ? '・今日の単語 ' + t.daily.length + '語' : ''),
+        lock: tt + ' から',
+      };
+    } else if (t.due.length) {
+      s5 = {
+        state: 'todo',
+        sub: '再テスト ' + t.due.length + '問（必須）' + (t.daily.length ? '・今日の単語 ' + t.daily.length + '語' : '') + '・朝4:00まで',
+        act: ' data-action="start-kind" data-kind="retest"',
+        go: '再テストを受ける（必須・' + t.due.length + '問）',
+      };
+    } else if (t.daily.length) {
+      s5 = { state: 'todo', sub: '今日の単語 ' + t.daily.length + '語・朝4:00まで', act: ' data-action="start-kind" data-kind="daily"', go: '今日のテストを受ける' };
+    } else if (t.today.length) {
+      s5 = { state: 'done', sub: '今日のテストは終わりました' + (t.open.length ? '・明日 ' + tt + ' に再テスト ' + t.open.length + '問（必須）' : '') };
+    } else {
+      s5 = { state: 'none', sub: '今日は受けるテストがありません' };
+    }
+    list.push(Object.assign({ title: 'テスト', mode: tt + ' から' }, s5));
+
+    const current = list.findIndex((x) => x.state === 'todo' || x.state === 'locked');
+    return { list, current, day: d, tests: t };
+  }
+
+  /** ホームの「今日の学習」：5つの手順。いまやる手順に青いボタン */
+  function stepsHtml(info) {
+    const tt = testTime();
+    const allDone = info.current < 0 && info.list[4].state === 'done';
+    return '<ol class="steps" aria-label="今日の学習の順番">' + info.list.map((s, i) => {
+      const cur = i === info.current;
+      const cls = 'step st-' + s.state + (cur ? ' is-current' : '');
+      const no = '<span class="step-no" aria-hidden="true">' + (s.state === 'done' ? icon('check') : i + 1) + '</span>';
+      const tag = s.state === 'done' ? '<span class="step-tag ok">完了</span>' : s.state === 'locked' ? '<span class="step-tag">' + icon('clock') + esc(s.lock) + '</span>' : '';
+      const main = '<span class="step-main"><span class="step-title">' + esc(s.title) + (s.mode ? '<span class="step-mode">' + esc(s.mode) + '</span>' : '') + '</span>' +
+        '<span class="step-sub">' + s.sub + '</span></span>';
+      const label = ' aria-label="' + esc(STEP_NO[i] + ' ' + s.title + (s.mode ? '（' + s.mode + '）' : '')) + '"';
+      if (cur && s.act) {
+        return '<li class="' + cls + '"><div class="step-row">' + no + main + '</div>' +
+          '<button type="button" class="btn primary block step-go"' + s.act + label + '>' + esc(s.go) + '</button></li>';
+      }
+      if (cur && s.state === 'locked') {
+        return '<li class="' + cls + '"><div class="step-row">' + no + main + tag + '</div>' +
+          '<p class="step-wait">' + icon('bell') + tt + ' になったら、ここから受けられます。</p></li>';
+      }
+      if (s.act) return '<li class="' + cls + '"><button type="button" class="step-row"' + s.act + label + '>' + no + main + tag + icon('chevron') + '</button></li>';
+      return '<li class="' + cls + '"><div class="step-row">' + no + main + tag + '</div></li>';
+    }).join('') + '</ol>' +
+      (allDone ? '<p class="steps-done">' + icon('check') + '今日の学習はすべて終わりました。明日もこの順番で。</p>' : '');
+  }
+
+  /** ホームの「テスト」：いま受けられるテストと、これからのテスト */
+  function testsHtml(t, now) {
+    const tt = testTime();
+    const open = t.win.open;
+    const head = open
+      ? '<div class="row static test-window is-open">' + icon('bell') + '<span class="r-main"><span class="r-title">いまテストを受けられます</span><span class="r-sub">朝4:00まで</span></span></div>'
+      : '<div class="row static test-window">' + icon('clock') + '<span class="r-main"><span class="r-title">テストは ' + tt + ' から</span><span class="r-sub">あと <span data-until="' + t.win.start + '">' + esc(Sched.untilText(t.win.start - now)) + '</span></span></span></div>';
+    const row = (kind, title, sub, ready, badge) => ready && open
+      ? rowBtn('start-kind', ' data-kind="' + kind + '"', title, sub, badge || '', 'accent')
+      : '<div class="row static' + (ready ? '' : ' dim') + '">' + rowInner(title, sub, badge || '', 'action') + '</div>';
+    let rows = '';
+    // 再テスト（必須）
+    const nRe = open ? t.due.length : t.tonight.length;
+    const later = t.open.length - nRe;
+    rows += row('retest', '再テスト（必須）',
+      nRe ? '間違えた ' + nRe + '問・満点になるまで毎日' + (open ? '' : '・' + tt + ' から') : later ? '次は明日 ' + tt + '・' + later + '問' : 'いまはありません',
+      nRe > 0, nRe ? '<span class="badge must">必須</span>' : '');
+    // 今日のテスト
+    const doneD = t.today.filter((a) => a.kind === 'daily');
+    rows += row('daily', '今日のテスト',
+      t.daily.length ? '今日学習した ' + t.daily.length + '語' + (open ? '' : '・' + tt + ' から') : doneD.length ? '受けました（' + doneD[doneD.length - 1].score + '点）' : '学習した単語が、ここに出ます',
+      t.daily.length > 0);
+    // まとめテスト（5日ごと）
+    const s = t.summary;
+    let sSub;
+    if (s.ready) sSub = '第' + s.period.no + '回・' + shortDate(s.period.firstDay) + '〜' + shortDate(s.period.dueDay) + ' に学習した ' + s.items.length + '語・' + summaryPlan('summary', s.items.length).count + '問' + (open ? '' : '・' + tt + ' から');
+    else if (s.taken) sSub = '第' + s.period.no + '回を受けました（' + s.taken.score + '点）・次は ' + todayLabel(s.next);
+    else if (s.period && util.dayKey(s.period.dueDay) === util.dayKey(t.win.day)) sSub = '今日の分は、学習した単語が少ないため、ありません・次は ' + todayLabel(s.next);
+    else sSub = '次は ' + todayLabel(s.next) + ' ' + tt;
+    rows += row('summary', 'まとめテスト（5日ごと）', sSub, s.ready);
+    // 月のまとめテスト（毎月1日）
+    const mo = t.monthly;
+    let mSub;
+    if (mo.ready) mSub = mo.period.month + '月に学習した ' + mo.items.length + '語・' + summaryPlan('monthly', mo.items.length).count + '問' + (open ? '' : '・' + tt + ' から');
+    else if (mo.taken) mSub = mo.period.month + '月の分を受けました（' + mo.taken.score + '点）・次は ' + todayLabel(mo.next);
+    else mSub = '次は ' + todayLabel(mo.next) + ' ' + tt + '・' + (new Date(mo.next).getMonth() === 0 ? 12 : new Date(mo.next).getMonth()) + '月に学習した単語';
+    rows += row('monthly', '月のまとめテスト（毎月1日）', mSub, mo.ready);
+    rows += rowBtn('goto-notify', '', 'テストの時間と通知', tt + '・カレンダーに通知を追加', '', '');
+    return '<div class="list tests-list">' + head + rows + '</div>';
+  }
+
+  /* ================= タイトル ================= */
+
+  function viewTitle() {
+    const now = Date.now();
+    const t = testInfo(now);
+    const tt = testTime();
+    const bits = [];
+    if (t.win.open) bits.push('いまテストを受けられます');
+    else bits.push('今日のテスト ' + tt + '〜');
+    const nRe = t.win.open ? t.due.length : t.tonight.length;
+    if (nRe) bits.push('再テスト ' + nRe + '問');
+    if (t.summary.ready) bits.push('まとめテスト');
+    if (t.monthly.ready) bits.push('月のまとめテスト');
+    return '<main class="screen title-screen" id="main" data-action="enter" role="button" tabindex="0" aria-label="' + APP_NAME + '。タップしてはじめる">' +
+      '<div class="title-body">' +
+      '<div class="title-cards" aria-hidden="true"><span></span><span></span><span></span></div>' +
+      '<p class="title-date">' + esc(todayLabel(now)) + '</p>' +
+      '<h1 class="wordmark"><span class="wm-ja">暗記</span><span class="wm-en">CARD</span></h1>' +
+      '<p class="title-tag">英語の音 → 場面 → 使い方</p>' +
+      '<p class="title-status">' + bits.map((b) => '<span>' + esc(b) + '</span>').join('') + '</p>' +
+      '</div>' +
+      '<p class="title-tap"><span>画面をタップしてはじめる</span></p>' +
+      '</main>';
+  }
+
   /* ================= ホーム ================= */
 
   /** ホームの上：今日の目標（輪）・連続学習・ポイント */
@@ -13105,7 +14163,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return '<section class="hero" aria-label="今日の記録">' +
       '<div class="hero-ring" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + done + '">' +
       '<svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="hero-metal" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="#e3eef9"/><stop offset=".3" stop-color="#8fb6dd"/><stop offset=".62" stop-color="#4f7fae"/><stop offset="1" stop-color="#c3d8ee"/></linearGradient></defs>' +
+      '<stop offset="0" class="ring-s1"/><stop offset=".3" class="ring-s2"/><stop offset=".62" class="ring-s3"/><stop offset="1" class="ring-s4"/></linearGradient></defs>' +
       '<circle class="ring-track" cx="60" cy="60" r="52"/>' +
       '<circle class="ring-fill" cx="60" cy="60" r="52" stroke="url(#hero-metal)" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"' + (done ? '' : ' opacity="0"') + '/></svg>' +
       '<p class="ring-text"><b class="num">' + today.cards + '</b><span>/ ' + goal + '枚</span></p></div>' +
@@ -13142,25 +14200,28 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     const st = store.state;
     const now = Date.now();
     const c = SS.counts(st.words, st.progress, now);
-    const streak = SS.streak(st.log, now);
-    const today = SS.today(st.log, now);
+    const streak = SS.streak(st.log, dnow(now));
+    const today = SS.today(st.log, dnow(now));
     const goal = st.settings.dailyGoal;
     const sess = st.session && !st.session.finished ? st.session : null;
     const cur = st.tests && st.tests.current;
     const mc = Q.missCounts(st.tests);
+    const info = stepsInfo(now);
 
     let html = '<main class="screen home" id="main">';
-    html += '<header class="page-head home-head"><p class="eyebrow">' + esc(todayLabel(now)) + '</p><h1 tabindex="-1">コアイメージ単語帳</h1></header>';
+    html += '<header class="page-head home-head"><p class="eyebrow">' + esc(todayLabel(now)) + '</p>' +
+      '<h1 tabindex="-1" class="brand"><span class="wm-ja">暗記</span><span class="wm-en">CARD</span></h1></header>';
     html += heroCard(streak, today, goal, st.log.totalPoints);
 
     if (sess || cur) {
       html += section('途中から', '<div class="list">' +
         (sess ? rowBtn('resume', '', 'カード学習の続き', scopeLabel(sess.scope) + '・' + SS.MODES[sess.mode].label + '・残り ' + SS.remaining(sess) + '枚', '', 'accent') : '') +
-        (cur ? rowBtn('resume-test', '', 'テストの続き', attemptTitle(cur) + '・残り ' + (cur.questions.length - cur.index) + '問', '', 'accent') : '') +
+        (cur ? rowBtn('resume-test', '', (cur.kind === 'practice' ? '練習' : 'テスト') + 'の続き', attemptTitle(cur) + '・残り ' + (cur.questions.length - cur.index) + '問', '', 'accent') : '') +
         '</div>');
     }
 
-    html += section('今日の学習', studyGroup(c, 'all'), { note: 'すべての回から' });
+    html += section('今日の学習', stepsHtml(info), { note: '上から順に', id: 'today' });
+    html += section('テスト', testsHtml(info.tests, now), { note: '毎日 ' + testTime() + ' から', id: 'tests' });
 
     html += section('回', st.rounds.length
       ? '<div class="list">' + st.rounds.map(roundRow).join('') + '</div>'
@@ -13168,13 +14229,12 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
 
     html += section('復習', '<div class="list">' +
       rowLink('#misses', '覚えていないリスト', 'テストで間違えた問題・克服 ' + mc.solved + '件', '<b>' + mc.open + '</b>件') +
-      '</div>');
-
-    html += section('これからの復習', '<div class="group"><dl class="facts">' +
-      '<div><dt>いま</dt><dd>' + (c.dueFwd + c.dueRev) + '<small>枚</small></dd></div>' +
+      '</div>' +
+      '<div class="group"><dl class="facts">' +
+      '<div><dt>復習の時期</dt><dd>' + (c.dueFwd + c.dueRev) + '<small>枚</small></dd></div>' +
       '<div><dt>明日</dt><dd>' + c.tomorrow + '<small>枚</small></dd></div>' +
       '<div><dt>7日以内</dt><dd>' + c.week + '<small>枚</small></dd></div>' +
-      '</dl></div>');
+      '</dl><p class="fine">覚えたカードは、忘れかけるころにまた出します（① ② に入ります）。</p></div>');
 
     html += '</main>';
     return html;
@@ -13416,7 +14476,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     if (!s || s.finished || !s.flipped) return;
     const now = Date.now();
     const out = SS.answer(s, st.progress, r, now);
-    const la = SS.logAnswer(st.log, out.event, now, st.settings.dailyGoal);
+    const la = SS.logAnswer(st.log, out.event, dnow(now), st.settings.dailyGoal);
     let log = la.log;
     const next = out.session;
     if (la.bonus) {
@@ -13424,7 +14484,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       next.points += la.bonus;
     }
     if (next.finished) {
-      const done = SS.logSetComplete(log, now);
+      const done = SS.logSetComplete(log, dnow(now));
       log = done.log;
       next.points += done.bonus;
       next.setBonus = done.bonus;
@@ -13450,9 +14510,9 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     if (!s || !s.finished) { go('home', true); return null; }
     const now = Date.now();
     const sum = SS.summary(s);
-    const today = SS.today(st.log, now);
+    const today = SS.today(st.log, dnow(now));
     const goal = st.settings.dailyGoal;
-    const streak = SS.streak(st.log, now);
+    const streak = SS.streak(st.log, dnow(now));
     const pct = Math.min(100, Math.round((today.cards / goal) * 100));
     let html = '<main class="screen result" id="main">';
     html += '<div class="result-hero">' + doneMark() +
@@ -13483,9 +14543,20 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
           '<span class="rl-next"><span>' + (state ? esc(util.formatDue(state.due, now)) : '') + '</span>' +
           '<span class="rl-rate m-' + (r.first || 'none') + '">' + esc(r.first ? srs.RATING_LABEL[r.first] : '未回答') + '</span></span></li>';
       }).join('') + '</ul><p class="section-note">思い出せたカードも、間隔をあけてまた出題します。</p>');
-    html += '<div class="btn-col">' +
-      '<button type="button" class="btn primary block" data-action="start" data-mode="' + s.mode + '" data-scope="' + esc(scopeKey(s.scope)) + '">もう1セット</button>' +
-      '<button type="button" class="btn text block" data-action="home">ホームへ</button></div>';
+    // 次の手順（今日の学習の順番）を案内する
+    const info = stepsInfo(now);
+    const nx = info.current >= 0 ? info.list[info.current] : null;
+    const again = ' data-action="start" data-mode="' + s.mode + '" data-scope="' + esc(scopeKey(s.scope)) + '"';
+    const canAgain = s.scope && s.scope.type === 'today' ? revTargets(now, info.day).length > 0 : true;
+    let btns = '';
+    if (nx && nx.state === 'todo' && nx.act) {
+      btns += '<button type="button" class="btn primary block"' + nx.act + '>次は ' + STEP_NO[info.current] + ' ' + esc(nx.title) + (nx.mode ? '（' + esc(nx.mode) + '）' : '') + '</button>';
+      if (canAgain && nx.act !== again) btns += '<button type="button" class="btn secondary block"' + again + '>もう1セット</button>';
+    } else {
+      if (nx && nx.state === 'locked') html += '<p class="next-note">' + icon('bell') + '次は ' + STEP_NO[4] + ' テスト。' + esc(testTime()) + ' から受けられます。</p>';
+      if (canAgain) btns += '<button type="button" class="btn primary block"' + again + '>もう1セット</button>';
+    }
+    html += '<div class="btn-col">' + btns + '<button type="button" class="btn text block" data-action="home">ホームへ</button></div>';
     html += '</main>';
     return html;
   }
@@ -13506,6 +14577,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     if (scope.type === 'round') return 'round:' + scope.roundId;
     if (scope.type === 'misses') return 'misses' + (scope.roundId ? ':' + scope.roundId : '');
     if (scope.type === 'wrong') return 'wrong:' + scope.attemptId;
+    if (scope.type === 'today') return 'today';
     return 'all';
   }
 
@@ -13514,6 +14586,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     if (scope.type === 'round') return roundTitle(scope.roundId) || '回';
     if (scope.type === 'misses') return '覚えていないリスト' + (scope.roundId ? '（' + roundTitle(scope.roundId) + '）' : '');
     if (scope.type === 'wrong') return 'テストで間違えた単語';
+    if (scope.type === 'today') return '今日の単語';
     return 'すべての回';
   }
 
@@ -13534,6 +14607,11 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       const ids = a ? Array.from(new Set(a.wrongs.map((w) => w.senseId))) : [];
       return { scope: { type: 'wrong', attemptId: arg }, only: ids.filter((id) => index.senses.has(id)) };
     }
+    if (type === 'today') {
+      // ② 逆から思い出す：今日覚えた単語（まだ ② をしていないもの）と、場面→英語の復習の時期のもの
+      const now = Date.now();
+      return { scope: { type: 'today' }, only: revTargets(now, dayInfo(now)) };
+    }
     return { scope: { type: 'all' }, only: null };
   }
 
@@ -13542,8 +14620,16 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   }
 
   function attemptTitle(a) {
-    if (a.kind === 'review') return '覚えていないリストの解き直し';
-    return (roundTitle(a.roundId) || '回') + ' テスト ' + a.no + '回目';
+    const md = (k) => (/^\d{4}-\d{2}-\d{2}$/.test(k || '') ? '（' + shortDate(util.parseDayKey(k)) + '）' : '');
+    switch (a.kind) {
+      case 'review': return '覚えていないリストの解き直し';
+      case 'practice': return '間違えた問題の練習';
+      case 'daily': return '今日のテスト' + md(a.period) + (a.no > 1 ? ' ' + a.no + '回目' : '');
+      case 'retest': return '再テスト' + md(a.period);
+      case 'summary': return 'まとめテスト' + (a.no ? ' 第' + a.no + '回' : '');
+      case 'monthly': return (/^\d{4}-\d{2}$/.test(a.period || '') ? Number(a.period.slice(5)) + '月の' : '月の') + 'まとめテスト';
+      default: return (roundTitle(a.roundId) || '回') + ' テスト ' + a.no + '回目';
+    }
   }
 
   function notFound(title, fallback) {
@@ -13566,6 +14652,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     const openMiss = Q.missList(st.tests, { status: 'open', roundId: r.id }).length;
     const review = r.wordIds.map((id) => index.words.get(id)).filter((w) => w && w.status === 'needs_review');
     const nextNo = Q.nextNo(st.tests, r.id);
+    const open = Sched.windowAt(now, testTime()).open;
 
     let html = '<main class="screen round" id="main">';
     html += pageHead(r.title, { back: 'home' });
@@ -13573,17 +14660,19 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
 
     html += section('1　カードで覚える', studyGroup(c, 'round:' + r.id));
 
-    html += section('2　テスト', '<div class="group">' +
+    html += section('2　回のテスト', '<div class="group">' +
       '<dl class="facts">' +
       '<div><dt>受験</dt><dd>' + stats.count + '<small>回</small></dd></div>' +
       '<div><dt>最高点</dt><dd>' + (stats.best == null ? '—' : stats.best + '<small>点</small>') + '</dd></div>' +
       '<div><dt>満点</dt><dd>' + (stats.perfectAt ? stats.perfectAt.no + '<small>回目</small>' : '<small>まだ</small>') + '</dd></div>' +
       '</dl>' +
-      '<p class="fine">内容理解（4択）' + items.length + '問と、文章作成（並べ替え）' + items.length + '問。それぞれ50点で、合計100点です。間違えた問題は「覚えていないリスト」に入ります。途中でやめても続きから再開できます。</p>' +
+      '<p class="fine">内容理解（4択）' + items.length + '問と、文章作成（並べ替え）' + items.length + '問。それぞれ50点で、合計100点です。テストは毎日 ' + esc(testTime()) + ' から朝4:00まで。間違えた問題は「覚えていないリスト」に入り、次の日の ' + esc(testTime()) + ' に再テスト（必須）です。途中でやめても続きから再開できます。</p>' +
       (mine
         ? '<button type="button" class="btn primary block" data-action="resume-test">テストの続き（残り ' + (mine.questions.length - mine.index) + '問）</button>'
-        : '<button type="button" class="btn primary block" data-action="start-test" data-round="' + esc(r.id) + '">テストを受ける（' + nextNo + '回目）</button>') +
-      '</div>', { note: '100点満点' });
+        : open
+          ? '<button type="button" class="btn primary block" data-action="start-test" data-round="' + esc(r.id) + '">テストを受ける（' + nextNo + '回目）</button>'
+          : '<button type="button" class="btn primary block" disabled>' + esc(testTime()) + ' から受けられます</button>') +
+      '</div>', { note: '全範囲・100点満点' });
 
     if (stats.count) {
       html += section('テストの記録', '<div class="list">' +
@@ -13604,6 +14693,27 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
 
   /* ----- テスト ----- */
 
+  /** テストの時間か（そうでなければ知らせる） */
+  function testOpen(now) {
+    if (Sched.windowAt(now, testTime()).open) return true;
+    toast('テストは毎日 ' + testTime() + ' から朝4:00まで受けられます。');
+    return false;
+  }
+
+  /** テスト（または練習）を作って始める */
+  function beginAttempt(opts, emptyMsg) {
+    confirmReplaceTest(() => {
+      const a = Q.createAttempt(Object.assign({ now: Date.now() }, opts));
+      if (!a.questions.length) {
+        toast(emptyMsg || '出題できる問題がありません。');
+        return;
+      }
+      store.set('tests', Object.assign({}, store.state.tests, { current: a }));
+      resetTestUi();
+      go('test');
+    });
+  }
+
   function startTest(roundId) {
     const st = store.state;
     const r = roundById(roundId);
@@ -13613,34 +14723,65 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       toast('この回には出題できる単語がありません。');
       return;
     }
-    const doStart = () => {
-      const pool = items.length >= 8 ? items : SS.studyable(st.words).filter((it) => it.sense.meaning);
-      const a = Q.createAttempt({ kind: 'round', roundId, no: Q.nextNo(st.tests, roundId), items, pool, now: Date.now() });
-      store.set('tests', Object.assign({}, st.tests, { current: a }));
-      resetTestUi();
-      go('test');
-    };
-    confirmReplaceTest(doStart);
+    if (!testOpen(Date.now())) return;
+    const pool = items.length >= 8 ? items : studyableItems();
+    beginAttempt({ kind: 'round', roundId, no: Q.nextNo(st.tests, roundId), items, pool });
   }
 
-  function startReview() {
-    const st = store.state;
-    const roundId = ui.missRound !== 'all' ? ui.missRound : undefined;
-    const keys = Q.openKeys(st.tests, roundId).filter((k) => index.senses.has(k.split('|')[0]));
-    if (!keys.length) {
-      toast('解き直す問題はありません。');
+  /** 用法|部 のキーから、出題する用法を集める */
+  function itemsOfKeys(keys) {
+    const want = new Set(keys.map((k) => k.split('|')[0]));
+    return studyableItems().filter((it) => want.has(it.sense.id));
+  }
+
+  /** 間違えた問題の練習（覚えていないリストは変えない）。keys がなければ ③ のミスすべて */
+  function startPractice(keys, qtypes) {
+    let k = keys;
+    let types = qtypes;
+    if (!k) {
+      const now = Date.now();
+      const m = mistakes(now, dayInfo(now));
+      k = m.keys;
+      types = m.types;
+    }
+    k = (k || []).filter(liveKey);
+    if (!k.length) {
+      toast('練習する問題はありません。');
       return;
     }
-    const doStart = () => {
-      const all = SS.studyable(st.words).filter((it) => it.sense.meaning);
-      const want = new Set(keys.map((k) => k.split('|')[0]));
-      const items = all.filter((it) => want.has(it.sense.id));
-      const a = Q.createAttempt({ kind: 'review', roundId: roundId || '', items, pool: all, only: keys, now: Date.now() });
-      store.set('tests', Object.assign({}, st.tests, { current: a }));
-      resetTestUi();
-      go('test');
-    };
-    confirmReplaceTest(doStart);
+    beginAttempt({ kind: 'practice', items: itemsOfKeys(k), pool: studyableItems(), only: k, qtypes: types || Q.missTypes(store.state.tests) });
+  }
+
+  /** ホームのテスト：retest（再テスト）/ daily（今日のテスト）/ summary（まとめ）/ monthly（月のまとめ）/ practice（練習） */
+  function startKind(kind) {
+    if (kind === 'practice') {
+      startPractice();
+      return;
+    }
+    const now = Date.now();
+    if (!testOpen(now)) return;
+    const st = store.state;
+    const t = testInfo(now);
+    const all = studyableItems();
+    const day = util.dayKey(t.win.day);
+    if (kind === 'retest') {
+      if (!t.due.length) { toast('いま受ける再テストはありません。'); return; }
+      beginAttempt({ kind, items: itemsOfKeys(t.due), pool: all, only: t.due, qtypes: Q.missTypes(st.tests), period: day });
+    } else if (kind === 'daily') {
+      if (!t.daily.length) { toast('今日学習した単語が、まだありません。'); return; }
+      const no = (st.tests.attempts || []).filter((a) => a.kind === 'daily' && a.period === day).length + 1;
+      beginAttempt({ kind, items: t.daily, pool: all, period: day, no });
+    } else if (kind === 'summary') {
+      const sm = t.summary;
+      if (!sm.ready) { toast(sm.taken ? 'このまとめテストは受けました。' : 'まとめテストは、まだありません。'); return; }
+      const plan = summaryPlan('summary', sm.items.length);
+      beginAttempt({ kind, items: sm.items, pool: all, period: sm.period.key, no: sm.period.no, perItem: plan.perItem, size: plan.size });
+    } else if (kind === 'monthly') {
+      const mo = t.monthly;
+      if (!mo.ready) { toast(mo.taken ? 'この月のまとめテストは受けました。' : '月のまとめテストは、まだありません。'); return; }
+      const plan = summaryPlan('monthly', mo.items.length);
+      beginAttempt({ kind, items: mo.items, pool: all, period: mo.period.key, perItem: plan.perItem, size: plan.size });
+    }
   }
 
   function confirmReplaceTest(doStart) {
@@ -13662,6 +14803,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     ui.testFeedback = null;
     ui.order = [];
     ui.testIntro = '';
+    ui.listenPlayed = '';
   }
 
   function viewTest() {
@@ -13674,19 +14816,22 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       return null;
     }
     const q = fb ? fb.question : Q.current(a);
+    const half = Q.HALF_SCORED.includes(a.kind);
     const uTotal = a.questions.filter((x) => x.part === 'understand').length;
     const cTotal = a.questions.length - uTotal;
     const ratio = a.questions.length ? (a.index / a.questions.length) : 1;
     const qi = a.questions.findIndex((x) => x.id === q.id);
     const partIndex = q.part === 'understand' ? qi + 1 : qi - uTotal + 1;
     const partTotal = q.part === 'understand' ? uTotal : cTotal;
-    const intro = !fb && q.part === 'compose' && a.index === uTotal && uTotal > 0 && ui.testIntro !== a.id;
-    const label = attemptTitle(a) + '・' + Q.PARTS[q.part].label + (intro ? '' : ' ' + partIndex + '/' + partTotal);
+    // 内容理解と文章作成に分けて採点するテスト（回のテスト・今日のテスト）は、2つの部の間に区切りを入れる
+    const intro = half && !fb && q.part === 'compose' && a.index === uTotal && uTotal > 0 && ui.testIntro !== a.id;
+    const label = half
+      ? attemptTitle(a) + '・' + Q.PARTS[q.part].label + (intro ? '' : ' ' + partIndex + '/' + partTotal)
+      : attemptTitle(a) + ' ' + (qi + 1) + '/' + a.questions.length;
 
     let html = '<main class="screen test" id="main">';
     html += topbar('quit-test', label, ratio, '残り <b>' + (a.questions.length - a.index) + '</b>問', 'テストの進み具合');
 
-    // 内容理解が終わったら、文章作成の前に区切りを入れる
     if (intro) {
       const uCorrect = a.results.slice(0, uTotal).filter((x) => x.correct).length;
       html += '<section class="card part-intro"><p class="eyebrow">' + esc(attemptTitle(a)) + '</p>' +
@@ -13697,7 +14842,8 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       return html;
     }
 
-    html += q.part === 'understand' ? mcqView(q, fb) : orderView(q, fb);
+    if (q.part === 'understand') html += mcqView(q, fb);
+    else html += q.qtype === 'spell' ? spellView(q, fb) : orderView(q, fb);
     if (fb) {
       html += '<div class="answer-bar"><button type="button" class="btn primary block" data-action="test-next">' + (Q.isDone(a) ? '結果を見る' : '次へ') + '</button></div>';
     } else if (q.part === 'understand') {
@@ -13714,9 +14860,46 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return html;
   }
 
+  /** 選択肢の単語（英単語の選択肢はその単語。意味の選択肢は、その意味の英単語）。聞き取りの問題（日本語の文）はなし */
+  function choiceItem(q, i) {
+    if (!q || q.part !== 'understand' || q.qtype === 'listen') return null;
+    const sid = Q.choiceSense(q, i, studyableItems());
+    const it = sid ? index.senses.get(sid) : null;
+    return it && isStudyable(it.word, it.sense) ? it : null;
+  }
+
+  /**
+   * 単語の音をすぐ鳴らす（テストの選択肢・つづりの答え）。クリック処理の中から呼ぶこと（iPhone の制限）。
+   * onEnd：鳴り終わったとき（鳴らせなかったときも）
+   */
+  function sayWord(it, onEnd) {
+    const wa = wordAudio(it);
+    const src = audioSource(wa);
+    let ended = false;
+    const end = () => {
+      if (ended) return;
+      ended = true;
+      if (onEnd) onEnd();
+    };
+    const synth = () => (speech.canSynth() ? speech.speak(wa.text, { onState: (st) => { if (st !== 'playing') end(); } }) : false);
+    const onState = (state, detail) => {
+      if (state === 'playing') return;
+      if (state === 'error' && detail === 'pack') {
+        // AI音声を読み込めないときは、端末の読み上げで
+        if (!synth()) end();
+        return;
+      }
+      end();
+    };
+    if (src.kind === 'pack') return speech.playClip(src.n.url, src.n.a, src.n.b, { onState });
+    if (src.kind === 'rec') return speech.play(wa.src, { onState });
+    if (src.kind === 'synth') return synth();
+    return false;
+  }
+
   function mcqView(q, fb) {
     const p = q.prompt;
-    let body = '<p class="q-label">' + esc(Q.QTYPE[q.qtype]) + '</p>';
+    let body = '<p class="q-label">' + esc(Q.QTYPE[q.qtype] || '') + '</p>';
     if (q.qtype === 'meaning') {
       // 単語のボタンは単語だけ、フレーズは丸いボタンで（カードの表と同じ形）
       const it = index.senses.get(q.senseId);
@@ -13731,21 +14914,31 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         (p.nuance ? '<p class="nuance-text">' + esc(p.nuance) + '</p>' : '') +
         (p.role ? '<p class="role-line"><span class="role-chip">' + esc(ST.ROLE[p.role] || '') + '</span>を表す言葉<span class="role-pos">（' + esc(posLabel(p.pos)) + '）</span></p>' : '') +
         '<p class="q-text">この場面に合う英語は？</p>';
+    } else if (q.qtype === 'listen') {
+      body += '<div class="listen-box">' + icon('speaker', 'listen-ic') +
+        audioCtl({ text: p.plain, what: '英文', cap: 'auto' }) + '</div>' +
+        (fb ? '<p class="ex-en listen-text" lang="en">' + util.markedHtml(p.sentence) + '</p>' : '') +
+        '<p class="q-text">聞こえた英文の意味は？</p>';
     } else {
       body += '<p class="ex-en" lang="en">' + util.clozeHtml(p.exEn) + '</p>' +
         '<p class="ex-ja">' + esc(p.exJa) + '</p>' +
         '<p class="q-text">空所に入る英語は？</p>';
     }
-    const isWord = q.qtype !== 'meaning';
-    const choices = '<div class="choices" role="group" aria-label="選択肢">' + q.choices.map((c, i) => {
+    const isWord = !['meaning', 'listen'].includes(q.qtype);
+    const choices = '<div class="choices' + (q.qtype === 'listen' ? ' long' : '') + '" role="group" aria-label="選択肢">' + q.choices.map((c, i) => {
+      const it = choiceItem(q, i);
       let cls = 'choice';
       if (fb) {
         if (i === q.answer) cls += ' is-correct';
         else if (i === fb.choice) cls += ' is-wrong';
       }
-      return '<button type="button" class="' + cls + '" data-action="choose" data-i="' + i + '"' + (fb ? ' disabled' : '') + '>' +
-        '<span class="ch-text"' + (isWord ? ' lang="en"' : '') + '>' + esc(c) + '</span>' +
-        (fb && i === q.answer ? icon('check', 'ch-ic') : '') + '</button>';
+      // 答えたあとは、選択肢をタップすると、その単語の音が鳴る（意味の選択肢には英単語も出す）
+      const attrs = !fb ? ' data-action="choose"'
+        : it ? ' data-action="choice-say" aria-label="' + esc(c + '（' + it.word.headword + '）を再生') + '"' : ' disabled';
+      return '<button type="button" class="' + cls + '"' + attrs + ' data-i="' + i + '">' +
+        '<span class="ch-text"' + (isWord ? ' lang="en"' : '') + '>' + esc(c) +
+        (fb && q.qtype === 'meaning' && it ? '<span class="ch-en" lang="en">' + esc(it.word.headword) + '</span>' : '') + '</span>' +
+        (fb && i === q.answer ? icon('check', 'ch-ic') : fb && it ? icon('speaker', 'ch-ic say') : '') + '</button>';
     }).join('') + '</div>';
     return '<article class="card qcard">' + body + '</article>' + choices + (fb ? feedbackHtml(q, fb) : '');
   }
@@ -13765,40 +14958,93 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     return '<article class="card qcard">' + body + '</article>' + (fb ? feedbackHtml(q, fb) : '');
   }
 
+  /** つづりを組み立てる：意味と場面を見て、文字を並べる */
+  function spellView(q, fb) {
+    const p = q.prompt;
+    const picked = fb ? [] : ui.order;
+    let body = '<p class="q-label">' + esc(Q.QTYPE.spell) + '</p>' +
+      '<p class="meaning-text spell-meaning">' + esc(p.meaning) + '</p>' +
+      (p.nuance ? '<p class="nuance-text">' + esc(p.nuance) + '</p>' : '') +
+      (p.scene ? '<p class="scene-text">' + esc(p.scene) + '</p>' : '') +
+      '<p class="q-text">この意味の英単語は？<span class="q-count">' + q.tokens.length + '文字</span></p>';
+    if (!fb) {
+      body += '<div class="order-answer spell-answer" aria-label="あなたのつづり">' +
+        (picked.length ? picked.map((ti, k) => '<button type="button" class="tile letter placed" lang="en" data-action="tile-unpick" data-k="' + k + '">' + esc(q.tokens[ti]) + '</button>').join('') : '<span class="order-hint">下の文字をタップして並べます</span>') +
+        '</div>' +
+        '<div class="tile-bank">' + q.order.map((ti) => picked.includes(ti)
+          ? '<span class="tile letter ghost" aria-hidden="true">' + esc(q.tokens[ti]) + '</span>'
+          : '<button type="button" class="tile letter" lang="en" data-action="tile-pick" data-i="' + ti + '">' + esc(q.tokens[ti]) + '</button>').join('') + '</div>';
+    }
+    return '<article class="card qcard">' + body + '</article>' + (fb ? feedbackHtml(q, fb) : '');
+  }
+
   function feedbackHtml(q, fb) {
     const it = index.senses.get(q.senseId);
     const meaning = it ? it.sense.meaning : '';
+    const kind = store.state.tests.current ? store.state.tests.current.kind : '';
     let html = '<section class="feedback ' + (fb.correct ? 'ok' : 'ng') + '" role="status">' +
       '<p class="fb-title">' + (fb.correct ? icon('check') + '正解' : '不正解') + '</p>';
-    if (q.part === 'compose') {
+    if (q.qtype === 'spell') {
+      html += '<p class="fb-label">正しいつづり</p><p class="fb-spell" lang="en">' + esc(q.prompt.headword) + '</p>' +
+        (it ? audioCtl(Object.assign(wordAudio(it), { what: '単語', sm: true, left: true, cap: 'auto' })) : '');
+      if (!fb.correct) html += '<p class="fb-label">あなたの答え</p><p class="fb-given" lang="en">' + esc(fb.given) + '</p>';
+    } else if (q.part === 'compose') {
       html += '<p class="fb-label">正しい英文</p><p class="ex-en" lang="en">' + util.markedHtml(q.prompt.sentence) + '</p>' +
         audioCtl({ text: util.plainSentence(q.prompt.sentence), what: '英文', sm: true, left: true, cap: 'auto' });
       if (!fb.correct) html += '<p class="fb-label">あなたの答え</p><p class="fb-given" lang="en">' + esc(fb.given) + '</p>';
     } else if (!fb.correct) {
-      html += '<p class="fb-label">正解</p><p class="fb-answer">' + esc(fb.expected) + '</p>';
+      html += '<p class="fb-label">正解</p><p class="fb-answer"' + (['meaning', 'listen'].includes(q.qtype) ? '' : ' lang="en"') + '>' + esc(fb.expected) + '</p>';
     }
     html += '<p class="fb-word"><b lang="en">' + esc(q.prompt.headword) + '</b>：' + esc(meaning) + '</p>';
-    if (!fb.correct) html += '<p class="fine">この問題は「覚えていないリスト」に入りました。</p>';
+    if (!fb.correct) {
+      html += '<p class="fine">' + (kind === 'practice'
+        ? '練習なので、記録は変わりません。答えを確かめて、もう一度解いてみましょう。'
+        : '「覚えていないリスト」に入りました。明日 ' + esc(testTime()) + ' に再テスト（必須）です。') + '</p>';
+    }
     return html + '</section>';
   }
 
-  function answerTest(response) {
+  /** 4択を選ぶ：選んだ瞬間に、その選択肢の単語の音を鳴らしてから答え合わせ */
+  function chooseAnswer(i) {
+    const a = store.state.tests.current;
+    if (!a || ui.testFeedback) return;
+    const q = Q.current(a);
+    if (!q || q.part !== 'understand' || !q.choices[i]) return;
+    const it = choiceItem(q, i);
+    const said = it ? !!sayWord(it, () => {
+      // 正解のときは、単語の音が終わってから次の問題へ
+      const fb = ui.testFeedback;
+      if (fb && fb.correct && fb.question.id === q.id) autoNext(q.id, 450);
+    }) : false;
+    answerTest(i, said);
+  }
+
+  function autoNext(qid, ms) {
+    clearTimeout(ui.fbTimer);
+    ui.fbTimer = setTimeout(() => {
+      if (ui.route === 'test' && ui.testFeedback && ui.testFeedback.question.id === qid) nextQuestion();
+    }, ms);
+  }
+
+  function answerTest(response, said) {
     const st = store.state;
     const a = st.tests.current;
     if (!a || ui.testFeedback) return;
     const q = Q.current(a);
     if (!q) return;
-    const out = Q.answer(st.tests, a, response, Date.now());
+    const now = Date.now();
+    const out = Q.answer(st.tests, a, response, now, { nextDue: Sched.retestDue(now, testTime()) });
     store.set('tests', out.tests);
     ui.testFeedback = { question: q, correct: out.result.correct, given: out.result.given, expected: out.result.expected, choice: q.part === 'understand' ? response : null };
     ui.order = [];
     render(false);
-    if (out.result.correct && q.part === 'understand') {
-      clearTimeout(ui.fbTimer);
-      ui.fbTimer = setTimeout(() => {
-        if (ui.route === 'test' && ui.testFeedback && ui.testFeedback.question.id === q.id) nextQuestion();
-      }, 800);
+    // 組み立てる問題（並べ替え・つづり）は、答え合わせのときに正しい英語（文・単語）を鳴らす
+    if (q.part === 'compose') {
+      const btn = $app.querySelector('.feedback .audio button[data-slow="0"]:not([disabled])');
+      if (btn) playFrom(btn);
     }
+    // 正解の4択は自動で次へ（単語の音を鳴らしたときは、鳴り終わってから。鳴らないときの予備に少し長め）
+    if (out.result.correct && q.part === 'understand') autoNext(q.id, said ? 2600 : 800);
   }
 
   function nextQuestion() {
@@ -13824,23 +15070,38 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     const a = (st.tests.attempts || []).find((x) => x.id === ui.param);
     if (!a) return notFound('結果が見つかりません', 'home');
     const isRound = a.kind === 'round';
+    const half = Q.HALF_SCORED.includes(a.kind);
+    const tt = testTime();
     const stats = isRound ? Q.roundStats(st.tests, a.roundId) : null;
     const first = stats && stats.perfectAt;
+    const total = a.parts.understand.total + a.parts.compose.total;
+    const correct = a.parts.understand.correct + a.parts.compose.correct;
+    const nWrong = a.wrongs.length;
     let html = '<main class="screen score" id="main">';
-    html += pageHead('テストの結果', { back: isRound ? 'round-' + a.roundId : 'misses' });
+    html += pageHead(a.kind === 'practice' ? '練習の結果' : 'テストの結果', { back: isRound ? 'round-' + a.roundId : 'home' });
     html += '<section class="score-hero">' + (a.score === 100 ? doneMark() : '') +
       '<p class="eyebrow">' + esc(attemptTitle(a)) + '・' + esc(util.formatDateTime(a.finishedAt)) + '</p>' +
-      '<p class="score-num"><b>' + a.score + '</b><span>点</span></p><p class="score-max">100点満点</p>';
+      '<p class="score-num"><b>' + a.score + '</b><span>点</span></p><p class="score-max">100点満点・' + correct + ' / ' + total + '問 正解</p>';
     if (isRound) {
       if (a.score === 100) html += '<p class="perfect">満点です。' + (first && first.no === a.no ? a.no + '回目で満点を取りました。' : '満点は ' + first.no + '回目で達成しています。') + '</p>';
-      else html += '<p class="to-perfect">満点まであと ' + (100 - a.score) + '点' + (first ? '（満点は ' + first.no + '回目で達成済み）' : '') + '</p>';
+      else html += '<p class="to-perfect">満点まであと ' + (100 - a.score) + '点' + (first ? '（満点は ' + first.no + '回目で達成済み）' : '') + '。間違えた ' + nWrong + '問は、明日 ' + esc(tt) + ' に再テスト（必須）です。</p>';
+    } else if (a.kind === 'practice') {
+      html += '<p class="to-perfect">' + (nWrong ? '練習は記録に入りません。間違えた問題を、もう一度解いてみましょう。' : '全問正解です。' + esc(tt) + ' からのテストで確かめます。') + '</p>';
+    } else if (a.kind === 'retest') {
+      html += '<p class="' + (nWrong ? 'to-perfect' : 'perfect') + '">' + (nWrong
+        ? correct + '問を克服しました。間違えた ' + nWrong + '問は、明日 ' + esc(tt) + ' にもう一度（満点になるまで毎日続きます）。'
+        : '満点です。再テストは、これで終わりです。') + '</p>';
+    } else if (a.kind === 'review') {
+      html += '<p class="to-perfect">' + correct + ' / ' + total + '問 正解。</p>';
     } else {
-      html += '<p class="to-perfect">' + (a.parts.understand.correct + a.parts.compose.correct) + ' / ' + (a.parts.understand.total + a.parts.compose.total) + '問 正解。正解した問題は「克服」になりました。</p>';
+      html += '<p class="' + (nWrong ? 'to-perfect' : 'perfect') + '">' + (nWrong
+        ? '間違えた ' + nWrong + '問は「覚えていないリスト」に入りました。明日 ' + esc(tt) + ' に再テスト（必須）です。'
+        : '満点です。') + '</p>';
     }
     html += '</section>';
     const partRow = (key) => {
       const p = a.parts[key];
-      const pts = isRound ? (a.score === 100 ? 50 : (p.total ? Math.floor((50 * p.correct) / p.total) : 0)) : null;
+      const pts = half ? (a.score === 100 ? 50 : (p.total ? Math.floor((50 * p.correct) / p.total) : 0)) : null;
       return '<div class="part-row"><span class="pr-label">' + esc(Q.PARTS[key].label) + '<span class="r-sub">　' + p.correct + ' / ' + p.total + '問</span></span>' +
         (pts != null ? '<span class="pr-pts"><b>' + pts + '</b> / 50点</span>' : '<span></span>') +
         '<span class="meter"><span style="width:' + (p.total ? Math.round((100 * p.correct) / p.total) : 0) + '%"></span></span></div>';
@@ -13853,20 +15114,68 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       if (!list.length) return;
       wrongs += '<details class="wrong-part"' + (list.length <= 15 ? ' open' : '') + '><summary>' + esc(Q.PARTS[part].label) + '<span>' + list.length + '問</span></summary><ul class="wrong-list">' + list.map((w) => {
         const it = index.senses.get(w.senseId);
+        const enAns = part === 'compose' || !['meaning', 'listen'].includes(w.qtype);
         return '<li>' + (it ? '<a href="#word-' + esc(it.word.id) + '" class="wl-word"><b lang="en">' + esc(it.word.headword) + '</b><span>' + esc(it.sense.meaning) + '</span></a>' : '<span class="muted">削除された単語</span>') +
           '<span class="wl-q">' + esc(Q.QTYPE[w.qtype] || '') + '</span>' +
           '<span class="wl-ans"><span class="mini-label">あなたの答え</span><span' + (part === 'compose' ? ' lang="en"' : '') + '>' + esc(w.given) + '</span></span>' +
-          '<span class="wl-ans ok"><span class="mini-label">正解</span><span' + (part === 'compose' || w.qtype !== 'meaning' ? ' lang="en"' : '') + '>' + esc(w.answer) + '</span></span></li>';
+          '<span class="wl-ans ok"><span class="mini-label">正解</span><span' + (enAns ? ' lang="en"' : '') + '>' + esc(w.answer) + '</span></span></li>';
       }).join('') + '</ul></details>';
     });
-    html += section('間違えた問題', a.wrongs.length ? '<div class="list">' + wrongs + '</div>' : '<div class="list"><p class="empty-note">ありません。</p></div>', { note: a.wrongs.length + '問' });
+    html += section('間違えた問題', nWrong ? '<div class="list">' + wrongs + '</div>' : '<div class="list"><p class="empty-note">ありません。</p></div>', { note: nWrong + '問' });
 
-    if (a.wrongs.length) {
-      html += '<button type="button" class="btn primary block" data-action="start" data-mode="fwd" data-scope="wrong:' + esc(a.id) + '">間違えた単語をカードで学習</button>';
+    if (a.kind === 'practice' && nWrong) {
+      html += '<div class="btn-col"><button type="button" class="btn primary block" data-action="start-kind" data-kind="practice">もう一度解く</button></div>';
+    } else if (nWrong) {
+      html += '<div class="btn-col"><button type="button" class="btn primary block" data-action="start" data-mode="fwd" data-scope="wrong:' + esc(a.id) + '">間違えた単語をカードで学習</button></div>';
     }
-    html += '<div class="list">' + rowLink('#misses', '覚えていないリスト', 'すべての回の間違えた問題') +
-      (isRound ? rowLink('#round-' + a.roundId, roundTitle(a.roundId) || '回', 'カード学習・テストの記録') : rowLink('#home', 'ホーム')) +
+    html += '<div class="list">' + rowLink('#misses', '覚えていないリスト', 'すべての間違えた問題・再テストの予定') +
+      (isRound ? rowLink('#round-' + a.roundId, roundTitle(a.roundId) || '回', 'カード学習・テストの記録') : rowLink('#home', 'ホーム', '今日の学習・テスト')) +
       '</div>';
+    html += '</main>';
+    return html;
+  }
+
+  /* ----- ③ ミスを確認 ----- */
+
+  function viewCheck() {
+    const now = Date.now();
+    const tt = testTime();
+    const m = mistakes(now, dayInfo(now));
+    let html = '<main class="screen check" id="main">';
+    html += pageHead('ミスを確認', { back: 'home' });
+    html += '<p class="lead">正しい答えと使い方を、音と一緒に確かめましょう。確かめたら ④ で問題を解きます。</p>';
+    if (!m.keys.length) {
+      html += '<div class="list"><p class="empty-note">いまは、ミスはありません。</p></div></main>';
+      return html;
+    }
+    const head = (it) => '<div class="ci-head"><a href="#word-' + esc(it.word.id) + '" class="ci-word"><b lang="en">' + esc(it.word.headword) + '</b></a>' +
+      audioCtl(Object.assign(wordAudio(it), { what: '単語', sm: true, cap: 'auto' })) + '</div>' +
+      '<p class="ci-meaning">' + esc(it.sense.meaning) + '</p>';
+    if (m.test.length) {
+      html += section('テストで間違えた問題', '<ul class="list check-list">' + m.test.map((e) => {
+        const it = index.senses.get(e.senseId);
+        const due = (e.dueAt || 0) <= now ? (Sched.windowAt(now, tt).open ? 'いま受けられます' : whenLabel(Sched.windowAt(now, tt).start, now)) : whenLabel(e.dueAt, now);
+        const enAns = e.part === 'compose' || !['meaning', 'listen'].includes(e.last.qtype);
+        return '<li class="check-item">' + head(it) +
+          '<p class="ci-meta"><span class="chip">' + esc(Q.QTYPE[e.last.qtype] || Q.PARTS[e.part].label) + '</span><span>再テスト：' + esc(due) + '</span><span>' + e.count + '回まちがえた</span></p>' +
+          (e.last.answer ? '<p class="ci-ans"><span class="mini-label">正解</span><span' + (enAns ? ' lang="en"' : '') + '>' + esc(e.last.answer) + '</span></p>' : '') +
+          (e.last.given ? '<p class="ci-ans ng"><span class="mini-label">あなたの答え</span><span' + (e.part === 'compose' ? ' lang="en"' : '') + '>' + esc(e.last.given) + '</span></p>' : '') +
+          '</li>';
+      }).join('') + '</ul>', { note: m.test.length + '件・再テストは ' + tt });
+    }
+    if (m.weak.length) {
+      html += section('今日のカードで思い出せなかった単語', '<ul class="list check-list">' + m.weak.map((w) => {
+        const it = index.senses.get(w.sid);
+        const ex = it.sense.examples[0];
+        return '<li class="check-item">' + head(it) +
+          '<p class="ci-meta"><span class="chip">' + esc(SS.MODES[w.mode].label) + '</span><span class="m-' + w.r + '">' + esc(w.r === 'again' ? '思い出せなかった' : 'あいまい') + '</span></p>' +
+          (it.sense.nuance ? '<p class="ci-nuance">' + esc(it.sense.nuance) + '</p>' : '') +
+          (ex ? '<p class="ex-en" lang="en">' + util.markedHtml(ex.en) + '</p>' + (ex.ja ? '<p class="ex-ja">' + esc(ex.ja) + '</p>' : '') : '') +
+          '</li>';
+      }).join('') + '</ul>', { note: m.weak.length + '枚' });
+    }
+    html += '<div class="btn-col"><button type="button" class="btn primary block" data-action="start-kind" data-kind="practice">' + STEP_NO[3] + ' 間違えた問題を解く（' + m.keys.length + '問）</button></div>';
+    html += '<p class="section-note">練習は何度でも解けます。覚えていないリストの「克服」は、' + esc(tt) + ' からのテストで正解したときです。</p>';
     html += '</main>';
     return html;
   }
@@ -13878,15 +15187,16 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     const roundId = ui.missRound !== 'all' ? ui.missRound : undefined;
     const list = Q.missList(st.tests, { status: ui.missStatus, roundId });
     const counts = Q.missCounts(st.tests);
-    const openKeys = Q.openKeys(st.tests, roundId).filter((k) => index.senses.has(k.split('|')[0]));
+    const openKeys = Q.openKeys(st.tests, roundId).filter(liveKey);
     const openSenses = new Set(openKeys.map((k) => k.split('|')[0]));
+    const now = Date.now();
     let html = '<main class="screen misses" id="main">';
     html += pageHead('覚えていないリスト');
-    html += '<p class="lead">テストで間違えた問題を、すべての回からためています。あとで正解すると「克服」になります（記録は残ります）。</p>';
+    html += '<p class="lead">テストで間違えた問題を、すべてためています。次の日の ' + esc(testTime()) + ' に再テスト（必須）があり、そこで正解すると「克服」になります。満点になるまで毎日続きます（記録は残ります）。</p>';
     html += '<section class="group"><dl class="facts"><div><dt>覚えていない</dt><dd>' + counts.open + '<small>件</small></dd></div><div><dt>克服した</dt><dd>' + counts.solved + '<small>件</small></dd></div><div><dt>これまで</dt><dd>' + counts.all + '<small>件</small></dd></div></dl>' +
       (openKeys.length
         ? '<div class="btn-col"><button type="button" class="btn primary block" data-action="start" data-mode="fwd" data-scope="misses' + (roundId ? ':' + esc(roundId) : '') + '">カードで学習（' + openSenses.size + '枚）</button>' +
-          '<button type="button" class="btn secondary block" data-action="review-test">問題を解き直す（' + openKeys.length + '問）</button></div>'
+          '<button type="button" class="btn secondary block" data-action="practice-misses">問題を練習する（' + openKeys.length + '問）</button></div>'
         : '') +
       '</section>';
     html += '<div class="filters">' + segButtons('miss-status', ui.missStatus, [['open', '覚えていない'], ['solved', '克服した'], ['all', 'すべて']], '状態') +
@@ -13901,8 +15211,9 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
           (it ? '<a class="miss-head" href="#word-' + esc(it.word.id) + '"><b lang="en">' + esc(it.word.headword) + '</b><span>' + esc(it.sense.meaning) + '</span></a>' : '<span class="muted">削除された単語</span>') +
           '<span class="miss-meta"><span class="chip">' + esc(Q.PARTS[e.part].label) + '</span>' + (rounds ? '<span>' + esc(rounds) + '</span>' : '') +
           '<span>' + e.count + '回まちがえた</span><span>最後 ' + esc(util.formatDate(e.lastAt)) + '</span>' +
+          (!e.solvedAt ? '<span class="miss-due">再テスト：' + esc((e.dueAt || 0) <= now ? (Sched.windowAt(now, testTime()).open ? 'いま受けられます' : whenLabel(Sched.windowAt(now, testTime()).start, now)) : whenLabel(e.dueAt, now)) + '</span>' : '') +
           (e.solvedAt ? '<span class="badge st-verified">克服 ' + esc(util.formatDate(e.solvedAt)) + '</span>' : '') + '</span>' +
-          (e.last && e.last.answer ? '<span class="miss-last"><span class="mini-label">正解</span><span' + (e.part === 'compose' || e.last.qtype !== 'meaning' ? ' lang="en"' : '') + '>' + esc(e.last.answer) + '</span></span>' : '') +
+          (e.last && e.last.answer ? '<span class="miss-last"><span class="mini-label">正解</span><span' + (e.part === 'compose' || !['meaning', 'listen'].includes(e.last.qtype) ? ' lang="en"' : '') + '>' + esc(e.last.answer) + '</span></span>' : '') +
           '</li>';
       }).join('') + '</ul>';
     }
@@ -14327,6 +15638,55 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
     }
   }
 
+  /** テストの時間と通知：時刻を選ぶ・カレンダーに予定（通知つき）を入れる */
+  function notifySection() {
+    const tt = testTime();
+    const opts = { now: Date.now(), testTime: tt, startDay: startDayTs(), appName: APP_NAME };
+    const g = (uid, title, sub) => '<a class="row" href="' + esc(Sched.googleCalendarUrl(opts, uid)) + '" target="_blank" rel="noopener noreferrer">' + rowInner(title, sub, '', '') + '</a>';
+    return section('テストの時間と通知', '<div class="group">' +
+      '<div class="f"><span class="f-label">毎日のテストの時間</span>' +
+      selectBox('test-time', tt, Sched.TIMES.map((x) => [x, x + (x === Sched.DEFAULT_TIME ? '（はじめの設定）' : '')]), '毎日のテストの時間') + '</div>' +
+      '<ul class="plain-list fine sched-list">' +
+      '<li><b>毎日のテスト</b>：' + esc(tt) + ' から朝4:00まで。今日学習した単語と、必須の再テスト</li>' +
+      '<li><b>再テスト</b>：間違えた問題は次の日の ' + esc(tt) + ' に必須。満点になるまで毎日</li>' +
+      '<li><b>まとめテスト</b>：5日ごと（次は ' + esc(todayLabel(Sched.nextSummaryDay(Date.now(), tt, startDayTs()))) + '）</li>' +
+      '<li><b>月のまとめテスト</b>：毎月1日。先月の単語を約50問</li></ul>' +
+      '<button type="button" class="btn primary block" data-action="add-calendar">' + icon('calendar') + 'カレンダーに通知を追加</button>' +
+      '<p class="fine">毎日の ' + esc(tt) + '、まとめテストの日、毎月1日に、端末のカレンダーから通知が届きます。保存されたファイル（.ics）を開いて、予定を追加してください（iPhone は「すべてを追加」）。</p>' +
+      '</div>' +
+      '<div class="list">' + g('daily-test', 'Googleカレンダーに追加：毎日のテスト', esc(tt) + '・毎日') +
+      g('summary-test', 'Googleカレンダーに追加：まとめテスト', '5日ごと') + g('monthly-test', 'Googleカレンダーに追加：月のまとめテスト', '毎月1日') + '</div>' +
+      '<p class="section-note">ホーム画面のアプリやブラウザは、閉じているあいだ自分では通知を出せません。そのため、カレンダーの予定の通知を使います。アプリを開いているときは、' + esc(tt) + ' になると画面でもお知らせします。時間を変えたら、カレンダーの予定も入れ直してください。</p>',
+    { id: 'notify' });
+  }
+
+  /** カレンダーの予定（.ics）を保存する */
+  function addCalendar() {
+    const tt = testTime();
+    const url = typeof C.saveFile === 'function' ? '' : location.href.split('#')[0];
+    const text = Sched.calendar({ now: Date.now(), testTime: tt, startDay: startDayTs(), appName: APP_NAME, url });
+    const name = 'ankicard-' + tt.replace(':', '') + '.ics';
+    const fail = () => toast('保存できませんでした。下の「Googleカレンダーに追加」を使ってください。');
+    if (typeof C.saveFile === 'function') {
+      C.saveFile(name, text).then((ok) => (ok ? toast('カレンダーのファイルを保存しました。開いて予定を追加してください。') : fail()), fail);
+      return;
+    }
+    try {
+      const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = href;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(href), 4000);
+      toast('カレンダーのファイルを保存しました。開いて予定を追加してください。');
+    } catch (e) {
+      fail();
+    }
+  }
+
   /** iPhone のホーム画面に追加する方法 */
   function homeScreenSection() {
     const db = store.status.backend === 'db';
@@ -14411,6 +15771,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       : st.backend === 'memory' ? 'このブラウザでは保存できません。ページを閉じると記録が消えます。'
       : '記録はあなたのアカウントに保存しています。';
     let html = '<main class="screen options" id="main">' + pageHead('設定');
+    html += notifySection();
     html += homeScreenSection();
     html += audioSection();
 
@@ -14444,6 +15805,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       '<p>コアイメージは、単語の意味や使い方をつかみやすくするための「見方」です。すべてのネイティブスピーカーが同じイメージを持っているとは限りません。well の「上手に」と「井戸」のように語源が違う単語は、無理に一つのイメージにまとめず、別々に覚えます。</p>' +
       '<p>評価のしかた：思い出せた → 間隔を広げて復習／あいまい → 間隔を短く／思い出せなかった → このセットですぐもう一度。</p>' +
       '<p>初期の単語は、辞書の情報と照らし合わせて意味・品詞・発音記号を確かめ、出典と確認方法を単語ごとに記録しています。例文・ニュアンス・場面の説明は、このアプリ用に作った学習用の文章です。</p>' +
+      '<p>毎日の順番：① 単語を覚える（英語 → 場面）→ ② 逆から思い出す（場面 → 英語）→ ③ ミスを確認 → ④ 間違えた問題を解く → ⑤ ' + esc(testTime()) + ' からテスト。テストで間違えた問題は、次の日に再テスト（必須）で、満点になるまで毎日続きます。5日ごとのまとめテストと、毎月1日の月のまとめテストで、長く覚えているかを確かめます。</p>' +
       '<p class="fine">AI音声：Kokoro-82M（Apache-2.0）と発音辞書 misaki（Apache-2.0）で作成。日本語は読み上げません。</p>' +
       '</div>');
     html += '</main>';
@@ -14592,6 +15954,36 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         e.stopPropagation();
         playFrom(el);
         return;
+      case 'enter':
+        go('home', true);
+        return;
+      case 'goto':
+        go(el.dataset.to || 'home');
+        return;
+      case 'goto-notify':
+        go('options');
+        setTimeout(() => {
+          const sec = document.getElementById('notify');
+          if (sec) sec.scrollIntoView({ block: 'start' });
+        }, 0);
+        return;
+      case 'start-kind':
+        startKind(el.dataset.kind);
+        return;
+      case 'practice-misses': {
+        const roundId = ui.missRound !== 'all' ? ui.missRound : undefined;
+        startPractice(Q.openKeys(store.state.tests, roundId).filter(liveKey), Q.missTypes(store.state.tests));
+        return;
+      }
+      case 'choice-say': {
+        const fb = ui.testFeedback;
+        const it = fb ? choiceItem(fb.question, Number(el.dataset.i)) : null;
+        if (it) sayWord(it);
+        return;
+      }
+      case 'add-calendar':
+        addCalendar();
+        return;
       case 'flip':
         flip();
         return;
@@ -14634,7 +16026,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         go('test');
         return;
       case 'review-test':
-        startReview();
+        startPractice(Q.openKeys(store.state.tests).filter(liveKey), Q.missTypes(store.state.tests));
         return;
       case 'quit-test':
         resetTestUi();
@@ -14643,7 +16035,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         go('home');
         return;
       case 'choose':
-        answerTest(Number(el.dataset.i));
+        chooseAnswer(Number(el.dataset.i));
         return;
       case 'test-skip':
         answerTest(null);
@@ -14766,6 +16158,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
             store.set('progress', {});
             store.set('log', SS.emptyLog());
             store.set('session', null);
+            store.set('meta', Object.assign({}, store.state.meta, { startDay: util.dayKey(Sched.studyDay(Date.now())), checkAt: 0 }));
             toast('学習記録をリセットしました。');
             render(false);
           },
@@ -14858,6 +16251,12 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         setSettings({ dailyGoal: Number(t.value) });
         toast('今日の目標を ' + t.value + '枚にしました。');
         return;
+      case 'test-time':
+        setSettings({ testTime: Sched.normalizeTime(t.value) });
+        scheduleAlert();
+        render(false);
+        toast('テストの時間を ' + testTime() + ' にしました。カレンダーの予定も入れ直してください。');
+        return;
       case 'round-filter':
         ui.roundFilter = t.value;
         render(false);
@@ -14898,6 +16297,11 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       if (e.key === 'Escape') closeModal();
       return;
     }
+    if (ui.route === 'title' && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      go('home', true);
+      return;
+    }
     if (ui.route === 'test') {
       if (e.target.closest && e.target.closest('input, textarea, select')) return;
       if (ui.testFeedback && e.key === 'Enter') {
@@ -14905,7 +16309,7 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
         nextQuestion();
       } else if (!ui.testFeedback && ['1', '2', '3', '4'].includes(e.key)) {
         const q = Q.current(store.state.tests.current);
-        if (q && q.part === 'understand') answerTest(Number(e.key) - 1);
+        if (q && q.part === 'understand') chooseAnswer(Number(e.key) - 1);
       }
       return;
     }
@@ -14920,6 +16324,49 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
       e.preventDefault();
       rate(['again', 'hard', 'good'][Number(e.key) - 1]);
     }
+  }
+
+  /* ================= テストの時間のお知らせ ================= */
+
+  /** 次のテストの時刻に、画面でお知らせする（アプリを開いているあいだ） */
+  function scheduleAlert() {
+    clearTimeout(ui.alertTimer);
+    const now = Date.now();
+    const w = Sched.windowAt(now, testTime());
+    const next = now < w.start ? w.start : Sched.timeOn(util.addDays(w.day, 1), testTime());
+    const ms = next - now;
+    if (!(ms > 0) || ms > 0x7fffffff) return;
+    ui.alertTimer = setTimeout(() => {
+      testTimeAlert();
+      scheduleAlert();
+    }, ms + 1000);
+  }
+
+  function testTimeAlert() {
+    const t = testInfo(Date.now());
+    if (!t.win.open) return;
+    const what = [];
+    if (t.due.length) what.push('再テスト ' + t.due.length + '問（必須）');
+    if (t.daily.length) what.push('今日のテスト');
+    if (t.summary.ready) what.push('まとめテスト');
+    if (t.monthly.ready) what.push('月のまとめテスト');
+    toast(testTime() + '、テストの時間です。' + (what.length ? what.join('・') + 'を受けましょう。' : ''));
+    if (['home', 'title', 'round', 'check', 'misses'].includes(ui.route)) render(false);
+  }
+
+  /** 「あと 2時間5分」を進める */
+  function tick() {
+    const now = Date.now();
+    $app.querySelectorAll('[data-until]').forEach((el) => {
+      el.textContent = Sched.untilText(Number(el.dataset.until) - now);
+    });
+  }
+
+  /** アプリに戻ってきたら、日付やテストの時間が変わっているかもしれないので描き直す */
+  function onVisible() {
+    if (document.visibilityState !== 'visible' || !store) return;
+    scheduleAlert();
+    if (['home', 'title', 'round', 'check', 'misses'].includes(ui.route) && !ui.modal) render(false);
   }
 
   /* ================= オフライン用（対応ブラウザのみ） ================= */

@@ -5,7 +5,7 @@
   "description": "英単語のコアイメージと自然な使い方をフラッシュカードで覚える学習アプリ",
   "scripts": {
     "start": "node scripts/serve.js",
-    "test": "node --test tests/unit.test.js tests/quiz.test.js",
+    "test": "node --test tests/unit.test.js tests/quiz.test.js tests/schedule.test.js",
     "test:e2e": "node tests/e2e.js",
     "build": "node scripts/build-single.js",
     "notebook": "node scripts/build-notebook.mjs"

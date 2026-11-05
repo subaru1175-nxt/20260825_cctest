@@ -8,6 +8,7 @@ const ST = require('../js/storage.js');
 const seed = require('../js/data-seed.js');
 
 const T0 = new Date(2026, 10, 4, 10, 0, 0).getTime();
+const DAY = 24 * 3600 * 1000;
 const words = () => seed.words.map((w) => ST.normalizeWord(w).word);
 const round1 = () => seed.rounds[0];
 
@@ -111,7 +112,8 @@ test('採点: 全問正解で100点、1問まちがえると99点。間違いは
   assert.equal(open[0].key, firstQ.senseId + '|understand');
   assert.deepEqual(open[0].roundIds, ['r1']);
 
-  // 2回目：全問正解 → 100点。間違えた問題は「克服」になるが、リストからは消えない
+  // 2回目（次の日）：全問正解 → 100点。間違えた問題は「克服」になるが、リストからは消えない
+  t += DAY;
   a = Q.createAttempt({ kind: 'round', roundId: 'r1', no: Q.nextNo(tests, 'r1'), items, now: (t += 1000) });
   assert.equal(a.no, 2);
   while (!Q.isDone(a)) {
@@ -152,7 +154,8 @@ test('覚えていないリストは回をまたいでたまり、解き直し�
   tests = out.tests;
   assert.equal(Q.missCounts(tests).open, 4, '途中でやめても、間違えた問題は残る');
   assert.equal(Q.missList(tests, { roundId: 'r2' }).length, 1);
-  // 解き直し：4問だけ出題。正解すると克服
+  // 次の日の再テスト：4問だけ出題。正解すると克服
+  t += DAY;
   const keys = Q.openKeys(tests);
   const review = Q.createAttempt({ kind: 'review', items, pool: items, only: keys, now: (t += 1000) });
   assert.equal(review.questions.length, 4);
@@ -221,4 +224,118 @@ test('途中のテストは保存データから復元できる', () => {
   assert.ok(restored.current, '途中のテストが残る');
   assert.equal(restored.current.index, 1);
   assert.equal(restored.current.questions.length, a.questions.length);
+});
+
+test('選択肢には、その選択肢の用法IDがある（タップした選択肢の単語の音を鳴らすため）', () => {
+  const items = Q.roundItems(words(), round1());
+  const byId = new Map(items.map((it) => [it.sense.id, it]));
+  const a = Q.createAttempt({ kind: 'round', roundId: 'r1', no: 1, items, now: T0 });
+  const mcq = a.questions.filter((q) => q.part === 'understand');
+  assert.ok(mcq.length > 100);
+  mcq.forEach((q) => {
+    assert.equal(q.choiceIds.length, q.choices.length, q.id);
+    assert.equal(q.choiceIds[q.answer], q.senseId, '正解の選択肢は、その問題の用法');
+    q.choices.forEach((text, i) => {
+      const it = byId.get(q.choiceIds[i]);
+      assert.ok(it, q.id + ' の選択肢 ' + text);
+      if (q.qtype === 'meaning') assert.equal(it.sense.meaning, text);
+      else assert.equal(it.word.headword, text);
+    });
+  });
+  // 前の版の問題（choiceIds なし）でも、文字から用法を探せる
+  const q = Object.assign({}, mcq.find((x) => x.qtype !== 'meaning'));
+  delete q.choiceIds;
+  q.choices.forEach((text, i) => assert.equal(byId.get(Q.choiceSense(q, i, items)).word.headword.toLowerCase(), text.toLowerCase()));
+});
+
+test('再テスト：間違えた問題は次の日の時刻に必須。同じ日のうちの正解では克服にしない', () => {
+  const items = Q.roundItems(words(), round1()).slice(0, 4);
+  const pool = Q.roundItems(words(), round1());
+  let tests = ST.emptyTests();
+  const due = T0 + DAY + 10 * 3600 * 1000; // 次の日の 20:00 のつもり
+  let a = Q.createAttempt({ kind: 'round', roundId: 'r1', no: 1, items, pool, now: T0 });
+  const missQ = a.questions[0];
+  let t = T0;
+  while (!Q.isDone(a)) {
+    const q = Q.current(a);
+    const out = Q.answer(tests, a, respond(q, q !== missQ), (t += 1000), { nextDue: due });
+    tests = out.tests;
+    a = out.attempt;
+  }
+  tests = Q.finish(tests, a, (t += 1000)).tests;
+  const key = missQ.senseId + '|understand';
+  assert.equal(tests.misses[key].dueAt, due);
+  assert.deepEqual(Q.dueKeys(tests, t), [], 'まだ時刻前');
+  assert.equal(Q.nextRetestAt(tests, t), due);
+  // 同じ日のうちに正解しても、克服にはならない
+  let r = Q.createAttempt({ kind: 'retest', items, pool, only: [key], now: t });
+  let out = Q.answer(tests, r, respond(Q.current(r), true), (t += 1000), { nextDue: due });
+  assert.equal(out.tests.misses[key].solvedAt, 0);
+  // 次の日の時刻に、また間違える → さらに次の日に必須
+  t = due + 60000;
+  assert.deepEqual(Q.dueKeys(tests, t), [key]);
+  r = Q.createAttempt({ kind: 'retest', items, pool, only: Q.dueKeys(tests, t), now: t });
+  assert.equal(r.kind, 'retest');
+  assert.equal(r.questions.length, 1);
+  out = Q.answer(tests, r, respond(Q.current(r), false), (t += 1000), { nextDue: due + DAY });
+  tests = Q.finish(out.tests, out.attempt, (t += 1000)).tests;
+  assert.equal(tests.misses[key].dueAt, due + DAY);
+  assert.equal(tests.misses[key].count, 2);
+  // その次の日に正解 → 克服（満点）
+  t = due + DAY + 60000;
+  r = Q.createAttempt({ kind: 'retest', items, pool, only: Q.dueKeys(tests, t), now: t });
+  out = Q.answer(tests, r, respond(Q.current(r), true), (t += 1000), { nextDue: due + 2 * DAY });
+  const fin = Q.finish(out.tests, out.attempt, (t += 1000));
+  assert.equal(fin.summary.score, 100);
+  assert.ok(fin.tests.misses[key].solvedAt > 0);
+  assert.deepEqual(Q.dueKeys(fin.tests), []);
+});
+
+test('まとめテスト：応用の形式（聞き取り・新しい文の空所・つづり・並べ替え）で、選んだ数だけ作る', () => {
+  const pool = Q.roundItems(words(), round1());
+  const items = pool.slice(0, 20);
+  const a = Q.createAttempt({ kind: 'summary', period: '2026-11-08', items, pool, perItem: 1, size: 30, now: T0 });
+  assert.equal(a.kind, 'summary');
+  assert.equal(a.period, '2026-11-08');
+  assert.equal(a.questions.length, 20);
+  const types = new Set(a.questions.map((q) => q.qtype));
+  ['context', 'listen', 'spell', 'order'].forEach((t) => assert.ok(types.has(t), t));
+  // 内容理解（4択）が先、組み立てる問題があと
+  const firstCompose = a.questions.findIndex((q) => q.part === 'compose');
+  assert.ok(a.questions.slice(firstCompose).every((q) => q.part === 'compose'));
+  a.questions.forEach((q) => {
+    if (q.qtype === 'context') assert.match(q.prompt.exEn, new RegExp('\\[' + q.prompt.headword + '\\]', 'i'));
+    if (q.qtype === 'listen') {
+      assert.ok(q.prompt.plain && !q.prompt.plain.includes('['));
+      assert.equal(q.choiceIds[q.answer], q.senseId);
+    }
+    if (q.qtype === 'spell') {
+      assert.equal(Q.judge(q, orderAnswer(q)).correct, true, 'つづり：正しい順なら正解');
+      assert.equal(Q.judge(q, orderAnswer(q).slice().reverse()).correct, q.tokens.join('') === q.tokens.slice().reverse().join(''));
+      assert.equal(Q.judge(q, null).correct, false);
+    }
+  });
+  // 月のまとめテスト：用法が少ないときは、1つの用法から2問ずつ（最大50問）
+  const m = Q.createAttempt({ kind: 'monthly', period: '2026-11', items: pool.slice(0, 30), pool, perItem: 2, size: 50, now: T0 });
+  assert.equal(m.kind, 'monthly');
+  assert.equal(m.questions.length, 50);
+  assert.ok(new Set(m.questions.map((q) => q.id)).size === 50, '同じ問題はくり返さない');
+  // 受け終えたかどうか
+  let tests = ST.emptyTests();
+  assert.equal(Q.hasTaken(tests, 'summary', '2026-11-08'), false);
+  let s = Q.createAttempt({ kind: 'summary', period: '2026-11-08', items: pool.slice(0, 3), pool, now: T0 });
+  let t = T0;
+  while (!Q.isDone(s)) {
+    const out = Q.answer(tests, s, respond(Q.current(s), true), (t += 1000));
+    tests = out.tests;
+    s = out.attempt;
+  }
+  const fin = Q.finish(tests, s, (t += 1000));
+  assert.equal(fin.summary.score, 100);
+  assert.equal(fin.summary.period, '2026-11-08');
+  assert.equal(Q.hasTaken(fin.tests, 'summary', '2026-11-08'), true);
+  // 保存しても種類と期間が残る
+  const back = ST.normalizeTests(JSON.parse(JSON.stringify(fin.tests)));
+  assert.equal(back.attempts[0].kind, 'summary');
+  assert.equal(back.attempts[0].period, '2026-11-08');
 });

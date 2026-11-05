@@ -8,12 +8,12 @@
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
-    module.exports = factory(require('./util.js'));
+    module.exports = factory(require('./util.js'), require('./schedule.js'));
   } else {
     root.CIF = root.CIF || {};
-    root.CIF.storage = factory(root.CIF.util);
+    root.CIF.storage = factory(root.CIF.util, root.CIF.schedule);
   }
-})(this, function (util) {
+})(this, function (util, sched) {
   'use strict';
 
   const PREFIX = 'cif.v1.';
@@ -53,6 +53,7 @@
     accent: 'us',
     autoplay: false,
     studyMode: 'fwd',
+    testTime: '20:00',
   };
 
   /* ---------- 保存先 ---------- */
@@ -507,6 +508,7 @@
   /* ---------- テストの記録 ---------- */
 
   const PARTS = ['understand', 'compose'];
+  const TEST_KINDS = ['round', 'daily', 'retest', 'summary', 'monthly', 'practice', 'review'];
 
   function emptyTests() {
     return { attempts: [], current: null, misses: {} };
@@ -521,8 +523,9 @@
     });
     out.attempts = (Array.isArray(t.attempts) ? t.attempts : []).slice(-500).filter((a) => a && typeof a === 'object').map((a) => ({
       id: str(a.id, 40),
-      kind: a.kind === 'review' ? 'review' : 'round',
+      kind: TEST_KINDS.includes(a.kind) ? a.kind : 'round',
       roundId: str(a.roundId, 40),
+      period: str(a.period, 20),
       no: Math.max(0, Math.floor(num(a.no, 0))),
       startedAt: num(a.startedAt, 0),
       finishedAt: num(a.finishedAt, 0),
@@ -549,6 +552,7 @@
         firstAt: num(e.firstAt, 0),
         lastAt: num(e.lastAt, 0),
         solvedAt: e.solvedAt ? num(e.solvedAt, 0) : 0,
+        dueAt: num(e.dueAt, 0),
         last: e.last && typeof e.last === 'object'
           ? { qtype: str(e.last.qtype, 20), given: str(e.last.given, 300), answer: str(e.last.answer, 300) }
           : { qtype: '', given: '', answer: '' },
@@ -569,6 +573,7 @@
     out.accent = s.accent === 'uk' ? 'uk' : 'us';
     out.autoplay = !!s.autoplay;
     out.studyMode = s.studyMode === 'rev' ? 'rev' : 'fwd';
+    out.testTime = sched.normalizeTime(s.testTime);
     return out;
   }
 

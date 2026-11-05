@@ -39,8 +39,6 @@ function speechMock(kind) {
         };
       }
     } catch (e) {}
-    const off = Number(localStorage.getItem('__test_offset') || 0);
-    if (off) { const real = Date.now.bind(Date); Date.now = () => real() + off; }
     const kind = ${JSON.stringify(kind)};
     if (kind === 'real') return;
     if (kind === 'unsupported') {
@@ -73,6 +71,9 @@ function speechMock(kind) {
 let browser;
 const results = [];
 
+/** テストの時計（日本時間）。ふだんはテストを受けられる 20:30 にしておく */
+const T0 = '2026-11-05T20:30:00+09:00';
+
 async function newPage(opts) {
   const o = opts || {};
   const ctx = await browser.newContext({
@@ -80,16 +81,76 @@ async function newPage(opts) {
     hasTouch: true,
     isMobile: true,
     locale: 'ja-JP',
+    timezoneId: 'Asia/Tokyo',
     reducedMotion: 'reduce',
+    acceptDownloads: true,
   });
   await ctx.addInitScript(speechMock(o.speech || 'mock'));
   const page = await ctx.newPage();
   page.errors = [];
   page.on('pageerror', (e) => page.errors.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.(googleapis|gstatic)/.test(m.text())) page.errors.push(m.text()); });
+  await page.clock.install({ time: new Date(o.time || T0) });
+  // 開くとタイトル（暗記CARD）。タップでホームへ
   await page.goto(URL0);
+  await page.waitForSelector('.title-screen');
+  await page.click('.title-screen');
   await page.waitForSelector('.home');
   return { ctx, page };
+}
+
+/** 時計を進める（日本時間）。hash の画面を開き直す */
+async function setTime(page, iso, hash) {
+  await page.clock.setSystemTime(new Date(iso));
+  await page.goto(URL0 + (hash == null ? '#home' : hash));
+  await page.reload();
+  if (hash == null || hash === '#home') await page.waitForSelector('.home');
+}
+
+/** ホームの「今日の学習」の5つの手順：[状態（* は いまの手順）, 説明] */
+const stepsOf = (page) => page.$$eval('.steps .step', (els) => els.map((e) => [(e.className.match(/st-(\w+)/) || [])[1] + (e.classList.contains('is-current') ? '*' : ''), e.querySelector('.step-sub').textContent]));
+const curQ = (page) => page.evaluate(() => {
+  const t = JSON.parse(localStorage.getItem('cif.v1.tests'));
+  return t.current ? t.current.questions[t.current.index] : null;
+});
+async function clickTiles(page, parts) {
+  for (const w of parts) {
+    const tiles = await page.$$('.tile-bank button.tile');
+    let done = false;
+    for (const t of tiles) {
+      if (((await t.textContent()) || '').toLowerCase() === w) { await t.click(); done = true; break; }
+    }
+    ok(done, '並べる語・文字が見つからない: ' + w);
+  }
+}
+/** テストを最後まで解く。wrong(q, i) が true の問題はまちがえる。答えた問題の一覧を返す */
+async function runTest(page, wrong, each) {
+  const seen = [];
+  for (let i = 0; i < 200; i++) {
+    if (await page.$('.score-hero')) return seen;
+    const intro = await page.$('[data-action="test-part-go"]');
+    if (intro) { await intro.click(); continue; }
+    const q = await curQ(page);
+    if (!q) { await page.waitForSelector('.score-hero'); return seen; }
+    const bad = !!wrong(q, i);
+    if (q.part === 'understand') await page.click('[data-action="choose"][data-i="' + (bad ? (q.answer + 1) % q.choices.length : q.answer) + '"]');
+    else if (bad) await page.click('[data-action="test-skip"]');
+    else {
+      await clickTiles(page, q.qtype === 'spell' ? q.answers[0].split('') : q.answers[0].split(' '));
+      await page.click('[data-action="order-check"]');
+    }
+    await page.waitForSelector('.feedback');
+    seen.push(Object.assign({ wrong: bad }, q));
+    if (each) await each(q, i);
+    const next = await page.$('[data-action="test-next"]');
+    if (next) await next.click().catch(() => {});
+    await page.waitForFunction((id) => {
+      const t = JSON.parse(localStorage.getItem('cif.v1.tests'));
+      return !t.current || (t.current.questions[t.current.index] || {}).id !== id;
+    }, q.id, { timeout: 8000 });
+    await page.waitForFunction(() => !document.querySelector('.feedback'), null, { timeout: 8000 }).catch(() => {});
+  }
+  throw new Error('test did not finish');
 }
 
 const ONLY = process.argv[2] || '';
@@ -428,11 +489,8 @@ async function noHScroll(page, label) {
 
     // 翌日にする → 復習カードを優先
     const progress = await ls(page, 'progress');
-    await page.evaluate((ms) => localStorage.setItem('__test_offset', String(ms)), DAY);
-    await page.reload();
-    await page.waitForSelector('.home');
-    const counts = await page.$$eval('.home .counts', (els) => Array.from(els[0].querySelectorAll('b')).map((e) => e.textContent));
-    eq(counts.slice(0, 2), ['10', String(TOTAL - 10)], '翌日: 復習10枚・残りは新しいカード');
+    await setTime(page, '2026-11-06T20:30:00+09:00');
+    eq((await stepsOf(page))[0], ['todo*', '今日 0 / 10枚・復習 10枚'], '翌日: ① は復習10枚から');
     const stats2 = await heroStats(page);
     ok(stats2[0].startsWith('1') && (await page.isVisible('text=今日はまだ学習していません')), '翌日はまだ学習していない表示');
     ok(!(await page.$('.hero-done')), '翌日は目標の達成表示が消える');
@@ -505,22 +563,30 @@ async function noHScroll(page, label) {
 
   await test('場面 → 英語: 単語を隠して場面と穴あき例文を出し、ヒントで最初の文字', async () => {
     const { ctx, page } = await newPage();
-    eq(await page.$$eval('.home .seg button', (els) => els.map((e) => e.textContent + ':' + e.getAttribute('aria-pressed'))), ['英語 → 場面:true', '場面 → 英語:false'], '出題のしかたは切り替えで選ぶ');
+    // ホームでは ② は ① のあと（まだボタンはない）
+    eq((await stepsOf(page))[1][0], 'wait', '② は ① のあと');
+    ok(!(await page.$('.steps [data-mode="rev"]')), '② はまだ押せない');
+    // 回の画面では、出題のしかたを切り替えで選ぶ
+    await page.goto(URL0 + '#round-r1');
+    await page.waitForSelector('.round');
+    eq(await page.$$eval('.round .seg button', (els) => els.map((e) => e.textContent + ':' + e.getAttribute('aria-pressed'))), ['英語 → 場面:true', '場面 → 英語:false'], '出題のしかたは切り替えで選ぶ');
     await page.click('[data-action="set-mode"][data-v="rev"]');
-    ok(await page.$eval('[data-action="start"][data-mode="rev"]', (b) => b.disabled), '最初は押せない（案内だけ）');
+    ok(await page.$eval('.round [data-action="start"][data-mode="rev"]', (b) => b.disabled), '最初は押せない（案内だけ）');
     ok(await page.isVisible('text=「英語 → 場面」で一度学習したカードから出ます'), '案内');
+    await page.reload();
+    await page.waitForSelector('.round [data-action="start"][data-mode="rev"]');
+    ok(true, '選んだ出題のしかたは保存される');
     await page.click('[data-action="set-mode"][data-v="fwd"]');
-    await page.click('[data-action="start"][data-mode="fwd"]');
-    await page.waitForSelector('.card-front');
-    await finishSet(page, 'good');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    await page.click('[data-action="set-mode"][data-v="rev"]');
-    await page.reload();
-    await page.waitForSelector('[data-action="start"][data-mode="rev"]:not([disabled])');
-    ok(true, '選んだ出題のしかたは保存される');
-    await page.click('[data-action="start"][data-mode="rev"]');
+    await page.click('.steps [data-action="start"][data-mode="fwd"]');
+    await page.waitForSelector('.card-front');
+    await finishSet(page, 'good');
+    // 結果画面から、次の手順（② 逆から思い出す）へ
+    ok((await page.textContent('.result .btn.primary')).includes('次は ② 逆から思い出す'), '次の手順の案内: ' + (await page.textContent('.result .btn.primary')));
+    await page.click('.result .btn.primary');
     await page.waitForSelector('.card-front.rev');
+    ok((await page.textContent('.topbar .t-label')).includes('今日の単語'), '② は今日の単語から');
     const sid = await current(page);
     const word = await page.evaluate((id) => JSON.parse(localStorage.getItem('cif.v1.words')).find((w) => w.senses.some((s) => s.id === id)).headword, sid);
     const text = await page.textContent('.card-front.rev');
@@ -600,8 +666,8 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.word-detail');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    const counts = await page.$$eval('.home .counts', (els) => Array.from(els[0].querySelectorAll('b')).map((e) => e.textContent));
-    eq(counts.slice(0, 2), ['0', String(TOTAL + 1)], '追加した borrow は出題、要確認は出題しない');
+    const fresh = await page.evaluate(() => window.CIF.session.counts(JSON.parse(localStorage.getItem('cif.v1.words')), {}, Date.now()).newFwd);
+    eq(fresh, TOTAL + 1, '追加した borrow は出題、要確認は出題しない');
     await page.goto(URL0 + '#words');
     await page.waitForSelector('.word-list');
     await page.selectOption('#status-filter', 'review');
@@ -808,7 +874,7 @@ async function noHScroll(page, label) {
     await ctx.close();
   });
 
-  await test('回のテスト: 採点・間違いの一覧・覚えていないリスト・解き直し・何回目で満点か', async () => {
+  await test('回のテスト: 採点・間違いの一覧・覚えていないリスト・練習・次の日の再テスト・何回目で満点か', async () => {
     const { ctx, page } = await newPage();
     // テストを短くするため、3語だけの回を用意する
     await page.evaluate(() => {
@@ -818,7 +884,7 @@ async function noHScroll(page, label) {
     });
     await page.reload();
     await page.waitForSelector('.home');
-    ok((await page.textContent('.home .list')).includes('第1回'), 'ホームに第1回');
+    ok((await page.textContent('.home')).includes('第1回'), 'ホームに第1回');
     await page.goto(URL0 + '#round-r-mini');
     await page.waitForSelector('.round');
     ok((await page.textContent('.round')).includes('内容理解（4択）3問と、文章作成（並べ替え）3問'));
@@ -885,25 +951,34 @@ async function noHScroll(page, label) {
     eq((await page.$$('.wrong-list li')).length, 2, '間違えた問題が2つ並ぶ');
     ok((await page.textContent('.wrong-list')).includes('あなたの答え'));
 
-    // 覚えていないリストに2件、カード学習は間違えた単語だけ
+    ok((await page.textContent('.score-hero')).includes('明日 20:00 に再テスト（必須）'), '再テストの案内');
+
+    // 覚えていないリストに2件。再テストは次の日の 20:00（必須）
     await page.goto(URL0 + '#misses');
     await page.waitForSelector('.misses');
     eq((await page.$$('.miss-list li')).length, 2);
     ok((await page.textContent('.miss-list')).includes('小テスト回'));
-    await page.click('[data-action="review-test"]');
+    ok((await page.textContent('.miss-list')).includes('再テスト：明日 20:00'), '再テストの予定: ' + (await page.textContent('.miss-list')));
+    // 練習はいつでも解けるが、克服にはならない（その日のうちの正解では克服にしない）
+    await page.click('[data-action="practice-misses"]');
     await page.waitForSelector('.qcard');
-    for (let k = 0; k < 2; k++) {
-      const q = await cur();
-      if (q.part === 'understand') await answerMcq(true);
-      else {
-        const intro = await page.$('[data-action="test-part-go"]');
-        if (intro) await intro.click();
-        await answerOrder(true);
-      }
-    }
-    await page.waitForSelector('.score-hero');
+    ok((await page.textContent('.topbar .t-label')).includes('間違えた問題の練習'));
+    eq((await runTest(page, () => false)).length, 2, '練習は間違えた2問');
     eq(await page.textContent('.score-num b'), '100');
-    ok((await page.textContent('.score-hero')).includes('克服'));
+    ok((await page.textContent('.score-hero')).includes('全問正解'));
+    await page.goto(URL0 + '#misses');
+    await page.waitForSelector('.misses');
+    eq((await page.$$('.miss-list li')).length, 2, '練習では克服にならない');
+    // 次の日の 20:30：再テスト（必須）。同じ2問を、間違えたときと同じ形式で
+    const before2 = Object.values((await ls(page, 'tests')).misses).map((e) => e.last.qtype).sort();
+    await setTime(page, '2026-11-06T20:30:00+09:00');
+    ok((await page.textContent('.tests-list')).includes('必須'), '再テストは必須');
+    await page.click('.tests-list [data-kind="retest"]');
+    await page.waitForSelector('.qcard');
+    const re = await runTest(page, () => false);
+    eq(re.map((q) => q.qtype).sort(), before2, '再テストは間違えたときと同じ形式');
+    eq(await page.textContent('.score-num b'), '100');
+    ok((await page.textContent('.score-hero')).includes('再テストは、これで終わりです'));
     await page.goto(URL0 + '#misses');
     await page.waitForSelector('.misses');
     eq((await page.$$('.miss-list li')).length, 0, 'まだ覚えていない問題は0件');
@@ -962,11 +1037,19 @@ async function noHScroll(page, label) {
     await page.click('[data-action="rate"][data-r="good"]');
     await finishSet(page, 'good');
     await noHScroll(page, '結果');
-    for (const h of ['words', 'word-w-light', 'edit-w-light', 'options', 'round-r1', 'misses']) {
+    for (const h of ['words', 'word-w-light', 'edit-w-light', 'options', 'round-r1', 'misses', 'check', 'title', 'home']) {
       await page.goto(URL0 + '#' + h);
       await page.waitForTimeout(150);
       await noHScroll(page, h);
     }
+    // テストの画面（4択・並べ替え・つづり・聞き取り）と結果
+    await page.click('.tests-list [data-kind="daily"]');
+    await page.waitForSelector('.qcard');
+    await runTest(page, (q, i) => i % 2 === 0, async (q) => noHScroll(page, 'テスト ' + q.qtype));
+    await noHScroll(page, 'テストの結果');
+    await page.goto(URL0 + '#check');
+    await page.waitForSelector('.check-list');
+    await noHScroll(page, 'ミスの確認');
     eq(page.errors, []);
     await ctx.close();
   });
@@ -1068,6 +1151,245 @@ async function noHScroll(page, label) {
     eq(man.display, 'standalone');
     ok(man.icons.some((i) => i.sizes === '192x192') && man.icons.some((i) => i.sizes === '512x512'), 'アプリのアイコン');
     ok(man.start_url && man.name && man.short_name, 'アプリの名前と開くページ');
+    await ctx.close();
+  });
+
+  await test('タイトル「暗記CARD」→ タップで、セクションごとのホーム（今日の学習の順番・テスト・回・復習）', async () => {
+    const { ctx, page } = await newPage({ time: '2026-11-05T15:10:00+09:00' });
+    // もう一度開き直して、タイトルを確かめる
+    await page.goto(URL0 + '#title');
+    await page.waitForSelector('.title-screen');
+    ok((await page.textContent('.wordmark')).replace(/\s/g, '') === '暗記CARD', 'タイトル: ' + (await page.textContent('.wordmark')));
+    ok((await page.textContent('.title-status')).includes('今日のテスト 20:00〜'));
+    ok((await page.textContent('.title-tap')).includes('タップ'));
+    ok(!(await page.$('.bottom-nav')), 'タイトルにはメニューを出さない');
+    eq(await page.title(), '暗記CARD');
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('.home');
+    ok((await page.textContent('.home-head .brand')).replace(/\s/g, '') === '暗記CARD');
+    eq(await page.$$eval('.home .section-title', (els) => els.map((e) => e.firstChild.textContent)), ['今日の学習', 'テスト', '回', '復習'], 'セクション');
+    eq(await page.$$eval('.steps .step-title', (els) => els.map((e) => e.firstChild.textContent)), ['単語を覚える', '逆から思い出す', 'ミスを確認', '間違えた問題を解く', 'テスト'], '5つの手順の順番');
+    const st = await stepsOf(page);
+    eq(st.map((x) => x[0]), ['todo*', 'wait', 'wait', 'wait', 'locked'], 'はじめは ① から');
+    eq(await page.$$eval('.steps .btn.primary', (els) => els.length), 1, '青いボタンは、いまの手順だけ');
+    ok((await page.textContent('.steps .is-current .btn.primary')).includes('単語を覚える'));
+    ok(st[4][1].startsWith('あと 4時間50分'), '⑤ は 20:00 まであと何分か: ' + st[4][1]);
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('毎日の順番：①覚える→②逆から→③ミスを確認→④間違えた問題を解く→⑤20:00のテスト。次の日に再テスト（必須）、満点まで毎日', async () => {
+    const { ctx, page } = await newPage({ time: '2026-11-05T15:10:00+09:00' });
+    // ① 10枚（2枚目は思い出せなかった）
+    await page.click('.steps .step-go');
+    await page.waitForSelector('.card-front');
+    await flipAndRate(page, 'good');
+    await flipAndRate(page, 'again');
+    await finishSet(page, 'good');
+    await page.click('.result .btn.primary');
+    // ② 場面→英語（今日の10枚）
+    await page.waitForSelector('.card-front.rev');
+    eq(Number(await remainText(page)), 10, '② は今日覚えた10枚');
+    await finishSet(page, 'good');
+    await page.click('[data-action="home"]');
+    await page.waitForSelector('.home');
+    let st = await stepsOf(page);
+    eq(st.map((x) => x[0]), ['done', 'done', 'todo*', 'todo', 'locked'], '①② のあとは ③: ' + JSON.stringify(st));
+    ok(st[2][1].includes('今日のカード 1枚'));
+    // ③ ミスを確認：思い出せなかった単語と、正しい使い方・音声
+    await page.click('.steps .step-go');
+    await page.waitForSelector('.check');
+    eq((await page.$$('.check-list li')).length, 1);
+    ok((await page.textContent('.check-list')).includes('思い出せなかった'));
+    ok(await page.$('.check-list .audio button[data-kind="pack"]'), '単語の音声');
+    // ④ 間違えた問題を解く（練習）
+    await page.click('.check .btn.primary');
+    await page.waitForSelector('.qcard');
+    eq((await runTest(page, () => false)).length, 1);
+    ok((await page.textContent('.page-head h1')).includes('練習の結果'));
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    st = await stepsOf(page);
+    eq(st.map((x) => x[0]), ['done', 'done', 'done', 'done', 'locked*'], '⑤ は 20:00 から: ' + JSON.stringify(st));
+    ok(!(await page.$('.tests-list [data-action="start-kind"]')), '20:00 前はテストを始められない');
+    ok((await page.textContent('.steps .is-current')).includes('20:00 になったら'), '⑤ の案内');
+    // 20:00 になると受けられる（開いたままでも、時間になったら知らせる）
+    await page.clock.setSystemTime(new Date('2026-11-05T19:59:50+09:00'));
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+    await page.reload();
+    await page.waitForSelector('.home');
+    await page.clock.runFor(15000);
+    await page.waitForFunction(() => document.getElementById('toast').textContent.includes('テストの時間です'), null, { timeout: 5000 });
+    await page.waitForSelector('.steps .is-current [data-kind="daily"]');
+    // ⑤ 今日のテスト：今日の10語。3問まちがえる
+    await page.click('.steps .is-current [data-kind="daily"]');
+    await page.waitForSelector('.qcard');
+    const daily = await runTest(page, (q, i) => i < 3);
+    eq(new Set(daily.map((q) => q.senseId)).size, 10, '今日学習した10語から');
+    ok((await page.textContent('.score-hero')).includes('明日 20:00 に再テスト（必須）'));
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    st = await stepsOf(page);
+    eq(st.map((x) => x[0]), ['done', 'done', 'done', 'done', 'done'], '今日はすべて完了');
+    ok(st[4][1].includes('明日 20:00 に再テスト 3問（必須）'), st[4][1]);
+    ok(await page.isVisible('text=今日の学習はすべて終わりました'));
+    // 次の日：タイトルに再テスト。20:00 前は受けられない
+    await setTime(page, '2026-11-06T12:00:00+09:00', '');
+    await page.waitForSelector('.title-screen');
+    ok((await page.textContent('.title-status')).includes('再テスト 3問'), 'タイトルで再テストを知らせる');
+    await page.click('.title-screen');
+    await page.waitForSelector('.home');
+    ok((await stepsOf(page))[4][1].includes('再テスト 3問（必須）'));
+    ok(!(await page.$('.tests-list [data-kind="retest"]')), '20:00 前は再テストを始められない');
+    // 20:30：再テスト（必須）。また1問まちがえる → その次の日も
+    await setTime(page, '2026-11-06T20:30:00+09:00');
+    await page.click('.tests-list [data-kind="retest"]');
+    await page.waitForSelector('.qcard');
+    const re1 = await runTest(page, (q, i) => i === 0);
+    eq(re1.length, 3, '再テストは間違えた3問');
+    ok((await page.textContent('.score-hero')).includes('満点になるまで毎日続きます'));
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    ok((await page.textContent('.tests-list')).includes('次は明日 20:00・1問'), '残り1問は次の日');
+    await setTime(page, '2026-11-07T20:30:00+09:00');
+    await page.click('.tests-list [data-kind="retest"]');
+    await page.waitForSelector('.qcard');
+    const re2 = await runTest(page, () => false);
+    eq(re2.length, 1);
+    eq(await page.textContent('.score-num b'), '100');
+    ok((await page.textContent('.score-hero')).includes('再テストは、これで終わりです'));
+    eq(Object.values((await ls(page, 'tests')).misses).filter((e) => !e.solvedAt).length, 0, '満点で、すべて克服');
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('テスト：選択肢をタップした瞬間に、その選択肢の単語の音が鳴る（意味の選択肢は、その意味の英単語）', async () => {
+    const { ctx, page } = await newPage();
+    await page.evaluate(() => {
+      const rounds = JSON.parse(localStorage.getItem('cif.v1.rounds'));
+      rounds.push({ id: 'r-mini', no: 9, title: '小テスト回', source: 'E2E', addedAt: '', wordIds: ['w-begin', 'w-sad', 'w-tooth', 'w-pretty', 'w-light'] });
+      localStorage.setItem('cif.v1.rounds', JSON.stringify(rounds));
+    });
+    await page.reload();
+    await page.goto(URL0 + '#round-r-mini');
+    await page.waitForSelector('[data-action="start-test"]');
+    await page.click('[data-action="start-test"]');
+    await page.waitForSelector('.qcard');
+    let n = 0;
+    let types = new Set();
+    for (let k = 0; k < 12; k++) {
+      const q = await curQ(page);
+      if (!q || q.part !== 'understand') break;
+      const wrong = k % 3 === 1;
+      const i = wrong ? (q.answer + 1) % 4 : q.answer;
+      const before = (await clips(page)).length;
+      await page.click('[data-action="choose"][data-i="' + i + '"]');
+      await waitClips(page, before + 1);
+      const played = (await clips(page))[before];
+      await sameClip(page, played, '#' + q.choiceIds[i]);
+      const head = await page.evaluate((sid) => JSON.parse(localStorage.getItem('cif.v1.words')).find((w) => w.senses.some((s) => s.id === sid)).headword, q.choiceIds[i]);
+      eq((await packOf(page, '#' + q.choiceIds[i]))[4], head, '選んだ選択肢の単語の音');
+      types.add(q.qtype);
+      n += 1;
+      if (wrong) {
+        // 答えたあとも、選択肢をタップすると その単語が鳴る。意味の選択肢には英単語も出る
+        const j = (i + 1) % 4;
+        const b2 = (await clips(page)).length;
+        await page.click('[data-action="choice-say"][data-i="' + j + '"]');
+        await waitClips(page, b2 + 1);
+        await sameClip(page, (await clips(page))[b2], '#' + q.choiceIds[j]);
+        if (q.qtype === 'meaning') eq(await page.$$eval('.choice .ch-en', (els) => els.length), 4, '意味の選択肢に英単語');
+        await page.click('[data-action="test-next"]');
+      } else {
+        // 正解は、単語の音が鳴り終わってから自動で次へ
+        await page.waitForFunction((id) => {
+          const t = JSON.parse(localStorage.getItem('cif.v1.tests'));
+          return t.current.questions[t.current.index].id !== id && !document.querySelector('.feedback');
+        }, q.id, { timeout: 8000 });
+      }
+    }
+    ok(n >= 6, '4択を ' + n + '問');
+    ok(types.has('meaning') && (types.has('scene') || types.has('cloze')), '意味の選択肢と英単語の選択肢: ' + Array.from(types).join(','));
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('まとめテスト（5日ごと・応用の形式）と、月のまとめテスト（毎月1日・先月の分）', async () => {
+    const { ctx, page } = await newPage({ time: '2026-11-05T15:10:00+09:00' });
+    eq((await ls(page, 'meta')).startDay, '2026-11-05', '使いはじめた日');
+    await page.click('.steps .step-go');
+    await page.waitForSelector('.card-front');
+    await finishSet(page, 'good');
+    // 4日目の夜：まだ。5日目（11/9）の 20:00 から
+    await setTime(page, '2026-11-08T21:00:00+09:00');
+    ok((await page.textContent('.tests-list')).includes('次は 11月9日（月） 20:00'), await page.textContent('.tests-list'));
+    ok(!(await page.$('.tests-list [data-kind="summary"]')));
+    await setTime(page, '2026-11-09T19:59:00+09:00');
+    ok(!(await page.$('.tests-list [data-kind="summary"]')), '5日目でも 20:00 前はまだ');
+    await setTime(page, '2026-11-09T20:00:00+09:00');
+    ok((await page.textContent('.tests-list [data-kind="summary"]')).includes('11/5〜11/9 に学習した 10語・20問'), await page.textContent('.tests-list'));
+    await page.click('.tests-list [data-kind="summary"]');
+    await page.waitForSelector('.qcard');
+    const sm = await runTest(page, () => false);
+    eq(sm.length, 20, '10語 × 2問');
+    const kinds = new Set(sm.map((q) => q.qtype));
+    ok(['listen', 'context', 'spell', 'order'].filter((k) => kinds.has(k)).length >= 3, '応用の形式: ' + Array.from(kinds).join(','));
+    ok(!kinds.has('meaning'), 'ふだんのテストとは違う形式');
+    const per = {};
+    sm.forEach((q) => { per[q.senseId] = (per[q.senseId] || []).concat(q.part); });
+    ok(Object.values(per).every((parts) => parts.length === 2 && parts.includes('understand') && parts.includes('compose')), '1語から「わかる」と「書ける」を1問ずつ');
+    eq(await page.textContent('.score-num b'), '100');
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    ok((await page.textContent('.tests-list')).includes('第1回を受けました（100点）・次は 11月14日（土）'), await page.textContent('.tests-list'));
+    // 月のまとめ：12/1 の 20:00 から、11月に学習した単語
+    await setTime(page, '2026-12-01T19:30:00+09:00');
+    ok((await page.textContent('.tests-list')).includes('次は 12月1日（火） 20:00・11月に学習した単語'), await page.textContent('.tests-list'));
+    await setTime(page, '2026-12-01T20:05:00+09:00');
+    ok((await page.textContent('.tests-list [data-kind="monthly"]')).includes('11月に学習した 10語・30問'));
+    await page.click('.tests-list [data-kind="monthly"]');
+    await page.waitForSelector('.qcard');
+    ok((await page.textContent('.topbar .t-label')).includes('11月のまとめテスト'));
+    const mo = await runTest(page, (q, i) => i === 0);
+    eq(mo.length, 30, '10語 × 3問');
+    eq(new Set(mo.map((q) => q.id)).size, 30, '同じ問題はない');
+    ok((await page.textContent('.score-hero')).includes('明日 20:00 に再テスト（必須）'));
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    ok((await page.textContent('.tests-list')).includes('11月の分を受けました'), '月のまとめは1回');
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('テストの時間と通知：時間を変えられ、カレンダー（.ics）に毎日・5日ごと・毎月1日の通知を入れられる', async () => {
+    const { ctx, page } = await newPage({ time: '2026-11-05T20:40:00+09:00' });
+    await page.click('.tests-list [data-action="goto-notify"]');
+    await page.waitForSelector('#notify');
+    eq(await page.inputValue('#test-time'), '20:00', 'はじめは 20:00');
+    await page.selectOption('#test-time', '21:00');
+    await page.waitForFunction(() => document.getElementById('notify').textContent.includes('21:00 から朝4:00まで'));
+    eq((await ls(page, 'settings')).testTime, '21:00');
+    const dl = page.waitForEvent('download');
+    await page.click('[data-action="add-calendar"]');
+    const file = await dl;
+    ok(/\.ics$/.test(file.suggestedFilename()), file.suggestedFilename());
+    const text = require('fs').readFileSync(await file.path(), 'utf8');
+    eq((text.match(/BEGIN:VEVENT/g) || []).length, 3, '3つの予定');
+    ok(text.includes('RRULE:FREQ=DAILY\r\n') && text.includes('RRULE:FREQ=DAILY;INTERVAL=5') && text.includes('RRULE:FREQ=MONTHLY;BYMONTHDAY=1'), '毎日・5日ごと・毎月1日');
+    eq((text.match(/DTSTART:\d{8}T210000\r\n/g) || []).length, 3, 'どれも 21:00');
+    eq((text.match(/BEGIN:VALARM\r\nACTION:DISPLAY\r\nTRIGGER:PT0M/g) || []).length, 3, 'その時刻に通知');
+    ok(text.includes('DTSTART:20261109T210000'), '次のまとめテストの日（11/9）から');
+    const links = await page.$$eval('#notify a[href*="calendar.google.com"]', (els) => els.map((a) => decodeURIComponent(a.href)));
+    eq(links.length, 3);
+    ok(links[0].includes('RRULE:FREQ=DAILY') && links[0].includes('T210000'), links[0]);
+    // 21:00 前はテストを受けられない
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    ok((await page.textContent('.tests-list')).includes('テストは 21:00 から'));
+    await page.goto(URL0 + '#round-r1');
+    await page.waitForSelector('.round');
+    ok(await page.$eval('.round .btn.primary[disabled]', (b) => b.textContent.includes('21:00 から受けられます')), '回のテストも 21:00 から');
+    eq(page.errors, []);
     await ctx.close();
   });
 

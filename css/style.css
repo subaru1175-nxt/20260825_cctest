@@ -1,27 +1,27 @@
 /*
- * コアイメージ単語帳 — スタイル
- * テーマ：グラファイト（グレー）× メタリックブルー
- *   地はやわらかいグレー、面は少し明るいグレー、大事なところだけメタリックブルーの光沢。
+ * 暗記CARD — スタイル
+ * テーマ：ライトグレー × メタリックブルー（暗い画面の設定ではグラファイト）
+ *   地は明るいライトグレー、面はさらに明るいグレー、大事なところだけメタリックブルーの光沢。
  * 部品は少なく、どの画面でも同じ形：
  *   青い光沢のボタン（メイン）／縁が青い光沢のボタン（サブ）／一覧の行（›）／切り替え／音声［再生｜ゆっくり］
  */
 :root {
-  --page: #c9cdd3;
-  --page-grad: radial-gradient(140% 520px at 50% -140px, #d5d8dd 0%, rgba(213, 216, 221, 0) 100%);
-  --surface: #dfe2e6;
-  --surface-2: #d5d9de;
-  --surface-3: #c8cdd3;
-  --card-top: #e8eaed;
-  --glass: rgba(201, 205, 211, 0.86);
-  --line: rgba(20, 26, 34, 0.11);
-  --line-2: rgba(20, 26, 34, 0.19);
-  --ink: #14181d;
-  --ink-2: #3a414a;
-  --ink-3: #5c636d;
-  --on-page: #454c55;
+  --page: #e8eaee;
+  --page-grad: radial-gradient(140% 520px at 50% -140px, #f5f6f8 0%, rgba(245, 246, 248, 0) 100%);
+  --surface: #f6f7f9;
+  --surface-2: #eef0f3;
+  --surface-3: #e0e3e8;
+  --card-top: #fcfcfd;
+  --glass: rgba(232, 234, 238, 0.86);
+  --line: rgba(20, 26, 34, 0.09);
+  --line-2: rgba(20, 26, 34, 0.17);
+  --ink: #15191e;
+  --ink-2: #3c434c;
+  --ink-3: #626b75;
+  --on-page: #525a64;
   --accent: #2c5784;
   --accent-2: #7f9fc2;
-  --accent-soft: #cbd7e4;
+  --accent-soft: #d8e3ef;
   --accent-ink: #ffffff;
   --metal: linear-gradient(135deg, #9fbddd 0%, #5b88b6 20%, #335f8b 46%, #284f7a 56%, #557fae 76%, #a2bfdd 100%);
   --metal-line: linear-gradient(135deg, #cddcec 0%, #7aa1c9 28%, #3a6794 52%, #6d97c3 76%, #c4d6ea 100%);
@@ -30,22 +30,32 @@
   --on-graphite: #f1f3f6;
   --on-graphite-2: #a5adb7;
   --ng: #ad4741;
-  --ng-soft: #f5e8e7;
+  --ng-soft: #f8ebea;
   --warn: #87682c;
-  --warn-soft: #f3ede1;
-  --hl: #c4d3e4;
-  --lv1: #b2c3d8;
+  --warn-soft: #f6f0e3;
+  --hl: #d3dfec;
+  --lv1: #b9c9dc;
   --lv2: #7493bb;
   --lv3: #2c5784;
-  --sky: #c7d3e0;
+  --sky: #d5dfea;
   --night: #2c3440;
   --moon: #e6dfc4;
-  --paper-2: #d2d6db;
-  --sheen: rgba(255, 255, 255, 0.32);
-  --hi: inset 0 1px 0 rgba(255, 255, 255, 0.42);
-  --shadow-1: 0 1px 1px rgba(16, 22, 30, 0.06), 0 3px 10px -2px rgba(16, 22, 30, 0.11);
-  --shadow-2: 0 2px 4px rgba(16, 22, 30, 0.08), 0 16px 36px -12px rgba(16, 22, 30, 0.3);
-  --shadow-blue: 0 10px 24px -10px rgba(40, 79, 122, 0.55);
+  --paper-2: #e3e6ea;
+  --sheen: rgba(255, 255, 255, 0.6);
+  --hi: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --shadow-1: 0 1px 1px rgba(16, 22, 30, 0.04), 0 3px 10px -2px rgba(16, 22, 30, 0.08);
+  --shadow-2: 0 2px 4px rgba(16, 22, 30, 0.05), 0 16px 36px -12px rgba(16, 22, 30, 0.22);
+  --shadow-blue: 0 10px 24px -10px rgba(40, 79, 122, 0.5);
+  --hero-bg: linear-gradient(155deg, #ffffff 0%, #f1f3f6 46%, #e2e6eb 100%);
+  --hero-ink: #15191e;
+  --hero-ink-2: #5c656f;
+  --ring-track: rgba(20, 26, 34, 0.08);
+  --ring-1: #a9c5e2;
+  --ring-2: #5b88b6;
+  --ring-3: #2f5b88;
+  --ring-4: #8fb0d3;
+  --hero-glow: rgba(122, 161, 201, 0.22);
+  --title-glow: #ffffff;
   --font-ui: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
   --font-en: "Source Serif 4", "Source Serif Pro", "Iowan Old Style", Georgia, serif;
   --font-ipa: "Noto Sans", "Lucida Sans Unicode", "Segoe UI", "Arial Unicode MS", sans-serif;
@@ -95,6 +105,16 @@
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-2: 0 18px 40px -16px rgba(0, 0, 0, 0.7);
     --shadow-blue: 0 10px 24px -12px rgba(0, 0, 0, 0.7);
+    --hero-bg: var(--graphite);
+    --hero-ink: #f1f3f6;
+    --hero-ink-2: #a5adb7;
+    --ring-track: rgba(255, 255, 255, 0.1);
+    --ring-1: #e3eef9;
+    --ring-2: #8fb6dd;
+    --ring-3: #4f7fae;
+    --ring-4: #c3d8ee;
+    --hero-glow: rgba(143, 182, 221, 0.26);
+    --title-glow: rgba(70, 78, 90, 0.55);
     color-scheme: dark;
   }
 }
@@ -138,6 +158,16 @@
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-2: 0 18px 40px -16px rgba(0, 0, 0, 0.7);
   --shadow-blue: 0 10px 24px -12px rgba(0, 0, 0, 0.7);
+  --hero-bg: var(--graphite);
+  --hero-ink: #f1f3f6;
+  --hero-ink-2: #a5adb7;
+  --ring-track: rgba(255, 255, 255, 0.1);
+  --ring-1: #e3eef9;
+  --ring-2: #8fb6dd;
+  --ring-3: #4f7fae;
+  --ring-4: #c3d8ee;
+  --hero-glow: rgba(143, 182, 221, 0.26);
+  --title-glow: rgba(70, 78, 90, 0.55);
   color-scheme: dark;
 }
 
@@ -414,31 +444,35 @@ details.plain > summary::-webkit-details-marker { display: none; }
   position: relative; overflow: hidden;
   display: grid; grid-template-columns: 122px 1fr; gap: 20px; align-items: center;
   padding: 22px 22px 22px 20px; border-radius: 26px;
-  background: var(--graphite); color: var(--on-graphite);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--shadow-2);
+  background: var(--hero-bg); color: var(--hero-ink);
+  box-shadow: var(--hi), var(--shadow-2);
 }
 .hero::before {
   content: ""; position: absolute; inset: -60% -35% auto auto; width: 80%; height: 170%;
-  background: radial-gradient(closest-side, rgba(143, 182, 221, 0.26), rgba(143, 182, 221, 0));
+  background: radial-gradient(closest-side, var(--hero-glow), rgba(143, 182, 221, 0));
   pointer-events: none;
 }
 .hero::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: var(--metal-soft); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0.55; pointer-events: none; }
 .hero-ring { position: relative; width: 122px; height: 122px; }
 .hero-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
-.ring-track { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 9; }
+.ring-track { fill: none; stroke: var(--ring-track); stroke-width: 9; }
+.ring-s1 { stop-color: var(--ring-1); }
+.ring-s2 { stop-color: var(--ring-2); }
+.ring-s3 { stop-color: var(--ring-3); }
+.ring-s4 { stop-color: var(--ring-4); }
 .ring-fill { fill: none; stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset 0.7s ease; }
 .ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
 .ring-text b { font-size: 2.2rem; font-weight: 600; letter-spacing: -0.02em; }
-.ring-text span { font-size: 0.74rem; color: var(--on-graphite-2); margin-top: 6px; letter-spacing: 0.06em; }
+.ring-text span { font-size: 0.74rem; color: var(--hero-ink-2); margin-top: 6px; letter-spacing: 0.06em; }
 .hero-side { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.hero-label { font-size: 0.74rem; letter-spacing: 0.16em; color: var(--on-graphite-2); display: flex; align-items: center; gap: 8px; }
+.hero-label { font-size: 0.74rem; letter-spacing: 0.16em; color: var(--hero-ink-2); display: flex; align-items: center; gap: 8px; }
 .hero-done { padding: 1px 9px; border-radius: 999px; background: var(--metal); color: #0b131c; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; }
 .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .hero-stats div { display: flex; flex-direction: column; gap: 2px; }
-.hero-stats dt { font-size: 0.7rem; color: var(--on-graphite-2); letter-spacing: 0.06em; }
+.hero-stats dt { font-size: 0.7rem; color: var(--hero-ink-2); letter-spacing: 0.06em; }
 .hero-stats dd { font-size: 1.6rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
-.hero-stats dd small { font-size: 0.8rem; color: var(--on-graphite-2); margin-left: 2px; font-weight: 500; }
-.hero-note { font-size: 0.72rem; color: var(--on-graphite-2); letter-spacing: 0.04em; }
+.hero-stats dd small { font-size: 0.8rem; color: var(--hero-ink-2); margin-left: 2px; font-weight: 500; }
+.hero-note { font-size: 0.72rem; color: var(--hero-ink-2); letter-spacing: 0.04em; }
 
 /* ---------- 下のメニュー（浮いたバー） ---------- */
 .bottom-nav {
@@ -840,3 +874,109 @@ body[data-route="study"] #toast, body[data-route="test"] #toast { bottom: calc(1
   .done-mark path { stroke-dashoffset: 0; }
   .audio.run button.playing::after { opacity: 0.85; transform: scaleX(1); }
 }
+
+/* ---------- タイトル ---------- */
+body[data-route="title"] { background-image: radial-gradient(120% 70% at 50% 0%, var(--title-glow) 0%, transparent 70%), var(--page-grad); }
+.title-screen {
+  min-height: 100vh; min-height: 100dvh; max-width: none;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) 24px calc(30px + env(safe-area-inset-bottom, 0px));
+  align-items: center; justify-content: center; gap: 0; text-align: center; cursor: pointer;
+  -webkit-user-select: none; user-select: none; outline: none;
+}
+.title-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.title-cards { position: relative; width: 128px; height: 88px; margin-bottom: 26px; }
+.title-cards span {
+  position: absolute; inset: 0; border-radius: 16px; border: 1.5px solid transparent;
+  background: linear-gradient(180deg, var(--card-top), var(--surface)) padding-box, var(--metal-line) border-box;
+  box-shadow: var(--shadow-2);
+}
+.title-cards span:nth-child(1) { transform: rotate(-10deg) translate(-16px, 6px); opacity: 0.55; }
+.title-cards span:nth-child(2) { transform: rotate(7deg) translate(14px, 2px); opacity: 0.8; }
+.title-cards span:nth-child(3)::before { content: ""; position: absolute; left: 18px; top: 22px; width: 54px; height: 9px; border-radius: 5px; background: var(--metal); }
+.title-cards span:nth-child(3)::after { content: ""; position: absolute; left: 18px; top: 44px; width: 86px; height: 6px; border-radius: 3px; background: var(--line-2); box-shadow: 0 13px 0 var(--line); }
+.title-date { font-size: 0.78rem; color: var(--on-page); letter-spacing: 0.14em; }
+.wordmark, .brand { display: flex; align-items: baseline; justify-content: center; gap: 0.08em; line-height: 1; font-weight: 800; }
+.wordmark { font-size: clamp(3rem, 16vw, 4.4rem); letter-spacing: 0.02em; }
+.wm-ja { color: var(--ink); }
+.wm-en {
+  font-family: var(--font-ui); font-weight: 800; letter-spacing: 0.06em;
+  background: var(--metal); background-size: 160% 160%; background-position: 30% 40%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.title-tag { font-size: 0.84rem; color: var(--on-page); letter-spacing: 0.2em; margin-top: 4px; }
+.title-status { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 18px; max-width: 340px; }
+.title-status span { padding: 5px 13px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--hi), var(--shadow-1); font-size: 0.76rem; color: var(--ink-2); letter-spacing: 0.04em; }
+.title-tap { font-size: 0.8rem; font-weight: 600; color: var(--accent); letter-spacing: 0.16em; }
+.title-tap span { display: inline-block; padding: 10px 22px; border-radius: 999px; border: 1px solid transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--metal-line) border-box; box-shadow: var(--shadow-1); animation: tap-pulse 2.4s ease-in-out infinite; }
+@keyframes tap-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* ホームの見出し（小さいロゴ） */
+.home-head .brand { justify-content: flex-start; font-size: 1.75rem; letter-spacing: 0.02em; }
+
+/* ---------- 今日の学習（5つの手順） ---------- */
+.steps { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--hi), var(--shadow-1); overflow: hidden; }
+.step { position: relative; }
+.step + .step::before { content: ""; position: absolute; top: 0; left: 64px; right: 0; height: 1px; background: var(--line); z-index: 1; }
+.step-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 66px; padding: 13px 16px 13px 18px; background: transparent; border: 0; text-align: left; color: inherit; font: inherit; }
+button.step-row { cursor: pointer; touch-action: manipulation; }
+button.step-row:active { background: var(--surface-2); }
+.step-row > .ic { color: var(--ink-3); opacity: 0.55; width: 17px; height: 17px; flex: none; }
+.step-no {
+  width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: 0.88rem; font-variant-numeric: tabular-nums; color: var(--ink-3);
+  background: var(--surface); border: 1.5px solid var(--line-2);
+}
+.step-no .ic { width: 16px; height: 16px; stroke-width: 2.4; }
+.st-done .step-no { color: var(--accent); border-color: transparent; background: linear-gradient(var(--accent-soft), var(--accent-soft)) padding-box, var(--metal-line) border-box; }
+.step.is-current { background: linear-gradient(100deg, var(--accent-soft) 0%, transparent 75%); }
+.step.is-current::after { content: ""; position: absolute; left: 0; top: 16px; height: 34px; width: 3px; border-radius: 0 3px 3px 0; background: var(--metal); }
+.step.is-current .step-no { color: var(--accent-ink); border-color: transparent; background: var(--metal); box-shadow: var(--shadow-blue); }
+.step-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.step-title { font-size: 1rem; font-weight: 600; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-feature-settings: "palt" 1; }
+.step-mode { font-size: 0.74rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.04em; }
+.step-sub { font-size: 0.79rem; color: var(--ink-3); line-height: 1.55; }
+.st-wait .step-title, .st-none .step-title { color: var(--ink-2); font-weight: 500; }
+.step-tag { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; background: var(--surface-3); color: var(--ink-2); white-space: nowrap; }
+.step-tag .ic { width: 13px; height: 13px; }
+.step-tag.ok { background: var(--accent-soft); color: var(--accent); }
+.btn.step-go { margin: 0 16px 16px 64px; width: calc(100% - 80px); }
+.step-wait { margin: -2px 16px 16px 64px; display: flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 600; color: var(--accent); }
+.step-wait .ic { width: 16px; height: 16px; }
+.steps-done { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 0.84rem; font-weight: 600; color: var(--accent); padding: 2px 6px; }
+
+/* ---------- テスト（ホーム） ---------- */
+.test-window > .ic { width: 22px; height: 22px; color: var(--ink-3); opacity: 1; }
+.test-window .r-title { font-weight: 600; }
+.test-window.is-open > .ic, .test-window.is-open .r-title { color: var(--accent); }
+.row.dim .r-title { color: var(--ink-2); font-weight: 500; }
+.badge.must { background: var(--ng-soft); color: var(--ng); }
+.next-note { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 0.88rem; font-weight: 600; color: var(--accent); }
+.miss-due { color: var(--accent); font-weight: 600; }
+.sched-list li { font-size: 0.82rem; }
+
+/* ---------- ③ ミスを確認 ---------- */
+.check-list li { display: flex; flex-direction: column; gap: 7px; padding: 16px 18px; position: relative; }
+.check-list li + li::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; height: 1px; background: var(--line); }
+.ci-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ci-word b { font-family: var(--font-en); font-size: 1.4rem; font-weight: 600; color: var(--ink); }
+.ci-meaning { font-weight: 600; line-height: 1.6; }
+.ci-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 0.75rem; color: var(--ink-3); }
+.ci-ans { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-size: 0.88rem; }
+.ci-ans span:lang(en) { font-size: 1.02rem; }
+.ci-ans.ng span:last-child { color: var(--ng); }
+.ci-nuance { font-size: 0.86rem; color: var(--ink-2); }
+.check-item .ex-en { font-size: 1.04rem; }
+.check-item .ex-ja { font-size: 0.8rem; }
+
+/* ---------- テストの新しい形式 ---------- */
+.ch-en { display: block; font-family: var(--font-en); font-size: 0.9rem; color: var(--ink-3); margin-top: 1px; }
+.ch-ic.say { color: var(--ink-3); opacity: 0.7; width: 18px; height: 18px; }
+.choices.long .ch-text { font-size: 0.95rem; line-height: 1.6; }
+.listen-box { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6px 0 2px; }
+.listen-ic { width: 44px; height: 44px; color: var(--accent); stroke-width: 1.4; }
+.listen-text { font-size: 1.16rem; }
+.spell-meaning { font-size: 1.22rem; font-weight: 700; line-height: 1.6; }
+.q-count { margin-left: 8px; font-size: 0.78rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.04em; }
+.tile.letter { min-width: 44px; justify-content: center; padding: 6px 10px; font-size: 1.32rem; }
+.spell-answer { justify-content: center; gap: 5px; }
+.fb-spell { font-family: var(--font-en); font-size: 1.7rem; font-weight: 600; letter-spacing: 0.02em; }

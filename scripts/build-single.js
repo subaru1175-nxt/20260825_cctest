@@ -41,8 +41,8 @@ function standalone() {
     '<head>',
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
-    '<title>コアイメージ単語帳</title>',
-    '<meta name="theme-color" content="#c9cdd3">',
+    '<title>暗記CARD</title>',
+    '<meta name="theme-color" content="#e8eaee">',
     '<link rel="icon" href="' + icon + '">',
     fontLink,
     '<style>\n' + css + '\n</style>',
@@ -60,7 +60,7 @@ function standalone() {
 function artifact() {
   // 公開ページは <html><head><body> を自動で付けるので、中身だけを書く
   return [
-    '<title>コアイメージ単語帳</title>',
+    '<title>暗記CARD</title>',
     '<meta name="claude:viewport-fit-sides" content="cover">',
     fontLink,
     '<style>\n' + css + '\n</style>',
