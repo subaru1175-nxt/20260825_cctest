@@ -14039,7 +14039,6 @@ button.step-row:active { background: var(--surface-2); }
         state: 'locked',
         sub: 'あと <span data-until="' + t.win.start + '">' + esc(Sched.untilText(t.win.start - now)) + '</span>' +
           (t.tonight.length ? '・再テスト ' + t.tonight.length + '問（必須）' : '') + (t.daily.length ? '・今日の単語 ' + t.daily.length + '語' : ''),
-        lock: tt + ' から',
       };
     } else if (t.due.length) {
       s5 = {
@@ -14069,7 +14068,7 @@ button.step-row:active { background: var(--surface-2); }
       const cur = i === info.current;
       const cls = 'step st-' + s.state + (cur ? ' is-current' : '');
       const no = '<span class="step-no" aria-hidden="true">' + (s.state === 'done' ? icon('check') : i + 1) + '</span>';
-      const tag = s.state === 'done' ? '<span class="step-tag ok">完了</span>' : s.state === 'locked' ? '<span class="step-tag">' + icon('clock') + esc(s.lock) + '</span>' : '';
+      const tag = s.state === 'done' ? '<span class="step-tag ok">完了</span>' : '';
       const main = '<span class="step-main"><span class="step-title">' + esc(s.title) + (s.mode ? '<span class="step-mode">' + esc(s.mode) + '</span>' : '') + '</span>' +
         '<span class="step-sub">' + s.sub + '</span></span>';
       const label = ' aria-label="' + esc(STEP_NO[i] + ' ' + s.title + (s.mode ? '（' + s.mode + '）' : '')) + '"';
@@ -15642,7 +15641,7 @@ button.step-row:active { background: var(--surface-2); }
   function notifySection() {
     const tt = testTime();
     const opts = { now: Date.now(), testTime: tt, startDay: startDayTs(), appName: APP_NAME };
-    const g = (uid, title, sub) => '<a class="row" href="' + esc(Sched.googleCalendarUrl(opts, uid)) + '" target="_blank" rel="noopener noreferrer">' + rowInner(title, sub, '', '') + '</a>';
+    const g = (uid, title, sub) => '<a class="row" href="' + esc(Sched.googleCalendarUrl(opts, uid)) + '" target="_blank" rel="noopener noreferrer">' + rowInner(title, 'Googleカレンダーに追加・' + sub, '', '') + '</a>';
     return section('テストの時間と通知', '<div class="group">' +
       '<div class="f"><span class="f-label">毎日のテストの時間</span>' +
       selectBox('test-time', tt, Sched.TIMES.map((x) => [x, x + (x === Sched.DEFAULT_TIME ? '（はじめの設定）' : '')]), '毎日のテストの時間') + '</div>' +
@@ -15654,8 +15653,8 @@ button.step-row:active { background: var(--surface-2); }
       '<button type="button" class="btn primary block" data-action="add-calendar">' + icon('calendar') + 'カレンダーに通知を追加</button>' +
       '<p class="fine">毎日の ' + esc(tt) + '、まとめテストの日、毎月1日に、端末のカレンダーから通知が届きます。保存されたファイル（.ics）を開いて、予定を追加してください（iPhone は「すべてを追加」）。</p>' +
       '</div>' +
-      '<div class="list">' + g('daily-test', 'Googleカレンダーに追加：毎日のテスト', esc(tt) + '・毎日') +
-      g('summary-test', 'Googleカレンダーに追加：まとめテスト', '5日ごと') + g('monthly-test', 'Googleカレンダーに追加：月のまとめテスト', '毎月1日') + '</div>' +
+      '<div class="list">' + g('daily-test', '毎日のテスト', tt + '・毎日') +
+      g('summary-test', 'まとめテスト', tt + '・5日ごと') + g('monthly-test', '月のまとめテスト', tt + '・毎月1日') + '</div>' +
       '<p class="section-note">ホーム画面のアプリやブラウザは、閉じているあいだ自分では通知を出せません。そのため、カレンダーの予定の通知を使います。アプリを開いているときは、' + esc(tt) + ' になると画面でもお知らせします。時間を変えたら、カレンダーの予定も入れ直してください。</p>',
     { id: 'notify' });
   }
@@ -15666,7 +15665,7 @@ button.step-row:active { background: var(--surface-2); }
     const url = typeof C.saveFile === 'function' ? '' : location.href.split('#')[0];
     const text = Sched.calendar({ now: Date.now(), testTime: tt, startDay: startDayTs(), appName: APP_NAME, url });
     const name = 'ankicard-' + tt.replace(':', '') + '.ics';
-    const fail = () => toast('保存できませんでした。下の「Googleカレンダーに追加」を使ってください。');
+    const fail = () => toast('保存できませんでした。下の Googleカレンダーの行を使ってください。');
     if (typeof C.saveFile === 'function') {
       C.saveFile(name, text).then((ok) => (ok ? toast('カレンダーのファイルを保存しました。開いて予定を追加してください。') : fail()), fail);
       return;
