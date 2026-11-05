@@ -108,7 +108,11 @@ async function setTime(page, iso, hash) {
 }
 
 /** ホームの「今日の学習」の5つの手順：[状態（* は いまの手順）, 説明] */
-const stepsOf = (page) => page.$$eval('.steps .step', (els) => els.map((e) => [(e.className.match(/st-(\w+)/) || [])[1] + (e.classList.contains('is-current') ? '*' : ''), e.querySelector('.step-sub').textContent]));
+const stepsOf = (page) => page.$$eval('.steps .step', (els) => els.map((e) => [(e.className.match(/st-(\w+)/) || [])[1] + (e.classList.contains('is-current') ? '*' : ''), e.querySelector('.step-stat').textContent]));
+/** いまの手順の一言 */
+const curDesc = (page) => page.textContent('.steps .is-current .step-desc');
+/** ホームのテストの行（再テスト・今日のテスト・まとめテスト・月のまとめテスト）の文字 */
+const testRow = (page, kind) => page.textContent('.tests-list [data-row="' + kind + '"]');
 const curQ = (page) => page.evaluate(() => {
   const t = JSON.parse(localStorage.getItem('cif.v1.tests'));
   return t.current ? t.current.questions[t.current.index] : null;
@@ -190,10 +194,10 @@ async function sameClip(page, played, key, slow) {
   return c;
 }
 const capOf = (page, sel) => page.textContent(sel + ' .audio-cap');
-/** ホームの上のまとまり：[連続学習, 今日の枚数, ポイント] */
+/** ホームの上の3つの数：[連続学習, 今日の枚数, ポイント] */
 const heroStats = (page) => page.evaluate(() => {
-  const dd = Array.from(document.querySelectorAll('.hero-stats dd')).map((e) => e.textContent);
-  return [dd[0], document.querySelector('.ring-text b').textContent, dd[1]];
+  const v = Array.from(document.querySelectorAll('.stats .stat-v')).map((e) => e.textContent);
+  return [v[1], v[0], v[2]];
 });
 
 async function flipAndRate(page, r) {
@@ -482,18 +486,19 @@ async function noHScroll(page, label) {
     ok(stats[0].startsWith('1'), '連続学習 1日: ' + stats[0]);
     ok(stats[1].startsWith('10'), '今日 10枚');
     ok(stats[2].startsWith(String(pts)), 'ポイント');
-    eq(await page.textContent('.hero-done'), '達成', '今日の目標・達成');
-    eq(await page.getAttribute('.hero-ring', 'aria-valuenow'), '10', '目標の輪がいっぱい');
-    const sched = await page.$$eval('.home .facts dd', (els) => els.map((e) => e.textContent));
-    eq(sched[1], '9枚', '明日の予定');
+    eq(await page.textContent('.stat-done'), '達成', '今日の目標・達成');
+    eq(await page.getAttribute('.stats [role="progressbar"]', 'aria-valuenow'), '10', '目標の線がいっぱい');
+    const tomorrow = await page.evaluate(() => window.CIF.session.counts(JSON.parse(localStorage.getItem('cif.v1.words')), JSON.parse(localStorage.getItem('cif.v1.progress')), Date.now()).tomorrow);
+    eq(tomorrow, 9, '明日の復習予定');
 
     // 翌日にする → 復習カードを優先
     const progress = await ls(page, 'progress');
     await setTime(page, '2026-11-06T20:30:00+09:00');
-    eq((await stepsOf(page))[0], ['todo*', '今日 0 / 10枚・復習 10枚'], '翌日: ① は復習10枚から');
+    eq((await stepsOf(page))[0], ['todo*', '0/10'], '翌日: ① から');
+    ok((await curDesc(page)).includes('復習 10枚'), '翌日: ① は復習10枚から: ' + (await curDesc(page)));
     const stats2 = await heroStats(page);
     ok(stats2[0].startsWith('1') && (await page.isVisible('text=今日はまだ学習していません')), '翌日はまだ学習していない表示');
-    ok(!(await page.$('.hero-done')), '翌日は目標の達成表示が消える');
+    ok(!(await page.$('.stat-done')), '翌日は目標の達成表示が消える');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
     const set = await ls(page, 'session');
@@ -1037,7 +1042,7 @@ async function noHScroll(page, label) {
     await page.click('[data-action="rate"][data-r="good"]');
     await finishSet(page, 'good');
     await noHScroll(page, '結果');
-    for (const h of ['words', 'word-w-light', 'edit-w-light', 'options', 'round-r1', 'misses', 'check', 'title', 'home']) {
+    for (const h of ['words', 'word-w-light', 'edit-w-light', 'options', 'round-r1', 'misses', 'check', 'install', 'title', 'home']) {
       await page.goto(URL0 + '#' + h);
       await page.waitForTimeout(150);
       await noHScroll(page, h);
@@ -1128,13 +1133,22 @@ async function noHScroll(page, label) {
     await ctx.close();
   });
 
-  await test('iPhone のホーム画面に追加できる（説明・アイコン・全画面表示の設定）', async () => {
+  await test('iPhone のホーム画面に追加できる（手順の画面・リンクのコピー・アイコン・全画面表示の設定）', async () => {
     const { ctx, page } = await newPage();
+    await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: URL0 });
+    // iPhone 以外では、ホームに「ホーム画面に追加」を出さない
+    ok(!(await page.$('.install-tip')), 'iPhone 以外では出さない');
     await page.goto(URL0 + '#options');
     await page.waitForSelector('#home-screen');
-    const t = await page.textContent('#home-screen');
-    ok(t.includes('Safari') && t.includes('ホーム画面に追加') && t.includes('共有'), '手順: ' + t.slice(0, 80));
-    eq(await page.$$eval('#home-screen .howto-list li', (els) => els.length), 4, '4つの手順');
+    await page.click('#home-screen a[href="#install"]');
+    await page.waitForSelector('.install');
+    const t = await page.textContent('.install');
+    ok(t.includes('Safari') && t.includes('ホーム画面に追加') && t.includes('共有') && t.includes('暗記CARD'), '手順: ' + t.slice(0, 80));
+    eq(await page.$$eval('.install-steps li', (els) => els.length), 5, '5つの手順');
+    eq(await page.inputValue('#app-link'), URL0, 'このアプリのリンク');
+    await page.click('[data-action="copy-link"]');
+    await page.waitForFunction(() => document.getElementById('toast').textContent.includes('コピーしました'));
+    eq(await page.evaluate(() => navigator.clipboard.readText()), URL0, 'リンクをコピーできる');
     const meta = await page.evaluate(() => ({
       capable: document.querySelector('meta[name="apple-mobile-web-app-capable"]') && document.querySelector('meta[name="apple-mobile-web-app-capable"]').content,
       title: document.querySelector('meta[name="apple-mobile-web-app-title"]') && document.querySelector('meta[name="apple-mobile-web-app-title"]').content,
@@ -1160,8 +1174,8 @@ async function noHScroll(page, label) {
     await page.goto(URL0 + '#title');
     await page.waitForSelector('.title-screen');
     ok((await page.textContent('.wordmark')).replace(/\s/g, '') === '暗記CARD', 'タイトル: ' + (await page.textContent('.wordmark')));
-    ok((await page.textContent('.title-status')).includes('今日のテスト 20:00〜'));
     ok((await page.textContent('.title-tap')).includes('タップ'));
+    eq(await page.$$eval('.title-screen *', (els) => els.filter((e) => e.children.length === 0 && e.textContent.trim()).map((e) => e.textContent.trim())), ['暗記', 'CARD', '英語を、音と場面で覚える', 'タップしてはじめる'], 'タイトルはロゴと一言だけ');
     ok(!(await page.$('.bottom-nav')), 'タイトルにはメニューを出さない');
     eq(await page.title(), '暗記CARD');
     await page.keyboard.press('Enter');
@@ -1172,8 +1186,10 @@ async function noHScroll(page, label) {
     const st = await stepsOf(page);
     eq(st.map((x) => x[0]), ['todo*', 'wait', 'wait', 'wait', 'locked'], 'はじめは ① から');
     eq(await page.$$eval('.steps .btn.primary', (els) => els.length), 1, '青いボタンは、いまの手順だけ');
-    ok((await page.textContent('.steps .is-current .btn.primary')).includes('単語を覚える'));
-    ok(st[4][1].startsWith('あと 4時間50分'), '⑤ は 20:00 まであと何分か: ' + st[4][1]);
+    ok((await page.textContent('.steps .is-current .btn.primary')).includes('覚える'));
+    eq(await page.$$eval('.steps .step-desc', (els) => els.length), 1, '説明は、いまの手順だけ');
+    eq(st[4][1], '20:00', '⑤ は 20:00 から');
+    ok((await page.textContent('.tests-list .test-window')).includes('あと 4時間50分'), '20:00 まであと何分か');
     eq(page.errors, []);
     await ctx.close();
   });
@@ -1195,7 +1211,8 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.home');
     let st = await stepsOf(page);
     eq(st.map((x) => x[0]), ['done', 'done', 'todo*', 'todo', 'locked'], '①② のあとは ③: ' + JSON.stringify(st));
-    ok(st[2][1].includes('今日のカード 1枚'));
+    eq(st[2][1], '1件');
+    ok((await curDesc(page)).includes('思い出せなかった単語 1'), await curDesc(page));
     // ③ ミスを確認：思い出せなかった単語と、正しい使い方・音声
     await page.click('.steps .step-go');
     await page.waitForSelector('.check');
@@ -1212,7 +1229,8 @@ async function noHScroll(page, label) {
     st = await stepsOf(page);
     eq(st.map((x) => x[0]), ['done', 'done', 'done', 'done', 'locked*'], '⑤ は 20:00 から: ' + JSON.stringify(st));
     ok(!(await page.$('.tests-list [data-action="start-kind"]')), '20:00 前はテストを始められない');
-    ok((await page.textContent('.steps .is-current')).includes('20:00 になったら'), '⑤ の案内');
+    ok((await curDesc(page)).startsWith('あと 4時間'), '⑤ は 20:00 まであと何分か: ' + (await curDesc(page)));
+    ok((await testRow(page, 'daily')).includes('20:00・10語'), '今日のテストは 20:00 から10語');
     // 20:00 になると受けられる（開いたままでも、時間になったら知らせる）
     await page.clock.setSystemTime(new Date('2026-11-05T19:59:50+09:00'));
     await page.evaluate(() => window.dispatchEvent(new Event('focus')));
@@ -1231,15 +1249,16 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.home');
     st = await stepsOf(page);
     eq(st.map((x) => x[0]), ['done', 'done', 'done', 'done', 'done'], '今日はすべて完了');
-    ok(st[4][1].includes('明日 20:00 に再テスト 3問（必須）'), st[4][1]);
-    ok(await page.isVisible('text=今日の学習はすべて終わりました'));
-    // 次の日：タイトルに再テスト。20:00 前は受けられない
+    ok(/^\d+点$/.test(st[4][1]), '⑤ は点数: ' + st[4][1]);
+    ok((await testRow(page, 'retest')).includes('明日・3問'), '再テストは明日 3問: ' + (await testRow(page, 'retest')));
+    ok(await page.isVisible('text=今日の学習は完了です'));
+    // 次の日：タイトル → ホーム。20:00 前は受けられない
     await setTime(page, '2026-11-06T12:00:00+09:00', '');
     await page.waitForSelector('.title-screen');
-    ok((await page.textContent('.title-status')).includes('再テスト 3問'), 'タイトルで再テストを知らせる');
     await page.click('.title-screen');
     await page.waitForSelector('.home');
-    ok((await stepsOf(page))[4][1].includes('再テスト 3問（必須）'));
+    ok((await testRow(page, 'retest')).includes('20:00・3問'), '今夜 20:00 に再テスト 3問: ' + (await testRow(page, 'retest')));
+    ok((await testRow(page, 'retest')).includes('必須'), '再テストは必須');
     ok(!(await page.$('.tests-list [data-kind="retest"]')), '20:00 前は再テストを始められない');
     // 20:30：再テスト（必須）。また1問まちがえる → その次の日も
     await setTime(page, '2026-11-06T20:30:00+09:00');
@@ -1250,7 +1269,7 @@ async function noHScroll(page, label) {
     ok((await page.textContent('.score-hero')).includes('満点になるまで毎日続きます'));
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    ok((await page.textContent('.tests-list')).includes('次は明日 20:00・1問'), '残り1問は次の日');
+    ok((await testRow(page, 'retest')).includes('明日・1問'), '残り1問は次の日: ' + (await testRow(page, 'retest')));
     await setTime(page, '2026-11-07T20:30:00+09:00');
     await page.click('.tests-list [data-kind="retest"]');
     await page.waitForSelector('.qcard');
@@ -1322,12 +1341,12 @@ async function noHScroll(page, label) {
     await finishSet(page, 'good');
     // 4日目の夜：まだ。5日目（11/9）の 20:00 から
     await setTime(page, '2026-11-08T21:00:00+09:00');
-    ok((await page.textContent('.tests-list')).includes('次は 11月9日（月） 20:00'), await page.textContent('.tests-list'));
+    ok((await testRow(page, 'summary')).includes('11/9'), '次は 11/9: ' + (await testRow(page, 'summary')));
     ok(!(await page.$('.tests-list [data-kind="summary"]')));
     await setTime(page, '2026-11-09T19:59:00+09:00');
     ok(!(await page.$('.tests-list [data-kind="summary"]')), '5日目でも 20:00 前はまだ');
     await setTime(page, '2026-11-09T20:00:00+09:00');
-    ok((await page.textContent('.tests-list [data-kind="summary"]')).includes('11/5〜11/9 に学習した 10語・20問'), await page.textContent('.tests-list'));
+    ok((await testRow(page, 'summary')).includes('第1回・11/5〜11/9 の単語') && (await testRow(page, 'summary')).includes('20問'), await testRow(page, 'summary'));
     await page.click('.tests-list [data-kind="summary"]');
     await page.waitForSelector('.qcard');
     const sm = await runTest(page, () => false);
@@ -1341,12 +1360,12 @@ async function noHScroll(page, label) {
     eq(await page.textContent('.score-num b'), '100');
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    ok((await page.textContent('.tests-list')).includes('第1回を受けました（100点）・次は 11月14日（土）'), await page.textContent('.tests-list'));
+    ok((await testRow(page, 'summary')).includes('次は 11/14') && (await testRow(page, 'summary')).includes('100点'), await testRow(page, 'summary'));
     // 月のまとめ：12/1 の 20:00 から、11月に学習した単語
     await setTime(page, '2026-12-01T19:30:00+09:00');
-    ok((await page.textContent('.tests-list')).includes('次は 12月1日（火） 20:00・11月に学習した単語'), await page.textContent('.tests-list'));
+    ok((await testRow(page, 'monthly')).includes('12/1') && !(await page.$('.tests-list [data-kind="monthly"]')), '次は 12/1: ' + (await testRow(page, 'monthly')));
     await setTime(page, '2026-12-01T20:05:00+09:00');
-    ok((await page.textContent('.tests-list [data-kind="monthly"]')).includes('11月に学習した 10語・30問'));
+    ok((await testRow(page, 'monthly')).includes('11月の単語') && (await testRow(page, 'monthly')).includes('30問'), await testRow(page, 'monthly'));
     await page.click('.tests-list [data-kind="monthly"]');
     await page.waitForSelector('.qcard');
     ok((await page.textContent('.topbar .t-label')).includes('11月のまとめテスト'));
@@ -1356,7 +1375,7 @@ async function noHScroll(page, label) {
     ok((await page.textContent('.score-hero')).includes('明日 20:00 に再テスト（必須）'));
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
-    ok((await page.textContent('.tests-list')).includes('11月の分を受けました'), '月のまとめは1回');
+    ok((await testRow(page, 'monthly')).includes('次は 1/1') && !(await page.$('.tests-list [data-kind="monthly"]')), '月のまとめは1回: ' + (await testRow(page, 'monthly')));
     eq(page.errors, []);
     await ctx.close();
   });
@@ -1382,14 +1401,52 @@ async function noHScroll(page, label) {
     const links = await page.$$eval('#notify a[href*="calendar.google.com"]', (els) => els.map((a) => decodeURIComponent(a.href)));
     eq(links.length, 3);
     ok(links[0].includes('RRULE:FREQ=DAILY') && links[0].includes('T210000'), links[0]);
-    // 21:00 前はテストを受けられない
+    // 21:00 前はテストを受けられない。カレンダーに入れたら、ホームの「通知を受け取る」は出さない
     await page.goto(URL0 + '#home');
     await page.waitForSelector('.home');
     ok((await page.textContent('.tests-list')).includes('テストは 21:00 から'));
+    ok(!(await page.$('.tests-list [data-action="goto-notify"]')), 'カレンダーに入れたあとは出さない');
     await page.goto(URL0 + '#round-r1');
     await page.waitForSelector('.round');
     ok(await page.$eval('.round .btn.primary[disabled]', (b) => b.textContent.includes('21:00 から受けられます')), '回のテストも 21:00 から');
     eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('iPhone の Safari では、ホームに「ホーム画面に追加」を出す（閉じると出さない）', async () => {
+    const ctx = await browser.newContext({
+      viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, locale: 'ja-JP', timezoneId: 'Asia/Tokyo',
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
+    });
+    await ctx.addInitScript(speechMock('mock'));
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.clock.install({ time: new Date(T0) });
+    await page.goto(URL0);
+    await page.waitForSelector('.title-screen');
+    await page.click('.title-screen');
+    await page.waitForSelector('.home .install-tip');
+    await page.click('.install-open');
+    await page.waitForSelector('.install-steps');
+    eq(await page.$$eval('.install-steps .is-title', (els) => els.map((e) => e.textContent)), [
+      'Safari でこのアプリを開く', '共有ボタン  をタップ', '「ホーム画面に追加」をタップ', '名前を「暗記CARD」にして「追加」', 'ホーム画面の「暗記CARD」から開く',
+    ], '手順');
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home .install-tip');
+    await page.click('[data-action="hide-install"]');
+    await page.waitForFunction(() => !document.querySelector('.install-tip'));
+    await page.reload();
+    await page.waitForSelector('.home');
+    ok(!(await page.$('.install-tip')), '閉じたら出さない');
+    eq((await ls(page, 'meta')).installHidden, true);
+    // ホーム画面から開いたとき（全画面）は、「ホーム画面から開いています」
+    await page.addInitScript(() => Object.defineProperty(window.navigator, 'standalone', { get: () => true }));
+    await page.goto(URL0 + '#install');
+    await page.reload();
+    await page.waitForSelector('.install-done');
+    ok((await page.textContent('.install-done')).includes('ホーム画面から開いています'));
+    eq(errors, []);
     await ctx.close();
   });
 

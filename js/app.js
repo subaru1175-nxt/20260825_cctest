@@ -159,7 +159,7 @@
     try { h = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (e) { h = ''; }
     if (!h || h === 'title') return { route: 'title', param: '' };
     if (h === 'home') return { route: 'home', param: '' };
-    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses', 'check'].includes(h)) return { route: h, param: '' };
+    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses', 'check', 'install'].includes(h)) return { route: h, param: '' };
     if (h.indexOf('word-') === 0) return { route: 'word', param: h.slice(5) };
     if (h.indexOf('round-') === 0) return { route: 'round', param: h.slice(6) };
     if (h.indexOf('score-') === 0) return { route: 'score', param: h.slice(6) };
@@ -226,10 +226,11 @@
       case 'score': html = viewScore(); break;
       case 'misses': html = viewMisses(); break;
       case 'check': html = viewCheck(); break;
+      case 'install': html = viewInstall(); break;
       default: html = viewHome();
     }
     if (html == null) return;
-    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses', 'check'].includes(ui.route);
+    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses', 'check', 'install'].includes(ui.route);
     $app.innerHTML = saveBanner() + html + (withNav ? navBar() : '');
     document.body.dataset.route = ui.route;
     if (resetScroll) window.scrollTo(0, 0);
@@ -862,7 +863,12 @@
     return { win, range, open: openList.map((e) => e.key), due, tonight, daily: dailyItems(now), summary, monthly, today };
   }
 
-  /** 今日の学習の5つの手順。state：todo（これから）/ done（終わった）/ locked（時間前）/ wait（前の手順のあと）/ none（今日はない） */
+  /**
+   * 今日の学習の5つの手順。
+   *   state … todo（これから）/ done（終わった）/ locked（時間前）/ wait（前の手順のあと）/ none（今日はない）
+   *   stat  … 右に出す短い数（10/10・あと10・2件・20:00 など）
+   *   desc  … いまの手順にだけ出す一言（HTML）　go … いまの手順のボタン
+   */
   function stepsInfo(now) {
     const st = store.state;
     const goal = st.settings.dailyGoal;
@@ -878,9 +884,10 @@
     list.push({
       title: '単語を覚える', mode: '英語 → 場面',
       state: n1 >= goal || (n1 > 0 && !left1) ? 'done' : left1 ? 'todo' : 'none',
-      sub: '今日 ' + n1 + ' / ' + goal + '枚' + (c.dueFwd ? '・復習 ' + c.dueFwd + '枚' : '') + (!left1 && !n1 ? '・いまはありません' : ''),
+      stat: n1 + '/' + goal,
+      desc: left1 ? '英語を見て、場面を思い浮かべます' + (c.dueFwd ? '・復習 ' + c.dueFwd + '枚' : '') : 'いまは覚える単語がありません',
       act: left1 ? ' data-action="start" data-mode="fwd" data-scope="all"' : '',
-      go: n1 ? '続きを覚える' : '単語を覚える',
+      go: n1 ? '続きを覚える' : '覚える',
     });
 
     // ② 逆から思い出す（場面 → 英語）。今日思い出せなかったカードの「もう一度」は、してもしなくてもよい
@@ -889,11 +896,10 @@
     list.push({
       title: '逆から思い出す', mode: '場面 → 英語',
       state: p2.must.length ? 'todo' : n2 ? 'done' : n1 ? 'none' : 'wait',
-      sub: p2.must.length ? 'あと ' + p2.must.length + '枚' + (n2 ? '・今日 ' + n2 + '枚' : '')
-        : n2 ? '今日 ' + n2 + '枚' + (p2.relearn.length ? '・もう一度 ' + p2.relearn.length + '枚' : '')
-          : n1 ? '場面から出せる単語がありません' : '① で覚えた単語を、場面から思い出します',
+      stat: p2.must.length ? 'あと' + p2.must.length : n2 ? n2 + '枚' : '—',
+      desc: p2.must.length ? '場面を見て、英語を思い出します' : '場面から出せる単語がありません',
       act: p2.all.length ? ' data-action="start" data-mode="rev" data-scope="today"' : '',
-      go: '逆から思い出す（' + Math.min(SS.SET_SIZE, p2.all.length) + '枚）',
+      go: '思い出す',
     });
 
     // ③ ミスを確認 ④ 間違えた問題を解く（⑤ が終わった日は、その日の分は終わり）
@@ -902,162 +908,171 @@
     const tested = t.today.length > 0 && !t.due.length && !t.daily.length;
     const checked = (st.meta.checkAt || 0) >= m.lastAt;
     const lastP = Q.lastTaken(st.tests, 'practice', m.lastAt);
-    const missSub = (m.test.length ? 'テストのミス ' + m.test.length + '件' : '') + (m.test.length && m.weak.length ? '・' : '') + (m.weak.length ? '今日のカード ' + m.weak.length + '枚' : '');
+    const parts = [];
+    if (m.weak.length) parts.push('思い出せなかった単語 ' + m.weak.length);
+    if (m.test.length) parts.push('テストのミス ' + m.test.length);
     list.push({
       title: 'ミスを確認', mode: '',
       state: !has ? (d.studied.length ? 'none' : 'wait') : checked || tested ? 'done' : 'todo',
-      sub: has ? missSub : d.studied.length ? 'ミスはありません' : '思い出せなかった単語と、テストで間違えた問題',
+      stat: has ? (m.test.length + m.weak.length) + '件' : d.studied.length ? '0件' : '—',
+      desc: parts.join('・'),
       act: has ? ' data-action="goto" data-to="check"' : '',
-      go: 'ミスを確認する（' + (m.test.length + m.weak.length) + '件）',
+      go: '確認する',
     });
     list.push({
       title: '間違えた問題を解く', mode: '練習',
       state: !has ? (d.studied.length ? 'none' : 'wait') : (lastP && lastP.score === 100) || tested ? 'done' : 'todo',
-      sub: has ? m.keys.length + '問' + (lastP ? '・前回 ' + lastP.score + '点' : '') + '・何度でも解けます' : '③ のミスを、問題で練習します',
+      stat: has ? m.keys.length + '問' : '—',
+      desc: '何度でも解けます（記録には入りません）' + (lastP ? '・前回 ' + lastP.score + '点' : ''),
       act: has ? ' data-action="start-kind" data-kind="practice"' : '',
-      go: (lastP ? 'もう一度解く' : '間違えた問題を解く') + '（' + m.keys.length + '問）',
+      go: lastP ? 'もう一度解く' : '解く',
     });
 
     // ⑤ テスト（毎日 20:00 から）
     let s5;
     if (!t.win.open) {
+      const extra = [];
+      if (t.tonight.length) extra.push('再テスト ' + t.tonight.length + '問');
+      if (t.daily.length) extra.push('今日の単語 ' + t.daily.length + '語');
       s5 = {
         state: 'locked',
-        sub: 'あと <span data-until="' + t.win.start + '">' + esc(Sched.untilText(t.win.start - now)) + '</span>' +
-          (t.tonight.length ? '・再テスト ' + t.tonight.length + '問（必須）' : '') + (t.daily.length ? '・今日の単語 ' + t.daily.length + '語' : ''),
+        stat: tt,
+        desc: 'あと <span data-until="' + t.win.start + '">' + esc(Sched.untilText(t.win.start - now)) + '</span>' + (extra.length ? '・' + extra.join('・') : ''),
       };
     } else if (t.due.length) {
       s5 = {
         state: 'todo',
-        sub: '再テスト ' + t.due.length + '問（必須）' + (t.daily.length ? '・今日の単語 ' + t.daily.length + '語' : '') + '・朝4:00まで',
+        stat: '必須',
+        desc: '再テスト ' + t.due.length + '問' + (t.daily.length ? '・今日の単語 ' + t.daily.length + '語' : '') + '・朝4:00まで',
         act: ' data-action="start-kind" data-kind="retest"',
-        go: '再テストを受ける（必須・' + t.due.length + '問）',
+        go: '再テストを受ける（' + t.due.length + '問）',
       };
     } else if (t.daily.length) {
-      s5 = { state: 'todo', sub: '今日の単語 ' + t.daily.length + '語・朝4:00まで', act: ' data-action="start-kind" data-kind="daily"', go: '今日のテストを受ける' };
+      s5 = {
+        state: 'todo',
+        stat: t.daily.length + '語',
+        desc: '今日学習した単語のテスト・朝4:00まで',
+        act: ' data-action="start-kind" data-kind="daily"',
+        go: '今日のテストを受ける',
+      };
     } else if (t.today.length) {
-      s5 = { state: 'done', sub: '今日のテストは終わりました' + (t.open.length ? '・明日 ' + tt + ' に再テスト ' + t.open.length + '問（必須）' : '') };
+      s5 = { state: 'done', stat: t.today[t.today.length - 1].score + '点', desc: '今日のテストは終わりました' };
     } else {
-      s5 = { state: 'none', sub: '今日は受けるテストがありません' };
+      s5 = { state: 'none', stat: '—', desc: '今日は受けるテストがありません' };
     }
-    list.push(Object.assign({ title: 'テスト', mode: tt + ' から' }, s5));
+    list.push(Object.assign({ title: 'テスト', mode: tt + '〜' }, s5));
 
     const current = list.findIndex((x) => x.state === 'todo' || x.state === 'locked');
-    return { list, current, day: d, tests: t };
+    const done = list.filter((x) => x.state === 'done' || x.state === 'none').length;
+    return { list, current, done, day: d, tests: t };
   }
 
-  /** ホームの「今日の学習」：5つの手順。いまやる手順に青いボタン */
+  /** ホームの「今日の学習」：5つの手順。ふだんは名前と数だけ。いまの手順にだけ一言と青いボタン */
   function stepsHtml(info) {
-    const tt = testTime();
     const allDone = info.current < 0 && info.list[4].state === 'done';
     return '<ol class="steps" aria-label="今日の学習の順番">' + info.list.map((s, i) => {
       const cur = i === info.current;
       const cls = 'step st-' + s.state + (cur ? ' is-current' : '');
       const no = '<span class="step-no" aria-hidden="true">' + (s.state === 'done' ? icon('check') : i + 1) + '</span>';
-      const tag = s.state === 'done' ? '<span class="step-tag ok">完了</span>' : '';
-      const main = '<span class="step-main"><span class="step-title">' + esc(s.title) + (s.mode ? '<span class="step-mode">' + esc(s.mode) + '</span>' : '') + '</span>' +
-        '<span class="step-sub">' + s.sub + '</span></span>';
-      const label = ' aria-label="' + esc(STEP_NO[i] + ' ' + s.title + (s.mode ? '（' + s.mode + '）' : '')) + '"';
-      if (cur && s.act) {
-        return '<li class="' + cls + '"><div class="step-row">' + no + main + '</div>' +
-          '<button type="button" class="btn primary block step-go"' + s.act + label + '>' + esc(s.go) + '</button></li>';
+      const head = '<span class="step-main"><span class="step-title">' + esc(s.title) + '</span>' +
+        (s.mode ? '<span class="step-mode">' + esc(s.mode) + '</span>' : '') + '</span>' +
+        '<span class="step-stat">' + esc(s.stat) + '</span>';
+      if (cur) {
+        return '<li class="' + cls + '"><div class="step-row">' + no + head + '</div>' +
+          '<div class="step-more"><p class="step-desc">' + (s.state === 'locked' ? icon('clock') : '') + '<span>' + s.desc + '</span></p>' +
+          (s.act && s.state !== 'locked'
+            ? '<button type="button" class="btn primary block step-go"' + s.act + ' aria-label="' + esc(STEP_NO[i] + ' ' + s.title + '：' + s.go) + '">' + esc(s.go) + '</button>'
+            : '') +
+          '</div></li>';
       }
-      if (cur && s.state === 'locked') {
-        return '<li class="' + cls + '"><div class="step-row">' + no + main + tag + '</div>' +
-          '<p class="step-wait">' + icon('bell') + tt + ' になったら、ここから受けられます。</p></li>';
-      }
-      if (s.act) return '<li class="' + cls + '"><button type="button" class="step-row"' + s.act + label + '>' + no + main + tag + icon('chevron') + '</button></li>';
-      return '<li class="' + cls + '"><div class="step-row">' + no + main + tag + '</div></li>';
+      const label = ' aria-label="' + esc(STEP_NO[i] + ' ' + s.title + (s.mode ? '（' + s.mode + '）' : '') + '・' + s.stat) + '"';
+      if (s.act) return '<li class="' + cls + '"><button type="button" class="step-row"' + s.act + label + '>' + no + head + icon('chevron') + '</button></li>';
+      return '<li class="' + cls + '"><div class="step-row">' + no + head + '</div></li>';
     }).join('') + '</ol>' +
-      (allDone ? '<p class="steps-done">' + icon('check') + '今日の学習はすべて終わりました。明日もこの順番で。</p>' : '');
+      (allDone ? '<p class="steps-done">' + icon('check') + '今日の学習は完了です。明日もこの順番で。</p>' : '');
   }
 
-  /** ホームの「テスト」：いま受けられるテストと、これからのテスト */
+  /** ホームの「テスト」：受けられる時間と、4つのテスト。右に短い数だけ */
   function testsHtml(t, now) {
+    const st = store.state;
     const tt = testTime();
     const open = t.win.open;
     const head = open
-      ? '<div class="row static test-window is-open">' + icon('bell') + '<span class="r-main"><span class="r-title">いまテストを受けられます</span><span class="r-sub">朝4:00まで</span></span></div>'
-      : '<div class="row static test-window">' + icon('clock') + '<span class="r-main"><span class="r-title">テストは ' + tt + ' から</span><span class="r-sub">あと <span data-until="' + t.win.start + '">' + esc(Sched.untilText(t.win.start - now)) + '</span></span></span></div>';
-    const row = (kind, title, sub, ready, badge) => ready && open
-      ? rowBtn('start-kind', ' data-kind="' + kind + '"', title, sub, badge || '', 'accent')
-      : '<div class="row static' + (ready ? '' : ' dim') + '">' + rowInner(title, sub, badge || '', 'action') + '</div>';
+      ? '<div class="row static test-window is-open">' + icon('bell') + rowInner('いま受けられます', '', '朝4:00まで', 'action') + '</div>'
+      : '<div class="row static test-window">' + icon('clock') + rowInner('テストは ' + tt + ' から', '', 'あと <span data-until="' + t.win.start + '">' + esc(Sched.untilText(t.win.start - now)) + '</span>', 'action') + '</div>';
+    const row = (kind, title, sub, ready, detail) => ready && open
+      ? rowBtn('start-kind', ' data-kind="' + kind + '" data-row="' + kind + '"', title, sub, detail, 'accent')
+      : '<div class="row static' + (ready ? '' : ' dim') + '" data-row="' + kind + '">' + rowInner(title, sub, detail, 'action') + '</div>';
     let rows = '';
-    // 再テスト（必須）
+    // 再テスト（必須）：間違えた問題。満点になるまで毎日
     const nRe = open ? t.due.length : t.tonight.length;
     const later = t.open.length - nRe;
-    rows += row('retest', '再テスト（必須）',
-      nRe ? '間違えた ' + nRe + '問・満点になるまで毎日' + (open ? '' : '・' + tt + ' から') : later ? '次は明日 ' + tt + '・' + later + '問' : 'いまはありません',
-      nRe > 0, nRe ? '<span class="badge must">必須</span>' : '');
+    rows += row('retest', '再テスト', '必須・満点になるまで毎日', nRe > 0,
+      nRe ? (open ? '<span class="badge must">必須</span>' : esc(tt) + '・') + nRe + '問' : later ? '明日・' + later + '問' : '—');
     // 今日のテスト
     const doneD = t.today.filter((a) => a.kind === 'daily');
-    rows += row('daily', '今日のテスト',
-      t.daily.length ? '今日学習した ' + t.daily.length + '語' + (open ? '' : '・' + tt + ' から') : doneD.length ? '受けました（' + doneD[doneD.length - 1].score + '点）' : '学習した単語が、ここに出ます',
-      t.daily.length > 0);
+    rows += row('daily', '今日のテスト', '今日学習した単語', t.daily.length > 0,
+      t.daily.length ? (open ? '' : esc(tt) + '・') + t.daily.length + '語' : doneD.length ? doneD[doneD.length - 1].score + '点' : '—');
     // まとめテスト（5日ごと）
     const s = t.summary;
-    let sSub;
-    if (s.ready) sSub = '第' + s.period.no + '回・' + shortDate(s.period.firstDay) + '〜' + shortDate(s.period.dueDay) + ' に学習した ' + s.items.length + '語・' + summaryPlan('summary', s.items.length).count + '問' + (open ? '' : '・' + tt + ' から');
-    else if (s.taken) sSub = '第' + s.period.no + '回を受けました（' + s.taken.score + '点）・次は ' + todayLabel(s.next);
-    else if (s.period && util.dayKey(s.period.dueDay) === util.dayKey(t.win.day)) sSub = '今日の分は、学習した単語が少ないため、ありません・次は ' + todayLabel(s.next);
-    else sSub = '次は ' + todayLabel(s.next) + ' ' + tt;
-    rows += row('summary', 'まとめテスト（5日ごと）', sSub, s.ready);
+    let sSub = '5日ごと・応用の形式';
+    let sVal = esc(shortDate(s.next));
+    if (s.ready) {
+      sSub = '第' + s.period.no + '回・' + shortDate(s.period.firstDay) + '〜' + shortDate(s.period.dueDay) + ' の単語';
+      sVal = (open ? '' : esc(tt) + '・') + summaryPlan('summary', s.items.length).count + '問';
+    } else if (s.taken) {
+      sSub = '5日ごと・次は ' + shortDate(s.next);
+      sVal = s.taken.score + '点';
+    } else if (s.period && util.dayKey(s.period.dueDay) === util.dayKey(t.win.day)) {
+      sSub = '今日の分は、学習した単語が少ないためなし';
+    }
+    rows += row('summary', 'まとめテスト', sSub, s.ready, sVal);
     // 月のまとめテスト（毎月1日）
     const mo = t.monthly;
-    let mSub;
-    if (mo.ready) mSub = mo.period.month + '月に学習した ' + mo.items.length + '語・' + summaryPlan('monthly', mo.items.length).count + '問' + (open ? '' : '・' + tt + ' から');
-    else if (mo.taken) mSub = mo.period.month + '月の分を受けました（' + mo.taken.score + '点）・次は ' + todayLabel(mo.next);
-    else mSub = '次は ' + todayLabel(mo.next) + ' ' + tt + '・' + (new Date(mo.next).getMonth() === 0 ? 12 : new Date(mo.next).getMonth()) + '月に学習した単語';
-    rows += row('monthly', '月のまとめテスト（毎月1日）', mSub, mo.ready);
-    rows += rowBtn('goto-notify', '', 'テストの時間と通知', tt + '・カレンダーに通知を追加', '', '');
+    let mSub = '毎月1日・先月の単語';
+    let mVal = esc(shortDate(mo.next));
+    if (mo.ready) {
+      mSub = mo.period.month + '月の単語';
+      mVal = (open ? '' : esc(tt) + '・') + summaryPlan('monthly', mo.items.length).count + '問';
+    } else if (mo.taken) {
+      mSub = '毎月1日・次は ' + shortDate(mo.next);
+      mVal = mo.taken.score + '点';
+    }
+    rows += row('monthly', '月のまとめテスト', mSub, mo.ready, mVal);
+    // 通知：カレンダーに入れるまでは、ここにも出す
+    if (!st.meta.calendarAt) rows += rowBtn('goto-notify', '', tt + ' に通知を受け取る', 'カレンダーに予定を入れます', '', '');
     return '<div class="list tests-list">' + head + rows + '</div>';
   }
 
   /* ================= タイトル ================= */
 
+  /** タイトル：ロゴと一言だけ。どこをタップしてもホームへ */
   function viewTitle() {
-    const now = Date.now();
-    const t = testInfo(now);
-    const tt = testTime();
-    const bits = [];
-    if (t.win.open) bits.push('いまテストを受けられます');
-    else bits.push('今日のテスト ' + tt + '〜');
-    const nRe = t.win.open ? t.due.length : t.tonight.length;
-    if (nRe) bits.push('再テスト ' + nRe + '問');
-    if (t.summary.ready) bits.push('まとめテスト');
-    if (t.monthly.ready) bits.push('月のまとめテスト');
     return '<main class="screen title-screen" id="main" data-action="enter" role="button" tabindex="0" aria-label="' + APP_NAME + '。タップしてはじめる">' +
       '<div class="title-body">' +
-      '<div class="title-cards" aria-hidden="true"><span></span><span></span><span></span></div>' +
-      '<p class="title-date">' + esc(todayLabel(now)) + '</p>' +
       '<h1 class="wordmark"><span class="wm-ja">暗記</span><span class="wm-en">CARD</span></h1>' +
-      '<p class="title-tag">英語の音 → 場面 → 使い方</p>' +
-      '<p class="title-status">' + bits.map((b) => '<span>' + esc(b) + '</span>').join('') + '</p>' +
+      '<span class="title-rule" aria-hidden="true"></span>' +
+      '<p class="title-tag">英語を、音と場面で覚える</p>' +
       '</div>' +
-      '<p class="title-tap"><span>画面をタップしてはじめる</span></p>' +
+      '<p class="title-tap">タップしてはじめる</p>' +
       '</main>';
   }
 
   /* ================= ホーム ================= */
 
-  /** ホームの上：今日の目標（輪）・連続学習・ポイント */
-  function heroCard(streak, today, goal, points) {
+  /** ホームの上：今日の目標・連続日数・ポイントを1行で */
+  function statsStrip(streak, today, goal, points) {
     const done = Math.min(goal, today.cards);
-    const c = 2 * Math.PI * 52;
-    const off = c * (1 - done / goal);
-    return '<section class="hero" aria-label="今日の記録">' +
-      '<div class="hero-ring" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + done + '">' +
-      '<svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="hero-metal" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" class="ring-s1"/><stop offset=".3" class="ring-s2"/><stop offset=".62" class="ring-s3"/><stop offset="1" class="ring-s4"/></linearGradient></defs>' +
-      '<circle class="ring-track" cx="60" cy="60" r="52"/>' +
-      '<circle class="ring-fill" cx="60" cy="60" r="52" stroke="url(#hero-metal)" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"' + (done ? '' : ' opacity="0"') + '/></svg>' +
-      '<p class="ring-text"><b class="num">' + today.cards + '</b><span>/ ' + goal + '枚</span></p></div>' +
-      '<div class="hero-side"><p class="hero-label">今日の目標' + (today.cards >= goal ? '<span class="hero-done">達成</span>' : '') + '</p>' +
-      '<dl class="hero-stats">' +
-      '<div><dt>連続学習</dt><dd class="num">' + streak.days + '<small>日</small></dd></div>' +
-      '<div><dt>ポイント</dt><dd class="num">' + points + '</dd></div></dl>' +
-      (streak.days && !streak.todayDone ? '<p class="hero-note">今日はまだ学習していません</p>' : '') +
-      '</div></section>';
+    const pct = Math.round((done / goal) * 100);
+    return '<section class="stats" aria-label="今日の記録">' +
+      '<div class="stat-cell" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + done + '">' +
+      '<span class="stat-k">今日の目標' + (today.cards >= goal ? '<span class="stat-done">達成</span>' : '') + '</span>' +
+      '<span class="stat-v"><b>' + today.cards + '</b><small>/' + goal + '</small></span>' +
+      '<span class="stat-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></span></div>' +
+      '<div class="stat-cell"><span class="stat-k">連続</span><span class="stat-v"><b>' + streak.days + '</b><small>日</small></span></div>' +
+      '<div class="stat-cell"><span class="stat-k">ポイント</span><span class="stat-v"><b>' + points + '</b></span></div>' +
+      '</section>' +
+      (streak.days && !streak.todayDone ? '<p class="stats-note">今日はまだ学習していません</p>' : '');
   }
 
   function todayLabel(now) {
@@ -1084,7 +1099,6 @@
   function viewHome() {
     const st = store.state;
     const now = Date.now();
-    const c = SS.counts(st.words, st.progress, now);
     const streak = SS.streak(st.log, dnow(now));
     const today = SS.today(st.log, dnow(now));
     const goal = st.settings.dailyGoal;
@@ -1092,11 +1106,13 @@
     const cur = st.tests && st.tests.current;
     const mc = Q.missCounts(st.tests);
     const info = stepsInfo(now);
+    const d = new Date(now);
 
     let html = '<main class="screen home" id="main">';
-    html += '<header class="page-head home-head"><p class="eyebrow">' + esc(todayLabel(now)) + '</p>' +
-      '<h1 tabindex="-1" class="brand"><span class="wm-ja">暗記</span><span class="wm-en">CARD</span></h1></header>';
-    html += heroCard(streak, today, goal, st.log.totalPoints);
+    html += '<header class="home-head"><h1 tabindex="-1" class="brand"><span class="wm-ja">暗記</span><span class="wm-en">CARD</span></h1>' +
+      '<p class="home-date"><span>' + (d.getMonth() + 1) + '.' + String(d.getDate()).padStart(2, '0') + '</span>' + '日月火水木金土'.charAt(d.getDay()) + '</p></header>';
+    html += statsStrip(streak, today, goal, st.log.totalPoints);
+    html += installTip();
 
     if (sess || cur) {
       html += section('途中から', '<div class="list">' +
@@ -1105,27 +1121,19 @@
         '</div>');
     }
 
-    html += section('今日の学習', stepsHtml(info), { note: '上から順に', id: 'today' });
-    html += section('テスト', testsHtml(info.tests, now), { note: '毎日 ' + testTime() + ' から', id: 'tests' });
-
+    html += section('今日の学習', stepsHtml(info), { note: info.done + ' / 5', id: 'today' });
+    html += section('テスト', testsHtml(info.tests, now), { note: '毎日 ' + testTime() + '〜4:00', id: 'tests' });
     html += section('回', st.rounds.length
       ? '<div class="list">' + st.rounds.map(roundRow).join('') + '</div>'
       : '<p class="section-note">まだ回がありません。</p>');
-
     html += section('復習', '<div class="list">' +
-      rowLink('#misses', '覚えていないリスト', 'テストで間違えた問題・克服 ' + mc.solved + '件', '<b>' + mc.open + '</b>件') +
-      '</div>' +
-      '<div class="group"><dl class="facts">' +
-      '<div><dt>復習の時期</dt><dd>' + (c.dueFwd + c.dueRev) + '<small>枚</small></dd></div>' +
-      '<div><dt>明日</dt><dd>' + c.tomorrow + '<small>枚</small></dd></div>' +
-      '<div><dt>7日以内</dt><dd>' + c.week + '<small>枚</small></dd></div>' +
-      '</dl><p class="fine">覚えたカードは、忘れかけるころにまた出します（① ② に入ります）。</p></div>');
-
+      rowLink('#misses', '覚えていないリスト', mc.solved ? '克服 ' + mc.solved + '件' : '', '<b>' + mc.open + '</b>件') +
+      '</div>');
     html += '</main>';
     return html;
   }
 
-  /** ホームに並べる回の行 */
+  /** ホームに並べる回の行：名前・覚え具合の線・学習した数 */
   function roundRow(r) {
     const st = store.state;
     const items = Q.roundItems(st.words, r);
@@ -1134,12 +1142,66 @@
     const seg = (k) => (lv[k] ? '<span class="lv-seg lv-' + k + '" style="flex:' + lv[k] + '"></span>' : '');
     const stats = Q.roundStats(st.tests, r.id);
     const studied = items.length - lv.new;
-    const sub = r.wordIds.length + '語・学習済み ' + studied + '/' + items.length + '・' +
-      (stats.count ? '最高 ' + stats.best + '点' + (stats.perfectAt ? '（' + stats.perfectAt.no + '回目で満点）' : '') : 'テスト未受験');
-    return '<a class="row" href="#round-' + esc(r.id) + '"><span class="r-main"><span class="r-title">' + esc(r.title) + '</span>' +
+    const sub = r.wordIds.length + '語' + (stats.count ? '・最高 ' + stats.best + '点' : '');
+    return '<a class="row round-row" href="#round-' + esc(r.id) + '"><span class="r-main"><span class="r-title">' + esc(r.title) + '</span>' +
       '<span class="r-sub">' + esc(sub) + '</span>' +
       '<span class="lv-bar" aria-hidden="true">' + seg('settled') + seg('reviewing') + seg('learning') + seg('new') + '</span></span>' +
+      '<span class="r-detail"><b>' + studied + '</b>/' + items.length + '</span>' +
       icon('chevron') + '</a>';
+  }
+
+  /* ================= ホーム画面に追加（iPhone） ================= */
+
+  function isIOS() {
+    const ua = (navigator && navigator.userAgent) || '';
+    return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1);
+  }
+
+  /** このアプリのリンク（公開ページ版は claude.ai のリンク。1ファイル版はなし） */
+  function appLink() {
+    if (typeof window.CIF_APP_URL === 'string' && /^https:\/\//.test(window.CIF_APP_URL)) return window.CIF_APP_URL;
+    if (/^https?:$/.test(location.protocol)) return location.href.split('#')[0];
+    return '';
+  }
+
+  /** iPhone の Safari で開いているときだけ、ホームに小さく出す（閉じたら出さない） */
+  function installTip() {
+    if (isStandalone() || !isIOS() || store.state.meta.installHidden) return '';
+    return '<div class="install-tip">' +
+      '<button type="button" class="install-open" data-action="goto" data-to="install">' + icon('share', 'install-ic') +
+      '<span class="r-main"><span class="r-title">ホーム画面に追加</span><span class="r-sub">アプリのように全画面で開けます</span></span>' + icon('chevron') + '</button>' +
+      '<button type="button" class="icon-btn bare" data-action="hide-install" aria-label="閉じる">' + icon('close') + '</button></div>';
+  }
+
+  function viewInstall() {
+    const link = appLink();
+    const onClaude = /^https:\/\/claude\.ai\//.test(link);
+    let html = '<main class="screen install" id="main">' + pageHead('ホーム画面に追加', { back: 'home' });
+    if (isStandalone()) {
+      html += '<section class="install-done">' + doneMark() +
+        '<p class="install-done-t">ホーム画面から開いています</p>' +
+        '<p class="fine">次からも、ホーム画面の「' + APP_NAME + '」から開けます。</p></section></main>';
+      return html;
+    }
+    html += '<p class="lead">iPhone のホーム画面に「' + APP_NAME + '」を置くと、アプリのように全画面で開けます。</p>';
+    const step = (title, body) => '<li><span class="is-no" aria-hidden="true"></span><div class="is-body"><p class="is-title">' + title + '</p>' + body + '</div></li>';
+    html += '<ol class="install-steps">' +
+      step('Safari でこのアプリを開く',
+        (link
+          ? '<div class="link-box"><input id="app-link" type="text" readonly value="' + esc(link) + '" aria-label="このアプリのリンク" autocapitalize="off" spellcheck="false">' +
+            '<button type="button" class="btn secondary sm" data-action="copy-link">コピー</button></div>' +
+            '<p class="fine">Claude アプリで見ているときは、リンクをコピーして Safari のアドレス欄に貼り付けて開きます。</p>'
+          : '<p class="fine">このファイルの版はホーム画面に追加できません。公開ページのリンクを Safari で開いてください。</p>')) +
+      step('共有ボタン ' + icon('share', 'share-ic') + ' をタップ', '<p class="fine">画面の下にあります（iPad は右上）。見つからないときは、アドレス欄の「…」から「共有」。</p>') +
+      step('「ホーム画面に追加」をタップ', '<p class="fine">共有のメニューを下にスクロールすると出てきます。</p>') +
+      step('名前を「' + APP_NAME + '」にして「追加」', '<p class="fine">「Webアプリとして開く」はオンのままにします。' + (onClaude ? 'アイコンの絵は claude.ai のものになります。' : '') + '</p>') +
+      step('ホーム画面の「' + APP_NAME + '」から開く', '<p class="fine">' + (onClaude
+        ? 'はじめて開いたときに claude.ai のログイン画面が出たら、いつものアカウントでログインしてください。学習の記録はアカウントに保存されているので、続きから使えます。'
+        : '学習の記録は、この端末に保存されます。') + '</p>') +
+      '</ol>';
+    html += '<p class="section-note">Android（Chrome）は、右上の「⋮」から「ホーム画面に追加」。</p>';
+    html += '</main>';
+    return html;
   }
 
   /* ================= カード学習 ================= */
@@ -2527,7 +2589,7 @@
   function notifySection() {
     const tt = testTime();
     const opts = { now: Date.now(), testTime: tt, startDay: startDayTs(), appName: APP_NAME };
-    const g = (uid, title, sub) => '<a class="row" href="' + esc(Sched.googleCalendarUrl(opts, uid)) + '" target="_blank" rel="noopener noreferrer">' + rowInner(title, 'Googleカレンダーに追加・' + sub, '', '') + '</a>';
+    const g = (uid, title, sub) => '<a class="row" data-cal="1" href="' + esc(Sched.googleCalendarUrl(opts, uid)) + '" target="_blank" rel="noopener noreferrer">' + rowInner(title, 'Googleカレンダーに追加・' + sub, '', '') + '</a>';
     return section('テストの時間と通知', '<div class="group">' +
       '<div class="f"><span class="f-label">毎日のテストの時間</span>' +
       selectBox('test-time', tt, Sched.TIMES.map((x) => [x, x + (x === Sched.DEFAULT_TIME ? '（はじめの設定）' : '')]), '毎日のテストの時間') + '</div>' +
@@ -2545,6 +2607,11 @@
     { id: 'notify' });
   }
 
+  /** カレンダーに予定を入れた（ホームの「通知を受け取る」を出さない） */
+  function markCalendar() {
+    if (!store.state.meta.calendarAt) store.set('meta', Object.assign({}, store.state.meta, { calendarAt: Date.now() }));
+  }
+
   /** カレンダーの予定（.ics）を保存する */
   function addCalendar() {
     const tt = testTime();
@@ -2552,6 +2619,7 @@
     const text = Sched.calendar({ now: Date.now(), testTime: tt, startDay: startDayTs(), appName: APP_NAME, url });
     const name = 'ankicard-' + tt.replace(':', '') + '.ics';
     const fail = () => toast('保存できませんでした。下の Googleカレンダーの行を使ってください。');
+    markCalendar();
     if (typeof C.saveFile === 'function') {
       C.saveFile(name, text).then((ok) => (ok ? toast('カレンダーのファイルを保存しました。開いて予定を追加してください。') : fail()), fail);
       return;
@@ -2572,25 +2640,12 @@
     }
   }
 
-  /** iPhone のホーム画面に追加する方法 */
+  /** 設定の「ホーム画面」：手順の画面へ */
   function homeScreenSection() {
-    const db = store.status.backend === 'db';
     if (isStandalone()) {
       return section('ホーム画面', '<div class="group"><p class="ok-line">ホーム画面から開いています。</p></div>', { id: 'home-screen' });
     }
-    return section('ホーム画面に追加（iPhone）', '<div class="group">' +
-      '<ol class="howto-list">' +
-      '<li><span>このページを <b>Safari</b> で開きます。</span></li>' +
-      '<li><span>共有ボタン ' + icon('share', 'share-ic') + ' をタップします。見つからないときは、アドレスバーの「…」から「共有」を選びます。</span></li>' +
-      '<li><span>下にスクロールして「<b>ホーム画面に追加</b>」をタップします。</span></li>' +
-      '<li><span>「Webアプリとして開く」はオンのまま、「<b>追加</b>」をタップします。</span></li>' +
-      '</ol>' +
-      '<p class="fine">ホーム画面のアイコンから、アプリのように全画面で開けます。' +
-      (db
-        ? 'はじめて開いたときにログイン画面が出たら、いつものアカウントでログインしてください。学習の記録はアカウントに保存されるので、続きから使えます。'
-        : '学習の記録はこの端末に保存されます。Safari で開いたときとは記録が別になることがあるので、移すときは「ファイルに書き出す」を使ってください。') +
-      '</p><p class="fine">Android（Chrome）：右上の「⋮」→「ホーム画面に追加」。</p>' +
-      '</div>', { id: 'home-screen' });
+    return section('ホーム画面', '<div class="list">' + rowLink('#install', 'ホーム画面に追加（iPhone）', 'アプリのように全画面で開けます') + '</div>', { id: 'home-screen' });
   }
 
   function audioSection() {
@@ -2830,6 +2885,7 @@
   /* ================= 操作 ================= */
 
   function onClick(e) {
+    if (e.target.closest && e.target.closest('a[data-cal]')) markCalendar();
     const el = e.target.closest('[data-action]');
     if (!el) return;
     const a = el.dataset.action;
@@ -2868,6 +2924,26 @@
       }
       case 'add-calendar':
         addCalendar();
+        return;
+      case 'copy-link': {
+        const input = document.getElementById('app-link');
+        const text = input ? input.value : appLink();
+        const done = () => toast('リンクをコピーしました。Safari のアドレス欄に貼り付けて開いてください。');
+        const fail = () => {
+          if (input) { input.focus(); input.select(); }
+          toast('自動でコピーできませんでした。リンクを長押しして「すべてを選択」→「コピー」してください。');
+        };
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+          else fail();
+        } catch (err) {
+          fail();
+        }
+        return;
+      }
+      case 'hide-install':
+        store.set('meta', Object.assign({}, store.state.meta, { installHidden: true }));
+        render(false);
         return;
       case 'flip':
         flip();

@@ -4,9 +4,10 @@
  *
  *   AI音声のファイル（audio/）は1つにまとめられないので、この版は端末の読み上げを使う。
  *
- * node scripts/build-single.js --artifact <出力パス>
+ * node scripts/build-single.js --artifact <出力パス> [--url <公開ページのリンク>]
  *   → claude.ai の公開ページ（Artifact）用。保存先に公開ページの保存領域を使う。
  *     AI音声は audio/*.mp3 をページと一緒に公開する（ページから audio/xxx.mp3 で読める）。
+ *     --url：「ホーム画面に追加」の画面で、コピーできるように出すリンク（https://claude.ai/artifact/…）
  */
 'use strict';
 const fs = require('fs');
@@ -57,7 +58,7 @@ function standalone() {
   ].join('\n');
 }
 
-function artifact() {
+function artifact(url) {
   // 公開ページは <html><head><body> を自動で付けるので、中身だけを書く
   return [
     '<title>暗記CARD</title>',
@@ -65,6 +66,7 @@ function artifact() {
     fontLink,
     '<style>\n' + css + '\n</style>',
     body,
+    url ? '<script>window.CIF_APP_URL = ' + JSON.stringify(url) + ';</script>' : '',
     scriptTags('js/artifact-backend.js'),
     '',
   ].join('\n');
@@ -74,8 +76,11 @@ const args = process.argv.slice(2);
 const ai = args.indexOf('--artifact');
 if (ai >= 0) {
   const out = path.resolve(args[ai + 1] || path.join(root, 'dist', 'artifact.html'));
+  const ui = args.indexOf('--url');
+  const url = ui >= 0 ? args[ui + 1] : '';
+  if (url && !/^https:\/\/claude\.ai\/artifact\/[A-Za-z0-9-]+$/.test(url)) throw new Error('--url は https://claude.ai/artifact/… の形にしてください: ' + url);
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  fs.writeFileSync(out, artifact());
+  fs.writeFileSync(out, artifact(url));
   console.log('wrote ' + out);
 } else {
   const out = path.join(root, 'dist', 'core-image-cards.html');
