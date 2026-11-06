@@ -72,6 +72,9 @@
     deviceOpen: false,
     listenPlayed: '',
     alertTimer: null,
+    recordsText: '',
+    moveText: '',
+    moveError: '',
   };
 
   /* ================= アイコン ================= */
@@ -159,7 +162,7 @@
     try { h = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (e) { h = ''; }
     if (!h || h === 'title') return { route: 'title', param: '' };
     if (h === 'home') return { route: 'home', param: '' };
-    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses', 'check', 'install'].includes(h)) return { route: h, param: '' };
+    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses', 'check', 'install', 'move', 'move-in'].includes(h)) return { route: h, param: '' };
     if (h.indexOf('word-') === 0) return { route: 'word', param: h.slice(5) };
     if (h.indexOf('round-') === 0) return { route: 'round', param: h.slice(6) };
     if (h.indexOf('score-') === 0) return { route: 'score', param: h.slice(6) };
@@ -227,10 +230,12 @@
       case 'misses': html = viewMisses(); break;
       case 'check': html = viewCheck(); break;
       case 'install': html = viewInstall(); break;
+      case 'move': html = viewMove(); break;
+      case 'move-in': html = viewMoveIn(); break;
       default: html = viewHome();
     }
     if (html == null) return;
-    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses', 'check', 'install'].includes(ui.route);
+    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses', 'check', 'install', 'move', 'move-in'].includes(ui.route);
     $app.innerHTML = saveBanner() + html + (withNav ? navBar() : '');
     document.body.dataset.route = ui.route;
     if (resetScroll) window.scrollTo(0, 0);
@@ -1112,7 +1117,7 @@
     html += '<header class="home-head"><h1 tabindex="-1" class="brand"><span class="wm-ja">暗記</span><span class="wm-en">CARD</span></h1>' +
       '<p class="home-date"><span>' + (d.getMonth() + 1) + '.' + String(d.getDate()).padStart(2, '0') + '</span>' + '日月火水木金土'.charAt(d.getDay()) + '</p></header>';
     html += statsStrip(streak, today, goal, st.log.totalPoints);
-    html += installTip();
+    html += moveOutTip() + installTip() + moveInTip();
 
     if (sess || cur) {
       html += section('途中から', '<div class="list">' +
@@ -1150,6 +1155,125 @@
       icon('chevron') + '</a>';
   }
 
+  /* ================= 新しいアプリに移る（claude.ai 版 → Claude を通さずに開ける版） ================= */
+
+  /** Claude を通さずに開ける新しいアプリのリンク（claude.ai 版にだけ入れる） */
+  function newAppLink() {
+    return typeof window.CIF_NEW_URL === 'string' && /^https:\/\//.test(window.CIF_NEW_URL) ? window.CIF_NEW_URL : '';
+  }
+
+  function tipCard(cls, to, ic, title, sub, hideAction) {
+    return '<div class="tip ' + cls + '">' +
+      '<button type="button" class="tip-open ' + cls + '-open" data-action="goto" data-to="' + to + '">' + icon(ic, 'tip-ic') +
+      '<span class="r-main"><span class="r-title">' + esc(title) + '</span><span class="r-sub">' + esc(sub) + '</span></span>' + icon('chevron') + '</button>' +
+      (hideAction ? '<button type="button" class="icon-btn bare" data-action="' + hideAction + '" aria-label="閉じる">' + icon('close') + '</button>' : '') + '</div>';
+  }
+
+  /** claude.ai 版のホームの上：新しいアプリに移る案内（いつも出す） */
+  function moveOutTip() {
+    if (!newAppLink()) return '';
+    return tipCard('move-tip', 'move', 'share', '新しいアプリに移る', 'Claude を通さずに、ホーム画面からすぐ開けます', '');
+  }
+
+  /** 新しいアプリのホームの上：まだ学習していないあいだだけ「記録を移す」を出す */
+  function moveInTip() {
+    if (newAppLink() || store.state.meta.moveInHidden || !/^https?:$/.test(location.protocol)) return '';
+    if (Object.keys((store.state.log && store.state.log.days) || {}).length) return '';
+    return tipCard('movein-tip', 'move-in', 'list', '記録を移す', 'claude.ai 版の記録を、このアプリに入れます', 'hide-move-in');
+  }
+
+  function stepItem(title, body) {
+    return '<li><span class="is-no" aria-hidden="true"></span><div class="is-body"><p class="is-title">' + title + '</p>' + body + '</div></li>';
+  }
+
+  function linkBox(id, link, action, label) {
+    return '<div class="link-box"><input id="' + id + '" type="text" readonly value="' + esc(link) + '" aria-label="' + esc(label) + '" autocapitalize="off" spellcheck="false">' +
+      '<button type="button" class="btn secondary sm" data-action="' + action + '">コピー</button></div>';
+  }
+
+  /** 文字をコピーする（できないときは欄を選んで、長押しでコピーしてもらう） */
+  function copyText(text, okMsg, fieldId) {
+    const fail = () => {
+      const el = fieldId && document.getElementById(fieldId);
+      if (el) { el.focus(); el.select(); }
+      toast('自動でコピーできませんでした。欄を長押しして「すべてを選択」→「コピー」してください。');
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(okMsg), fail);
+      else fail();
+    } catch (err) {
+      fail();
+    }
+  }
+
+  function viewMove() {
+    const link = newAppLink();
+    let html = '<main class="screen install" id="main">' + pageHead('新しいアプリに移る', { back: 'home' });
+    if (!link) return html + '<p class="lead">このページは claude.ai 版で使います。</p></main>';
+    html += '<p class="lead">Claude を通さずに、ホーム画面のアイコンからすぐ開ける「' + APP_NAME + '」です。ここまでの記録も、そのまま移せます。</p>';
+    html += '<ol class="install-steps">' +
+      stepItem('記録をコピー', '<button type="button" class="btn primary block" data-action="copy-records">記録をコピー</button>' +
+        (ui.recordsText ? '<textarea id="records-text" rows="3" readonly spellcheck="false">' + esc(ui.recordsText) + '</textarea>' : '') +
+        '<p class="fine">単語・学習の記録・テストの記録・覚えていないリストを、まとめてコピーします。</p>') +
+      stepItem('新しいアプリを Safari で開く', linkBox('new-link', link, 'copy-new-link', '新しいアプリのリンク') +
+        '<p class="fine">リンクをコピーして、Safari のアドレス欄に貼り付けて開きます。<a href="' + esc(link) + '" target="_blank" rel="noopener">開く</a></p>') +
+      stepItem('新しいアプリで「記録を移す」', '<p class="fine">ホームの上の「記録を移す」をタップして、コピーした記録を貼り付け、「読み込む」をタップします。</p>') +
+      stepItem('新しいアプリをホーム画面に追加', '<p class="fine">共有ボタン ' + icon('share', 'share-ic') + ' →「ホーム画面に追加」→ 名前は「' + APP_NAME + '」→「追加」。</p>') +
+      stepItem('古いアイコンを消す', '<p class="fine">ホーム画面にある claude.ai 版のアイコン（Claude の絵）は、長押しして削除できます。これからは新しい「' + APP_NAME + '」から開きます。</p>') +
+      '</ol></main>';
+    return html;
+  }
+
+  function viewMoveIn() {
+    let html = '<main class="screen install" id="main">' + pageHead('記録を移す', { back: 'home' });
+    html += '<p class="lead">claude.ai 版の「新しいアプリに移る」でコピーした記録を、下に貼り付けて「読み込む」をタップしてください。</p>';
+    html += '<div class="group"><label class="f" for="move-text"><span class="f-label">コピーした記録</span>' +
+      '<textarea id="move-text" rows="5" placeholder="ここを長押しして「ペースト」" spellcheck="false" autocapitalize="off">' + esc(ui.moveText) + '</textarea></label>' +
+      (ui.moveError ? '<div class="banner warn" role="alert">' + esc(ui.moveError) + '</div>' : '') +
+      '<button type="button" class="btn primary block" data-action="move-in">読み込む</button>' +
+      '<p class="fine">単語・学習の記録・テストの記録・覚えていないリストが、このアプリに入ります。</p></div>';
+    html += '</main>';
+    return html;
+  }
+
+  /** 貼り付けた記録を読み込む（このアプリで学習した記録があるときは、置き換えてよいか確かめる） */
+  function moveIn() {
+    const text = String(ui.moveText || '').trim();
+    if (!text) {
+      ui.moveError = '記録が貼り付けられていません。claude.ai 版で「記録をコピー」してから、ここに貼り付けてください。';
+      render(false);
+      return;
+    }
+    const p = ST.parseImport(text);
+    if (!p.ok) {
+      ui.moveError = p.error;
+      render(false);
+      return;
+    }
+    const apply = () => {
+      const next = ST.applyImport(store.state, p.data, 'replace');
+      Object.keys(next).forEach((k) => store.set(k, next[k]));
+      rebuildIndex();
+      ensureStartDay();
+      if (speech) speech.refresh(false);
+      ui.moveText = '';
+      ui.moveError = '';
+      toast('記録を移しました（学習 ' + p.stats.days + '日分・テスト ' + p.stats.attempts + '回）。');
+      go('home', true);
+    };
+    if (Object.keys((store.state.log && store.state.log.days) || {}).length) {
+      openModal({
+        title: 'このアプリの記録を置き換えますか？',
+        body: 'このアプリで学習した記録は消え、コピーした記録になります。',
+        ok: '置き換える',
+        danger: true,
+        onOk: apply,
+      });
+      return;
+    }
+    apply();
+  }
+
   /* ================= ホーム画面に追加（iPhone） ================= */
 
   function isIOS() {
@@ -1166,17 +1290,19 @@
 
   /** iPhone の Safari で開いているときだけ、ホームに小さく出す（閉じたら出さない） */
   function installTip() {
-    if (isStandalone() || !isIOS() || store.state.meta.installHidden) return '';
-    return '<div class="install-tip">' +
-      '<button type="button" class="install-open" data-action="goto" data-to="install">' + icon('share', 'install-ic') +
-      '<span class="r-main"><span class="r-title">ホーム画面に追加</span><span class="r-sub">アプリのように全画面で開けます</span></span>' + icon('chevron') + '</button>' +
-      '<button type="button" class="icon-btn bare" data-action="hide-install" aria-label="閉じる">' + icon('close') + '</button></div>';
+    if (newAppLink() || isStandalone() || !isIOS() || store.state.meta.installHidden) return '';
+    return tipCard('install-tip', 'install', 'share', 'ホーム画面に追加', 'アプリのように全画面で開けます', 'hide-install');
   }
 
   function viewInstall() {
     const link = appLink();
     const onClaude = /^https:\/\/claude\.ai\//.test(link);
     let html = '<main class="screen install" id="main">' + pageHead('ホーム画面に追加', { back: 'home' });
+    if (newAppLink()) {
+      html += '<p class="lead">Claude を通さずに開ける新しいアプリができました。ホーム画面には、新しいアプリを追加してください。</p>' +
+        '<div class="btn-col"><button type="button" class="btn primary block" data-action="goto" data-to="move">新しいアプリに移る</button></div></main>';
+      return html;
+    }
     if (isStandalone()) {
       html += '<section class="install-done">' + doneMark() +
         '<p class="install-done-t">ホーム画面から開いています</p>' +
@@ -1184,14 +1310,13 @@
       return html;
     }
     html += '<p class="lead">iPhone のホーム画面に「' + APP_NAME + '」を置くと、アプリのように全画面で開けます。</p>';
-    const step = (title, body) => '<li><span class="is-no" aria-hidden="true"></span><div class="is-body"><p class="is-title">' + title + '</p>' + body + '</div></li>';
+    const step = stepItem;
     html += '<ol class="install-steps">' +
       step('Safari でこのアプリを開く',
         (link
-          ? '<div class="link-box"><input id="app-link" type="text" readonly value="' + esc(link) + '" aria-label="このアプリのリンク" autocapitalize="off" spellcheck="false">' +
-            '<button type="button" class="btn secondary sm" data-action="copy-link">コピー</button></div>' +
-            '<p class="fine">Claude アプリで見ているときは、リンクをコピーして Safari のアドレス欄に貼り付けて開きます。</p>'
-          : '<p class="fine">このファイルの版はホーム画面に追加できません。公開ページのリンクを Safari で開いてください。</p>')) +
+          ? linkBox('app-link', link, 'copy-link', 'このアプリのリンク') +
+            '<p class="fine">' + (onClaude ? 'Claude アプリで見ているときは、リンクをコピーして Safari のアドレス欄に貼り付けて開きます。' : 'いま Safari で見ているなら、そのまま次へ進みます。') + '</p>'
+          : '<p class="fine">このファイルの版はホーム画面に追加できません。アプリのリンクを Safari で開いてください。</p>')) +
       step('共有ボタン ' + icon('share', 'share-ic') + ' をタップ', '<p class="fine">画面の下にあります（iPad は右上）。見つからないときは、アドレス欄の「…」から「共有」。</p>') +
       step('「ホーム画面に追加」をタップ', '<p class="fine">共有のメニューを下にスクロールすると出てきます。</p>') +
       step('名前を「' + APP_NAME + '」にして「追加」', '<p class="fine">「Webアプリとして開く」はオンのままにします。' + (onClaude ? 'アイコンの絵は claude.ai のものになります。' : '') + '</p>') +
@@ -2925,22 +3050,30 @@
       case 'add-calendar':
         addCalendar();
         return;
-      case 'copy-link': {
-        const input = document.getElementById('app-link');
-        const text = input ? input.value : appLink();
-        const done = () => toast('リンクをコピーしました。Safari のアドレス欄に貼り付けて開いてください。');
-        const fail = () => {
-          if (input) { input.focus(); input.select(); }
-          toast('自動でコピーできませんでした。リンクを長押しして「すべてを選択」→「コピー」してください。');
-        };
-        try {
-          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
-          else fail();
-        } catch (err) {
-          fail();
+      case 'copy-link':
+        copyText(appLink(), 'リンクをコピーしました。Safari のアドレス欄に貼り付けて開いてください。', 'app-link');
+        return;
+      case 'copy-new-link':
+        copyText(newAppLink(), 'リンクをコピーしました。Safari のアドレス欄に貼り付けて開いてください。', 'new-link');
+        return;
+      case 'copy-records': {
+        const text = JSON.stringify(ST.buildExport(store.state, { includeProgress: true }));
+        ui.recordsText = text;
+        copyText(text, '記録をコピーしました。新しいアプリの「記録を移す」に貼り付けてください。', 'records-text');
+        if (!document.getElementById('records-text')) {
+          // コピーできなかったときに選べるよう、欄を出しておく
+          const btn = el.closest('.is-body');
+          if (btn) btn.insertAdjacentHTML('beforeend', '<textarea id="records-text" rows="3" readonly spellcheck="false">' + esc(text) + '</textarea>');
         }
         return;
       }
+      case 'move-in':
+        moveIn();
+        return;
+      case 'hide-move-in':
+        store.set('meta', Object.assign({}, store.state.meta, { moveInHidden: true }));
+        render(false);
+        return;
       case 'hide-install':
         store.set('meta', Object.assign({}, store.state.meta, { installHidden: true }));
         render(false);
@@ -3169,6 +3302,11 @@
     }
     if (t.id === 'import-text') {
       ui.importText = t.value;
+      return;
+    }
+    if (t.id === 'move-text') {
+      ui.moveText = t.value;
+      ui.moveError = '';
       return;
     }
     if (t.id === 'slow-gap') {

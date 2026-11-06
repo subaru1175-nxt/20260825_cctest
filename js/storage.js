@@ -593,6 +593,8 @@
       data.log = state.log;
       data.settings = state.settings;
       data.tests = Object.assign({}, state.tests || emptyTests(), { current: null });
+      // まとめテスト（5日ごと）の数え方がずれないように、使いはじめた日も移す
+      if (state.meta && /^\d{4}-\d{2}-\d{2}$/.test(state.meta.startDay || '')) data.meta = { startDay: state.meta.startDay };
     }
     return data;
   }
@@ -641,6 +643,7 @@
       settings: json && json.settings ? normalizeSettings(json.settings) : null,
       rounds: json && Array.isArray(json.rounds) ? normalizeRounds(json.rounds) : null,
       tests: json && json.tests ? normalizeTests(json.tests) : null,
+      meta: json && json.meta && /^\d{4}-\d{2}-\d{2}$/.test(str(json.meta.startDay, 10)) ? { startDay: str(json.meta.startDay, 10) } : null,
     };
     const stats = {
       words: words.length,
@@ -669,6 +672,7 @@
         session: null,
         rounds: mergeRounds(data.rounds || [], [], ids).rounds,
         tests: data.tests || emptyTests(),
+        meta: Object.assign({}, state.meta || {}, data.meta || {}),
       };
     }
     const byId = new Map(state.words.map((w) => [w.id, w]));

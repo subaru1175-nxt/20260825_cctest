@@ -1427,7 +1427,7 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.title-screen');
     await page.click('.title-screen');
     await page.waitForSelector('.home .install-tip');
-    await page.click('.install-open');
+    await page.click('.install-tip-open');
     await page.waitForSelector('.install-steps');
     eq(await page.$$eval('.install-steps .is-title', (els) => els.map((e) => e.textContent)), [
       'Safari でこのアプリを開く', '共有ボタン  をタップ', '「ホーム画面に追加」をタップ', '名前を「暗記CARD」にして「追加」', 'ホーム画面の「暗記CARD」から開く',
@@ -1448,6 +1448,113 @@ async function noHScroll(page, label) {
     ok((await page.textContent('.install-done')).includes('ホーム画面から開いています'));
     eq(errors, []);
     await ctx.close();
+  });
+
+  await test('記録を移す：claude.ai 版の「新しいアプリに移る」でコピー → 新しいアプリの「記録を移す」に貼り付け', async () => {
+    // claude.ai 版（新しいアプリのリンク入り）で1セット学習して、記録をコピー
+    const old = await newPage();
+    await old.ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: URL0 });
+    await old.page.addInitScript(() => { window.CIF_NEW_URL = 'https://example.github.io/app/'; });
+    await old.page.reload();
+    await old.page.waitForSelector('.home .move-tip');
+    ok(!(await old.page.$('.movein-tip')), 'claude.ai 版には「記録を移す」を出さない');
+    await old.page.click('.steps .step-go');
+    await old.page.waitForSelector('.card-front');
+    await finishSet(old.page, 'good');
+    await old.page.goto(URL0 + '#home');
+    await old.page.waitForSelector('.home .move-tip');
+    await old.page.click('.move-tip-open');
+    await old.page.waitForSelector('.install-steps');
+    eq(await old.page.inputValue('#new-link'), 'https://example.github.io/app/');
+    await old.page.click('[data-action="copy-records"]');
+    await old.page.waitForFunction(() => document.getElementById('toast').textContent.includes('記録をコピーしました'));
+    const copied = await old.page.evaluate(() => navigator.clipboard.readText());
+    const data = JSON.parse(copied);
+    eq(Object.keys(data.progress).length, 10, '学習記録');
+    ok(data.log && data.tests && data.meta && data.meta.startDay === '2026-11-05', 'テストの記録・使いはじめた日');
+    // ホーム画面に追加の画面は、新しいアプリへ案内する
+    await old.page.goto(URL0 + '#install');
+    await old.page.waitForSelector('[data-to="move"]');
+    eq(old.page.errors, []);
+    await old.ctx.close();
+
+    // 新しいアプリ：まだ学習していないので「記録を移す」が出る
+    const neu = await newPage();
+    await neu.page.waitForSelector('.home .movein-tip');
+    ok(!(await neu.page.$('.move-tip')), '新しいアプリには「新しいアプリに移る」を出さない');
+    await neu.page.click('.movein-tip-open');
+    await neu.page.waitForSelector('#move-text');
+    await neu.page.click('[data-action="move-in"]');
+    await neu.page.waitForSelector('.banner.warn');
+    ok((await neu.page.textContent('.banner.warn')).includes('貼り付けられていません'));
+    await neu.page.fill('#move-text', '{oops');
+    await neu.page.click('[data-action="move-in"]');
+    await neu.page.waitForFunction(() => document.querySelector('.banner.warn').textContent.includes('JSON'));
+    await neu.page.fill('#move-text', copied);
+    await neu.page.click('[data-action="move-in"]');
+    await neu.page.waitForSelector('.home');
+    await neu.page.waitForFunction(() => document.getElementById('toast').textContent.includes('記録を移しました'));
+    eq((await stepsOf(neu.page))[0], ['done', '10/10'], '移した記録で ① は終わっている');
+    eq(Object.keys(await ls(neu.page, 'progress')).length, 10);
+    eq((await ls(neu.page, 'meta')).startDay, '2026-11-05', '使いはじめた日も移る');
+    ok(!(await neu.page.$('.movein-tip')), '移したあとは出さない');
+    eq(neu.page.errors, []);
+    await neu.ctx.close();
+  });
+
+  await test('GitHub Pages のような場所（/20260825_cctest/）でも、そのまま開ける（アイコン・音声・オフライン）', async () => {
+    const http = require('http');
+    const fs = require('fs');
+    const path = require('path');
+    const root = path.resolve(__dirname, '..');
+    const base = '/20260825_cctest/';
+    const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.mp3': 'audio/mpeg', '.webmanifest': 'application/manifest+json' };
+    const srv = http.createServer((req, res) => {
+      let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+      if (!p.startsWith(base)) { res.writeHead(404); res.end(); return; }
+      p = p.slice(base.length) || 'index.html';
+      const f = path.join(root, p);
+      if (!f.startsWith(root) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream' });
+      res.end(fs.readFileSync(f));
+    });
+    await new Promise((r) => srv.listen(8766, r));
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'ja-JP', timezoneId: 'Asia/Tokyo' });
+    await ctx.addInitScript(speechMock('mock'));
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    const site = 'http://localhost:8766' + base;
+    await page.goto(site);
+    await page.waitForSelector('.title-screen');
+    await page.click('.title-screen');
+    await page.waitForSelector('.home');
+    const head = await page.evaluate(async () => {
+      const man = await (await fetch(document.querySelector('link[rel="manifest"]').href)).json();
+      const icon = await fetch(document.querySelector('link[rel="apple-touch-icon"]').href);
+      return { man, icon: [icon.status, (await icon.blob()).size] };
+    });
+    eq([head.man.name, head.man.short_name, head.man.display], ['暗記CARD', '暗記CARD', 'standalone']);
+    ok(head.icon[0] === 200 && head.icon[1] > 5000, 'ホーム画面のアイコン');
+    // サービスワーカー（オフライン用）が、このフォルダで動く
+    const scope = await page.evaluate(async () => (await navigator.serviceWorker.ready).scope);
+    eq(scope, site, 'オフライン用の仕組みの範囲');
+    // AI音声のファイルを、このフォルダから読める
+    await page.click('.steps .step-go');
+    await page.waitForSelector('.card-front');
+    await page.click('.card-front .audio button[data-slow="0"]');
+    await page.waitForFunction(() => window.__clips.length > 0, null, { timeout: 8000 });
+    const played = (await page.evaluate(() => window.__clips))[0];
+    const abs = await page.evaluate((u) => new URL(u, location.href).href, played.url);
+    ok(abs.startsWith(site + 'audio/'), '音声のファイルはこのフォルダの audio/: ' + abs);
+    eq(await page.evaluate(async (u) => (await fetch(u)).status, abs), 200, '音声のファイルを読める');
+    // 手順の画面のリンクは、このアプリのアドレス
+    await page.goto(site + '#install');
+    await page.waitForSelector('#app-link');
+    eq(await page.inputValue('#app-link'), site);
+    eq(errors, []);
+    await ctx.close();
+    srv.close();
   });
 
   await browser.close();
