@@ -54,6 +54,8 @@
     autoplay: false,
     studyMode: 'fwd',
     testTime: '20:00',
+    sfx: true,
+    seriesFocus: '',
   };
 
   /* ---------- 保存先 ---------- */
@@ -461,6 +463,12 @@
 
   /* ---------- 回（第1回・第2回…） ---------- */
 
+  /** シリーズの名前。前の版の「第1回」は「シリーズ1」にそろえる */
+  function seriesTitle(title, no) {
+    if (!title || /^第\s*\d+\s*回$/.test(title)) return 'シリーズ' + no;
+    return title;
+  }
+
   function normalizeRounds(list) {
     if (!Array.isArray(list)) return [];
     const seen = new Set();
@@ -470,7 +478,7 @@
       .map((r) => ({
         id: String(r.id),
         no: Math.max(1, Math.floor(num(r.no, 1))),
-        title: str(r.title, 40) || '第' + Math.max(1, Math.floor(num(r.no, 1))) + '回',
+        title: seriesTitle(str(r.title, 40), Math.max(1, Math.floor(num(r.no, 1)))),
         source: str(r.source, 200),
         addedAt: str(r.addedAt, 20),
         wordIds: (Array.isArray(r.wordIds) ? r.wordIds : []).map((x) => str(x, 64)).filter((x) => /^[A-Za-z0-9][A-Za-z0-9-]*$/.test(x)),
@@ -574,6 +582,8 @@
     out.autoplay = !!s.autoplay;
     out.studyMode = s.studyMode === 'rev' ? 'rev' : 'fwd';
     out.testTime = sched.normalizeTime(s.testTime);
+    out.sfx = s.sfx !== false;
+    out.seriesFocus = /^[A-Za-z0-9-]{1,40}$/.test(String(s.seriesFocus || '')) ? String(s.seriesFocus) : '';
     return out;
   }
 

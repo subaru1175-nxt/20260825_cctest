@@ -29,6 +29,7 @@
 
 ```sh
 # 1) 素材をそろえる（下の表）。置き場所は任意のフォルダ（例: ~/kokoro）
+#    bash scripts/audio/fetch-models.sh ~/kokoro  で npm・PyPI から取ってきて sha256 を確かめられる
 # 2) Python 3.10 以上で
 python -m venv .venv && .venv/bin/pip install onnxruntime numpy praat-parselmouth
 # 3) 生成（ffmpeg と node が必要。586件で約14分・4コア。2回目からは合成結果を使い回すので約1分）

@@ -23,9 +23,9 @@ function respond(q, ok) {
   return ok ? right : right.slice().reverse();
 }
 
-test('第1回: 資料の98語。要確認（fell・brighe）を除いた用法が出題される', () => {
+test('シリーズ1: 資料の98語。要確認（fell・brighe）を除いた用法が出題される', () => {
   const r = round1();
-  assert.equal(r.title, '第1回');
+  assert.equal(r.title, 'シリーズ1');
   assert.equal(r.wordIds.length, 98);
   ['w-take', 'w-well', 'w-pretty', 'w-look'].forEach((id) => assert.ok(r.wordIds.includes(id), id));
   const items = Q.roundItems(words(), r);
@@ -192,7 +192,7 @@ test('保存データ: テストの記録は書き出し・読み込みで戻る
   assert.equal(next.rounds[0].id, 'r1');
 });
 
-test('回の追加: 新しい版の回は足され、すでにある回には増えた単語だけ足す', () => {
+test('シリーズの追加: 新しい版のシリーズは足され、すでにあるシリーズには増えた単語だけ足す。前の版の「第1回」は「シリーズ1」に', () => {
   const ids = new Set(words().map((w) => w.id).concat(['w-mine']));
   const mine = [{ id: 'r1', no: 1, title: '第1回', wordIds: ['w-begin', 'w-mine'] }];
   const { rounds, changed } = ST.mergeRounds(ST.normalizeRounds(mine), seed.rounds, ids);
@@ -200,10 +200,25 @@ test('回の追加: 新しい版の回は足され、すでにある回には増
   assert.equal(rounds[0].wordIds.length, 99, '自分で入れた単語も残る');
   assert.equal(rounds[0].wordIds[0], 'w-begin');
   const r2 = ST.mergeRounds(rounds, seed.rounds.concat([{ id: 'r2', no: 2, title: '第2回', wordIds: ['w-light'] }]), ids);
-  assert.deepEqual(r2.rounds.map((r) => r.title), ['第1回', '第2回']);
+  assert.deepEqual(r2.rounds.map((r) => r.title), ['シリーズ1', 'シリーズ2']);
+  assert.deepEqual(ST.normalizeRounds([{ id: 'r3', no: 3, title: '' }, { id: 'r4', no: 4, title: '英検の単語' }]).map((r) => r.title), ['シリーズ3', '英検の単語'], '名前のないシリーズ・自分で付けた名前');
 });
 
-test('カード学習を回や覚えていないリストに絞れる', () => {
+test('学習中のシリーズ：新しいカードは、そのシリーズから先に出す（復習の時期のカードはその前）', () => {
+  const ws = words();
+  const r1 = Q.roundItems(ws, round1()).map((it) => it.sense.id);
+  const other = S.studyable(ws).map((it) => it.sense.id).filter((id) => !r1.includes(id));
+  assert.ok(other.length >= 10, 'シリーズ1にない単語がある');
+  const prefer = other.slice(0, 12);
+  const set = S.build(ws, {}, 'fwd', T0, { prefer });
+  assert.ok(set.cards.every((id) => prefer.includes(id)), '新しいカードは学習中のシリーズから: ' + set.cards.join(','));
+  // 復習の時期のカードは、新しいカードより先
+  const progress = { [r1[0]]: { fwd: { reps: 1, lapses: 0, streak: 1, interval: 1, ease: 2.5, due: T0 - 1000, last: T0 - DAY, history: [] } } };
+  const set2 = S.build(ws, progress, 'fwd', T0, { prefer });
+  assert.equal(set2.cards.includes(r1[0]), true, '復習の時期のカードも入る');
+});
+
+test('カード学習をシリーズや覚えていないリストに絞れる', () => {
   const ws = words();
   const only = Q.roundItems(ws, round1()).map((it) => it.sense.id);
   const set = S.build(ws, {}, 'fwd', T0, { only, scope: { type: 'round', roundId: 'r1' } });

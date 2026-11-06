@@ -1,6 +1,9 @@
 /*
- * 手書きの単語リストのデータを辞書と照合して、js/data-notebook.js を作る
- *   npm install（初回だけ）→ node scripts/build-notebook.mjs
+ * シリーズ（単語のリスト）のデータを辞書と照合して、js/data-notebook.js を作る
+ *   npm install（初回だけ）→ node scripts/build-notebook.mjs（npm run notebook）
+ *
+ * シリーズは下の SERIES に並べる。新しい単語のリストが届いたら、data/notebook/ にデータを足して、
+ * SERIES に1つ足す（書き方は data/notebook/README.md）。
  *
  * 照合すること
  *   - 品詞・意味：Princeton WordNet 3.1 に、その品詞の語義があり、指定した説明文を含むか
@@ -12,17 +15,25 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { dictionary as CMU } from 'cmu-pronouncing-dictionary';
 import part1 from '../data/notebook/words-1.mjs';
 import part2 from '../data/notebook/words-2.mjs';
 import part3 from '../data/notebook/words-3.mjs';
-import TESTS from '../data/notebook/tests.mjs';
+import TESTS1 from '../data/notebook/tests.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WN_DIR = path.join(root, 'node_modules', 'wordnet-db', 'dict');
-const CHECKED = '2026-11-04';
-const SOURCE_LABEL = '手書きの単語リスト（Untitled_Notebook.pdf）';
-const ROUND = { id: 'r1', no: 1, title: '第1回', source: SOURCE_LABEL, addedAt: CHECKED };
+/**
+ * シリーズの一覧（この順にアプリに並ぶ）
+ *   id … r1, r2, …（一度決めたら変えない）　checked … 辞書と照合した日（追加した日）
+ *   parts … 単語のデータ（words-*.mjs）　tests … 文章作成のテスト用の例文（用法ID → [英文, 日本語, 別の正解]）
+ */
+const SERIES = [
+  { id: 'r1', no: 1, title: 'シリーズ1', source: '手書きの単語リスト（Untitled_Notebook.pdf）', checked: '2026-11-04', parts: [part1, part2, part3], tests: TESTS1 },
+];
+const TESTS = Object.assign({}, ...SERIES.map((x) => x.tests));
+const CHECKED = SERIES.map((x) => x.checked).sort().pop();
 const POS_JA = { noun: '名詞', verb: '動詞', adjective: '形容詞', adverb: '副詞', pronoun: '代名詞', interjection: '間投詞', auxiliary: '助動詞', phrase: 'フレーズ', preposition: '前置詞', other: 'その他' };
 const WN_POS = { noun: 'noun', verb: 'verb', adj: 'adj', adv: 'adv' };
 
@@ -105,7 +116,7 @@ const seenSense = new Set();
 const seenWord = new Set();
 const report = [];
 
-function buildWord(src) {
+function buildWord(src, series) {
   const id = 'w-' + slug(src.w);
   if (seenWord.has(id)) errors.push('重複した単語: ' + src.w);
   seenWord.add(id);
@@ -189,7 +200,7 @@ function buildWord(src) {
   evidence.forEach((e) => noteLines.push('照合：' + e));
   if (!review) noteLines.push('例文・一言ニュアンス・場面の説明は、このアプリ用に作った学習用の文章です。');
 
-  const sources = [{ label: SOURCE_LABEL + (src.src ? '（表記：' + src.src + '）' : ''), url: '' }];
+  const sources = [{ label: series.source + (src.src ? '（表記：' + src.src + '）' : ''), url: '' }];
   if (!review) {
     sources.push({ label: 'Princeton WordNet 3.1', url: 'https://wordnet.princeton.edu/' });
     sources.push({ label: 'CMU Pronouncing Dictionary', url: 'http://www.speech.cs.cmu.edu/cgi-bin/cmudict' });
@@ -202,7 +213,7 @@ function buildWord(src) {
     id,
     headword: src.w,
     status,
-    check: { date: CHECKED, method, note: noteLines.join('\n') },
+    check: { date: series.checked, method, note: noteLines.join('\n') },
     sources,
     groups: src.groups || {},
     senses,
@@ -212,9 +223,15 @@ function buildWord(src) {
   };
 }
 
-const all = [...part1, ...part2, ...part3];
-const words = all.filter((x) => !x.ref).map(buildWord);
-ROUND.wordIds = all.map((x) => (x.ref ? x.ref : 'w-' + slug(x.w)));
+const words = [];
+const rounds = SERIES.map((se) => {
+  const all = se.parts.flat();
+  all.filter((x) => !x.ref).forEach((x) => words.push(buildWord(x, se)));
+  return { id: se.id, no: se.no, title: se.title, source: se.source, addedAt: se.checked, wordIds: all.map((x) => (x.ref ? x.ref : 'w-' + slug(x.w))) };
+});
+// { ref } で指している単語が、どこかにあるか（このファイルの単語か、data-seed.js の見本の単語）
+const known = new Set(words.map((w) => w.id).concat(createRequire(import.meta.url)('../js/data-seed.js').sample));
+rounds.forEach((r) => r.wordIds.forEach((id) => { if (!known.has(id)) errors.push(r.title + ': 見つからない単語 ' + id); }));
 const unused = Object.keys(TESTS).filter((k) => !seenSense.has(k));
 if (unused.length) errors.push('使われていないテスト例文: ' + unused.join(', '));
 if (errors.length) {
@@ -222,7 +239,7 @@ if (errors.length) {
   process.exit(1);
 }
 
-const body = JSON.stringify({ source: SOURCE_LABEL, checked: CHECKED, rounds: [ROUND], words }, null, 1);
+const body = JSON.stringify({ source: SERIES.map((x) => x.source).join(' / '), checked: CHECKED, rounds, words }, null, 1);
 const out = `/*
  * data-notebook.js — 手書きの単語リスト（Untitled_Notebook.pdf）から作った単語データ
  * このファイルは scripts/build-notebook.mjs で自動生成しています。直接は編集しないでください。
@@ -250,7 +267,8 @@ fs.writeFileSync(path.join(root, 'data', 'notebook', 'REPORT.md'),
   '自動生成：`node scripts/build-notebook.mjs`（' + CHECKED + '）\n\n' +
   '- 単語 ' + words.length + '語・用法 ' + senses + 'つ\n' +
   '- 確認済み ' + counts.verified + '語／未確認 ' + counts.unverified + '語／要確認 ' + counts.needs_review + '語\n' +
-  '- 第1回の単語：資料の ' + ROUND.wordIds.length + '語（すでに入っていた take, well, pretty, look を含む。重複して追加していません）\n' +
+  rounds.map((r) => '- ' + r.title + '：' + r.source + ' の ' + r.wordIds.length + '語（' + r.addedAt + '）\n').join('') +
+  '- シリーズ1 は、すでに入っていた take, well, pretty, look を含みます（重複して追加していません）\n' +
   '- テスト（文章作成）用の例文：' + Object.keys(TESTS).length + '文（カードの例文とは別の文）\n\n' +
   '| 単語 | 資料の表記 | 確認状況 | 用法 |\n| --- | --- | --- | --- |\n' + report.join('\n') + '\n');
 console.log('wrote js/data-notebook.js — ' + words.length + ' words, ' + senses + ' senses', counts);

@@ -38,7 +38,7 @@
     spell: 'つづりを組み立てる',
   };
   const KINDS = ['round', 'daily', 'retest', 'summary', 'monthly', 'practice', 'review'];
-  const KIND_LABEL = { round: '回のテスト', daily: '今日のテスト', retest: '再テスト', summary: 'まとめテスト', monthly: '月のまとめテスト', practice: '練習', review: '解き直し' };
+  const KIND_LABEL = { round: 'シリーズのテスト', daily: '今日のテスト', retest: '再テスト', summary: 'まとめテスト', monthly: '月のまとめテスト', practice: '練習', review: '解き直し' };
   /** 内容理解・文章作成をそれぞれ50点にして合計する種類（それ以外は正解の割合で100点） */
   const HALF_SCORED = ['round', 'daily'];
 

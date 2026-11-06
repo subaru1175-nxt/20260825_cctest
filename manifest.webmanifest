@@ -1,7 +1,7 @@
 {
   "name": "暗記CARD",
   "short_name": "暗記CARD",
-  "description": "英単語の音・場面・使い方をカードで覚え、毎日20:00のテストで長く覚える",
+  "description": "英単語を音・場面・使い方のカードで覚え、毎日20:00のテストと満点まで続く再テストで長く覚える",
   "lang": "ja",
   "start_url": "./index.html",
   "scope": "./",
@@ -10,9 +10,30 @@
   "background_color": "#e8eaee",
   "theme_color": "#e8eaee",
   "icons": [
-    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" },
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "./",
+  "categories": [
+    "education"
   ]
 }

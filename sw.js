@@ -7,7 +7,7 @@ const CACHE = 'cif-v7';
 const FILES = [
   './', './index.html', './css/style.css', './manifest.webmanifest', './icons/icon.svg', './icons/icon-180.png',
   './js/util.js', './js/srs.js', './js/session.js', './js/schedule.js', './js/quiz.js', './js/storage.js', './js/data-notebook.js', './js/data-seed.js',
-  './js/diagrams.js', './js/speech.js', './js/audio-pack.js', './js/app.js',
+  './js/diagrams.js', './js/speech.js', './js/sfx.js', './js/audio-pack.js', './js/app.js',
 ];
 
 self.addEventListener('install', (e) => {

@@ -106,6 +106,10 @@
       stop,
       voiceLabel,
       currentLabel,
+      /** 効果音と同じ AudioContext を使う（iPhone で、タップで音を出せる状態にしたものを共有する） */
+      context() {
+        return audioCtx(true);
+      },
     };
     let token = 0;
     let audioEl = null;

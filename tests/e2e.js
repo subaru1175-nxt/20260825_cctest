@@ -27,6 +27,8 @@ function speechMock(kind) {
     window.__spoken = [];
     window.__clips = [];
     window.__stops = 0;
+    window.__sfx = [];
+    window.addEventListener('cif:sfx', (e) => window.__sfx.push(e.detail.name));
     // アプリが鳴らした区間（ファイルとバイトの範囲）を記録する
     window.addEventListener('cif:clip', (e) => window.__clips.push(e.detail));
     try {
@@ -469,7 +471,9 @@ async function noHScroll(page, label) {
     await finishSet(page, 'good');
     await page.waitForSelector('#result-title');
     eq(await page.textContent('#result-title'), 'セット完了');
-    ok(await page.isVisible('.done-mark'), '達成の演出');
+    ok(await page.isVisible('.result-hero .score-ring'), '点数の輪');
+    eq(await page.textContent('.result-hero .score-num b'), '90', '思い出せた割合（10枚中9枚）');
+    eq(await page.textContent('.result-hero .grade'), 'EXCELLENT');
     const tally = await page.$$eval('.result .stats .stat-num', (els) => els.map((e) => e.textContent));
     eq(tally, ['9', '0', '1']);
     const nexts = await page.$$eval('.rl-next > span:first-child', (els) => els.map((e) => e.textContent));
@@ -889,7 +893,7 @@ async function noHScroll(page, label) {
     });
     await page.reload();
     await page.waitForSelector('.home');
-    ok((await page.textContent('.home')).includes('第1回'), 'ホームに第1回');
+    ok((await page.textContent('.home')).includes('シリーズ1'), 'ホームにシリーズ1');
     await page.goto(URL0 + '#round-r-mini');
     await page.waitForSelector('.round');
     ok((await page.textContent('.round')).includes('内容理解（4択）3問と、文章作成（並べ替え）3問'));
@@ -1020,7 +1024,7 @@ async function noHScroll(page, label) {
     await page.waitForSelector('.round');
     await page.click('[data-action="start"][data-mode="fwd"]');
     await page.waitForSelector('.card-front');
-    ok((await page.textContent('.topbar .t-label')).includes('第1回'));
+    ok((await page.textContent('.topbar .t-label')).includes('シリーズ1'));
     const set = await ls(page, 'session');
     const r1 = SEED.rounds[0].wordIds;
     const ws = await ls(page, 'words');
@@ -1042,7 +1046,7 @@ async function noHScroll(page, label) {
     await page.click('[data-action="rate"][data-r="good"]');
     await finishSet(page, 'good');
     await noHScroll(page, '結果');
-    for (const h of ['words', 'word-w-light', 'edit-w-light', 'options', 'round-r1', 'misses', 'check', 'install', 'title', 'home']) {
+    for (const h of ['words', 'word-w-light', 'edit-w-light', 'options', 'round-r1', 'misses', 'check', 'install', 'add-series', 'title', 'home']) {
       await page.goto(URL0 + '#' + h);
       await page.waitForTimeout(150);
       await noHScroll(page, h);
@@ -1181,7 +1185,7 @@ async function noHScroll(page, label) {
     await page.keyboard.press('Enter');
     await page.waitForSelector('.home');
     ok((await page.textContent('.home-head .brand')).replace(/\s/g, '') === '暗記CARD');
-    eq(await page.$$eval('.home .section-title', (els) => els.map((e) => e.firstChild.textContent)), ['今日の学習', 'テスト', '回', '復習'], 'セクション');
+    eq(await page.$$eval('.home .section-title', (els) => els.map((e) => e.firstChild.textContent)), ['今日の学習', 'テスト', 'シリーズ', '復習'], 'セクション');
     eq(await page.$$eval('.steps .step-title', (els) => els.map((e) => e.firstChild.textContent)), ['単語を覚える', '逆から思い出す', 'ミスを確認', '間違えた問題を解く', 'テスト'], '5つの手順の順番');
     const st = await stepsOf(page);
     eq(st.map((x) => x[0]), ['todo*', 'wait', 'wait', 'wait', 'locked'], 'はじめは ① から');
@@ -1251,7 +1255,10 @@ async function noHScroll(page, label) {
     eq(st.map((x) => x[0]), ['done', 'done', 'done', 'done', 'done'], '今日はすべて完了');
     ok(/^\d+点$/.test(st[4][1]), '⑤ は点数: ' + st[4][1]);
     ok((await testRow(page, 'retest')).includes('明日・3問'), '再テストは明日 3問: ' + (await testRow(page, 'retest')));
-    ok(await page.isVisible('text=今日の学習は完了です'));
+    ok(await page.isVisible('text=今日の学習が完了しました'), '今日のスコア');
+    const ds = await page.$$eval('.day-score .ds-cell', (els) => els.map((e) => e.querySelector('.ds-l').textContent + ':' + e.querySelector('b').textContent));
+    eq(ds.length, 4, '学習・思い出せた・テスト・ポイント');
+    ok(ds[0] === '学習:20' && ds[2].startsWith('テスト:'), JSON.stringify(ds));
     // 次の日：タイトル → ホーム。20:00 前は受けられない
     await setTime(page, '2026-11-06T12:00:00+09:00', '');
     await page.waitForSelector('.title-screen');
@@ -1555,6 +1562,101 @@ async function noHScroll(page, label) {
     eq(errors, []);
     await ctx.close();
     srv.close();
+  });
+
+  await test('効果音：タイトル・カードをめくる・評価・完了・テストの正解/不正解。設定でオフにできる', async () => {
+    const { ctx, page } = await newPage({ time: '2026-11-05T20:30:00+09:00' });
+    const sfx = () => page.evaluate(() => window.__sfx.slice());
+    ok((await sfx()).includes('open'), 'タイトルからホームへ: ' + (await sfx()));
+    await page.click('.steps .step-go');
+    await page.waitForSelector('.card-front');
+    await page.click('.card-front .tap-hint');
+    await page.waitForSelector('.card-back');
+    ok((await sfx()).includes('flip'), 'カードをめくる');
+    await page.click('[data-action="rate"][data-r="good"]');
+    ok((await sfx()).includes('tick'), '評価');
+    await finishSet(page, 'good');
+    ok((await sfx()).includes('perfect'), 'すべて思い出せた → perfect: ' + (await sfx()));
+    // テスト：4択は単語の音のあとに正解の音、まちがえたら不正解の音
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    await page.click('.tests-list [data-kind="daily"]');
+    await page.waitForSelector('.qcard');
+    const q = await curQ(page);
+    await page.click('[data-action="choose"][data-i="' + q.answer + '"]');
+    await page.waitForFunction(() => window.__sfx.includes('correct'), null, { timeout: 8000 });
+    await page.waitForFunction((id) => (JSON.parse(localStorage.getItem('cif.v1.tests')).current.questions[JSON.parse(localStorage.getItem('cif.v1.tests')).current.index] || {}).id !== id, q.id, { timeout: 8000 });
+    await page.waitForFunction(() => !document.querySelector('.feedback'));
+    await page.click('[data-action="test-skip"]');
+    await page.waitForFunction(() => window.__sfx.includes('wrong'));
+    // 設定でオフ → 鳴らない
+    await page.goto(URL0 + '#options');
+    await page.waitForSelector('#sfx');
+    ok(await page.isChecked('#sfx'), 'はじめはオン');
+    await page.uncheck('#sfx');
+    eq((await ls(page, 'settings')).sfx, false);
+    await page.evaluate(() => { window.__sfx = []; });
+    await page.click('.nav-item[href="#home"]');
+    await page.waitForSelector('.home');
+    await page.click('.nav-item[href="#words"]');
+    await page.waitForSelector('.word-list');
+    eq(await sfx(), [], 'オフのときは鳴らない');
+    eq(page.errors, []);
+    await ctx.close();
+  });
+
+  await test('シリーズ：学習中のシリーズを選ぶと ① の新しい単語がそこから出る。シリーズを追加の案内。前の版の「第1回」は「シリーズ1」', async () => {
+    const { ctx, page } = await newPage({ time: '2026-11-05T15:10:00+09:00' });
+    // 前の版の名前と、2つめのシリーズ（シリーズ1にない単語）を用意する
+    const extra = await page.evaluate(() => {
+      const rounds = JSON.parse(localStorage.getItem('cif.v1.rounds'));
+      const words = JSON.parse(localStorage.getItem('cif.v1.words'));
+      const inR1 = new Set(rounds[0].wordIds);
+      const ids = words.filter((w) => !inR1.has(w.id) && w.status !== 'needs_review').map((w) => w.id);
+      rounds[0].title = '第1回';
+      rounds.push({ id: 'r2', no: 2, title: '', source: 'E2E', addedAt: '2026-11-05', wordIds: ids });
+      localStorage.setItem('cif.v1.rounds', JSON.stringify(rounds));
+      return ids;
+    });
+    ok(extra.length >= 3, 'シリーズ2の単語: ' + extra.length);
+    await page.reload();
+    await page.waitForSelector('.home');
+    const rows = await page.$$eval('.round-row .r-title', (els) => els.map((e) => e.textContent));
+    eq(rows, ['シリーズ1学習中', 'シリーズ2'], '前の版の名前もシリーズ1に・名前のないシリーズはシリーズ2');
+    ok((await page.textContent('.steps .is-current .step-desc')).includes('シリーズ1 の新しい単語'));
+    // シリーズ2を学習する
+    await page.click('a[href="#round-r2"]');
+    await page.waitForSelector('[data-action="focus-series"][data-round="r2"]');
+    await page.click('[data-action="focus-series"][data-round="r2"]');
+    await page.waitForSelector('.focus-row');
+    eq((await ls(page, 'settings')).seriesFocus, 'r2');
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('.home');
+    ok((await page.textContent('.steps .is-current .step-desc')).includes('シリーズ2 の新しい単語'));
+    eq(await page.$$eval('.round-row .r-title', (els) => els.map((e) => e.textContent)), ['シリーズ1', 'シリーズ2学習中']);
+    await page.click('.steps .step-go');
+    await page.waitForSelector('.card-front');
+    const set = await ls(page, 'session');
+    const owner = await page.evaluate(() => {
+      const m = {};
+      JSON.parse(localStorage.getItem('cif.v1.words')).forEach((w) => w.senses.forEach((x) => { m[x.id] = w.id; }));
+      return m;
+    });
+    ok(set.cards.every((sid) => extra.includes(owner[sid])), '新しいカードはシリーズ2から: ' + set.cards.join(','));
+    // 自動に戻す
+    await page.goto(URL0 + '#round-r2');
+    await page.waitForSelector('.focus-row [data-action="focus-series"]');
+    await page.click('.focus-row [data-action="focus-series"]');
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('cif.v1.settings')).seriesFocus === '');
+    // シリーズを追加の案内
+    await page.goto(URL0 + '#home');
+    await page.waitForSelector('a[href="#add-series"]');
+    ok((await page.textContent('a[href="#add-series"]')).includes('シリーズ3'), '次のシリーズの番号');
+    await page.click('a[href="#add-series"]');
+    await page.waitForSelector('.install-steps');
+    eq(await page.$$eval('.install-steps .is-title', (els) => els.map((e) => e.textContent)), ['単語のリストを送る', 'カードと音声ができる', 'アプリを開き直す']);
+    eq(page.errors, []);
+    await ctx.close();
   });
 
   await browser.close();

@@ -19,7 +19,7 @@
   {
    "id": "r1",
    "no": 1,
-   "title": "第1回",
+   "title": "シリーズ1",
    "source": "手書きの単語リスト（Untitled_Notebook.pdf）",
    "addedAt": "2026-11-04",
    "wordIds": [

@@ -54,8 +54,11 @@
     return !!(f && f.reps > 0 && hasCue);
   }
 
-  /** only: 出題してよい用法IDの集合（回や覚えていないリストで絞るとき） */
-  function pickCards(words, progress, mode, now, size, only) {
+  /**
+   * only: 出題してよい用法IDの集合（シリーズや覚えていないリストで絞るとき）
+   * prefer: 新しいカードのうち、先に出す用法IDの集合（学習中のシリーズ）
+   */
+  function pickCards(words, progress, mode, now, size, only, prefer) {
     const items = studyable(words).filter((it) => (!only || only.has(it.sense.id)) && eligible(it, progress, mode));
     const due = [];
     const fresh = [];
@@ -67,6 +70,7 @@
       else later.push({ it, st });
     });
     due.sort((a, b) => a.st.due - b.st.due || b.st.lapses - a.st.lapses);
+    if (prefer && prefer.size) fresh.sort((a, b) => (prefer.has(b.it.sense.id) ? 1 : 0) - (prefer.has(a.it.sense.id) ? 1 : 0) || a.index - b.index);
     later.sort((a, b) => a.st.due - b.st.due);
     const picked = [];
     const early = {};
@@ -99,7 +103,8 @@
   function build(words, progress, mode, now, opts) {
     const size = (opts && opts.size) || SET_SIZE;
     const only = opts && opts.only ? new Set(opts.only) : null;
-    const { ids, early } = pickCards(words, progress, mode, now, size, only);
+    const prefer = opts && opts.prefer ? new Set(opts.prefer) : null;
+    const { ids, early } = pickCards(words, progress, mode, now, size, only, prefer);
     if (!ids.length) return null;
     return {
       id: util.randomId('set'),

@@ -36,12 +36,14 @@
 
   const SAMPLE_TEXT = 'Hello! This is how I sound.';
   const APP_NAME = '暗記CARD';
+  const APP_VERSION = '1.0.0';
   const DAILY_MAX = 20; // 今日のテストに出す単語の上限
   const SUMMARY_MIN = 3; // まとめテストに必要な単語の数
   const STEP_NO = ['①', '②', '③', '④', '⑤'];
 
   let store = null;
   let speech = null;
+  let sfx = null;
   let aidSeq = 0;
   let packNoticeShown = false;
   const index = { words: new Map(), senses: new Map() };
@@ -106,7 +108,7 @@
   /* ================= 起動 ================= */
 
   async function boot() {
-    $app.innerHTML = '<div class="screen loading"><p>読み込み中…</p></div>';
+    $app.innerHTML = '<div class="screen loading" role="status" aria-label="読み込み中"><p class="wordmark"><span class="wm-ja">暗記</span><span class="wm-en">CARD</span></p><span class="load-bar" aria-hidden="true"><i></i></span></div>';
     const backend = await ST.pickBackend();
     store = ST.createStore(backend);
     await store.init(C.seed);
@@ -117,6 +119,7 @@
       store.set('session', fixed);
     }
     speech = C.speech.create(window, () => store.state.settings);
+    sfx = C.sfx.create(() => speech.context(), () => store.state.settings.sfx !== false);
     speech.onChange(refreshAudioUI);
     store.onStatus(() => {
       const el = document.getElementById('save-banner');
@@ -162,7 +165,7 @@
     try { h = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (e) { h = ''; }
     if (!h || h === 'title') return { route: 'title', param: '' };
     if (h === 'home') return { route: 'home', param: '' };
-    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses', 'check', 'install', 'move', 'move-in'].includes(h)) return { route: h, param: '' };
+    if (['study', 'result', 'words', 'options', 'new-word', 'test', 'misses', 'check', 'install', 'move', 'move-in', 'add-series'].includes(h)) return { route: h, param: '' };
     if (h.indexOf('word-') === 0) return { route: 'word', param: h.slice(5) };
     if (h.indexOf('round-') === 0) return { route: 'round', param: h.slice(6) };
     if (h.indexOf('score-') === 0) return { route: 'score', param: h.slice(6) };
@@ -232,10 +235,12 @@
       case 'install': html = viewInstall(); break;
       case 'move': html = viewMove(); break;
       case 'move-in': html = viewMoveIn(); break;
+      case 'add-series': html = viewAddSeries(); break;
       default: html = viewHome();
     }
     if (html == null) return;
-    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses', 'check', 'install', 'move', 'move-in'].includes(ui.route);
+    const withNav = ['home', 'words', 'word', 'options', 'round', 'score', 'misses', 'check', 'install', 'move', 'move-in', 'add-series'].includes(ui.route);
+    if (resetScroll) html = html.replace('<main class="screen', '<main class="screen is-entering');
     $app.innerHTML = saveBanner() + html + (withNav ? navBar() : '');
     document.body.dataset.route = ui.route;
     if (resetScroll) window.scrollTo(0, 0);
@@ -243,6 +248,11 @@
   }
 
   function afterRender() {
+    animateCounts();
+    if (ui.route === 'home' && ui.freshSteps && ui.freshSteps.length) {
+      fx('step');
+      ui.freshSteps = [];
+    }
     if (ui.route === 'study') {
       const s = store.state.session;
       if (ui.autoplayNext) {
@@ -676,6 +686,75 @@
     return word.status !== 'needs_review' && sense.status !== 'needs_review';
   }
 
+  /** 点数の輪（0〜100）。数字はあとから数え上げる */
+  function scoreRing(value, unit, label) {
+    const v = Math.max(0, Math.min(100, Math.round(value)));
+    const c = 2 * Math.PI * 52;
+    return '<div class="score-ring' + (v === 100 ? ' is-perfect' : '') + '">' +
+      '<svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="sr-metal" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" class="srs1"/><stop offset=".55" class="srs2"/><stop offset="1" class="srs3"/></linearGradient></defs>' +
+      '<circle class="sr-track" cx="60" cy="60" r="52"/>' +
+      '<circle class="sr-fill" cx="60" cy="60" r="52" stroke="url(#sr-metal)" style="stroke-dasharray:' + c.toFixed(1) + ';stroke-dashoffset:' + (c * (1 - v / 100)).toFixed(1) + ';--full:' + c.toFixed(1) + '"' + (v ? '' : ' opacity="0"') + '/></svg>' +
+      '<p class="sr-num score-num"><b data-count="' + v + '">' + v + '</b><span>' + esc(unit) + '</span></p>' +
+      (label ? '<p class="sr-label">' + esc(label) + '</p>' : '') + '</div>';
+  }
+
+  /** 点数に合わせた一言（英語の小さな見出し） */
+  function gradeHtml(p) {
+    const g = p >= 100 ? 'PERFECT' : p >= 90 ? 'EXCELLENT' : p >= 75 ? 'GREAT' : p >= 60 ? 'GOOD' : 'NICE TRY';
+    return '<p class="grade' + (p >= 100 ? ' is-perfect' : '') + '">' + g + '</p>';
+  }
+
+  /** 「1分42秒」 */
+  function durationText(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return m ? m + '分' + (s ? s + '秒' : '') : s + '秒';
+  }
+
+  /** data-count の数字を 0 から数え上げる（動きを減らす設定のときは、そのまま） */
+  function animateCounts() {
+    if (!window.requestAnimationFrame) return;
+    try {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    } catch (e) { /* noop */ }
+    $app.querySelectorAll('[data-count]').forEach((el) => {
+      const to = Number(el.dataset.count);
+      if (!(to > 0)) return;
+      const prefix = el.dataset.prefix || '';
+      const t0 = window.performance ? window.performance.now() : Date.now();
+      const step = (t) => {
+        const k = Math.min(1, (t - t0) / 750);
+        el.textContent = prefix + Math.round(to * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) window.requestAnimationFrame(step);
+      };
+      el.textContent = prefix + '0';
+      window.requestAnimationFrame(step);
+    });
+  }
+
+  /** 今日の5つの手順がすべて終わったときの、今日のスコア */
+  function dayScoreHtml(info, today) {
+    const d = info.day;
+    const acc = d.firsts ? Math.round((100 * d.goodFirsts) / d.firsts) : 0;
+    const tests = info.tests.today;
+    const last = tests.length ? tests[tests.length - 1] : null;
+    const cell = (v, unit, label, prefix) => '<div class="ds-cell"><p class="ds-v"><b data-count="' + v + '"' + (prefix ? ' data-prefix="' + prefix + '"' : '') + '>' + (prefix || '') + v + '</b><span>' + esc(unit) + '</span></p><p class="ds-l">' + esc(label) + '</p></div>';
+    return '<section class="day-score" aria-label="今日のスコア">' +
+      '<p class="ds-head">' + icon('check') + '<span>今日の学習が完了しました</span></p>' +
+      '<div class="ds-row">' + cell(today.cards, '枚', '学習') + cell(acc, '%', '思い出せた') +
+      (last ? cell(last.score, '点', 'テスト') : '') + cell(today.points, 'pt', 'ポイント', '+') + '</div></section>';
+  }
+
+  /** 前にホームを出したときから、新しく終わった手順（音と動きで知らせる） */
+  function freshSteps(info) {
+    const key = util.dayKey(info.day.range.day);
+    const done = info.list.map((x) => x.state === 'done');
+    const prev = ui.stepsSeen && ui.stepsSeen.key === key ? ui.stepsSeen.done : null;
+    ui.stepsSeen = { key, done };
+    return prev ? done.map((d, i) => (d && !prev[i] ? i : -1)).filter((i) => i >= 0) : [];
+  }
+
   function doneMark() {
     return '<svg class="done-mark" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-15"/></svg>';
   }
@@ -734,7 +813,7 @@
   function dayInfo(now) {
     const st = store.state;
     const range = Sched.dayRange(now);
-    const out = { range, fwd: [], rev: [], weak: [], studied: [], lastAt: 0 };
+    const out = { range, fwd: [], rev: [], weak: [], studied: [], lastAt: 0, firsts: 0, goodFirsts: 0 };
     SS.studyable(st.words).forEach((it) => {
       const sid = it.sense.id;
       let any = false;
@@ -749,11 +828,37 @@
           if (x.t < first.t) first = x;
           if (x.t > out.lastAt) out.lastAt = x.t;
         });
+        out.firsts += 1;
+        if (first.r === 'good') out.goodFirsts += 1;
         if (first.r === 'again' || first.r === 'hard') out.weak.push({ sid, mode, r: first.r, t: first.t });
       });
       if (any) out.studied.push(sid);
     });
     return out;
+  }
+
+  /**
+   * 学習中のシリーズ：① の新しい単語は、ここから先に出す。
+   * 設定で選んでいなければ、まだ覚えていない単語が残っている最初のシリーズ
+   */
+  function focusSeries() {
+    const st = store.state;
+    const chosen = st.settings.seriesFocus ? roundById(st.settings.seriesFocus) : null;
+    if (chosen) return chosen;
+    const fresh = (r) => Q.roundItems(st.words, r).some((it) => {
+      const s = SS.stateOf(st.progress, it.sense.id, 'fwd');
+      return !s || !s.reps;
+    });
+    return st.rounds.find(fresh) || st.rounds[0] || null;
+  }
+
+  function focusFresh(r) {
+    if (!r) return 0;
+    const st = store.state;
+    return Q.roundItems(st.words, r).filter((it) => {
+      const s = SS.stateOf(st.progress, it.sense.id, 'fwd');
+      return !s || !s.reps;
+    }).length;
   }
 
   /**
@@ -884,13 +989,16 @@
     const list = [];
 
     // ① 単語を覚える（英語 → 場面）
+    const focus = focusSeries();
     const left1 = c.newFwd + c.dueFwd;
     const n1 = d.fwd.length;
     list.push({
       title: '単語を覚える', mode: '英語 → 場面',
       state: n1 >= goal || (n1 > 0 && !left1) ? 'done' : left1 ? 'todo' : 'none',
       stat: n1 + '/' + goal,
-      desc: left1 ? '英語を見て、場面を思い浮かべます' + (c.dueFwd ? '・復習 ' + c.dueFwd + '枚' : '') : 'いまは覚える単語がありません',
+      desc: left1
+        ? (focusFresh(focus) ? esc(focus.title) + ' の新しい単語' : '英語を見て、場面を思い浮かべます') + (c.dueFwd ? '・復習 ' + c.dueFwd + '枚' : '')
+        : 'いまは覚える単語がありません',
       act: left1 ? ' data-action="start" data-mode="fwd" data-scope="all"' : '',
       go: n1 ? '続きを覚える' : '覚える',
     });
@@ -977,7 +1085,7 @@
     const allDone = info.current < 0 && info.list[4].state === 'done';
     return '<ol class="steps" aria-label="今日の学習の順番">' + info.list.map((s, i) => {
       const cur = i === info.current;
-      const cls = 'step st-' + s.state + (cur ? ' is-current' : '');
+      const cls = 'step st-' + s.state + (cur ? ' is-current' : '') + ((ui.freshSteps || []).includes(i) ? ' just-done' : '');
       const no = '<span class="step-no" aria-hidden="true">' + (s.state === 'done' ? icon('check') : i + 1) + '</span>';
       const head = '<span class="step-main"><span class="step-title">' + esc(s.title) + '</span>' +
         (s.mode ? '<span class="step-mode">' + esc(s.mode) + '</span>' : '') + '</span>' +
@@ -994,7 +1102,7 @@
       if (s.act) return '<li class="' + cls + '"><button type="button" class="step-row"' + s.act + label + '>' + no + head + icon('chevron') + '</button></li>';
       return '<li class="' + cls + '"><div class="step-row">' + no + head + '</div></li>';
     }).join('') + '</ol>' +
-      (allDone ? '<p class="steps-done">' + icon('check') + '今日の学習は完了です。明日もこの順番で。</p>' : '');
+      (allDone ? '<p class="steps-done">明日もこの順番で。テストは毎日 ' + esc(testTime()) + ' から。</p>' : '');
   }
 
   /** ホームの「テスト」：受けられる時間と、4つのテスト。右に短い数だけ */
@@ -1126,11 +1234,13 @@
         '</div>');
     }
 
-    html += section('今日の学習', stepsHtml(info), { note: info.done + ' / 5', id: 'today' });
+    ui.freshSteps = freshSteps(info);
+    const allDone = info.current < 0 && info.list[4].state === 'done';
+    html += section('今日の学習', (allDone ? dayScoreHtml(info, today) : '') + stepsHtml(info), { note: info.done + ' / 5', id: 'today' });
     html += section('テスト', testsHtml(info.tests, now), { note: '毎日 ' + testTime() + '〜4:00', id: 'tests' });
-    html += section('回', st.rounds.length
-      ? '<div class="list">' + st.rounds.map(roundRow).join('') + '</div>'
-      : '<p class="section-note">まだ回がありません。</p>');
+    const focusId = (focusSeries() || {}).id;
+    html += section('シリーズ', '<div class="list">' + st.rounds.map((r) => roundRow(r, r.id === focusId)).join('') +
+      rowLink('#add-series', 'シリーズを追加', '新しい単語のリストを送ると、シリーズ' + (st.rounds.length + 1) + 'として入ります', '', 'action') + '</div>');
     html += section('復習', '<div class="list">' +
       rowLink('#misses', '覚えていないリスト', mc.solved ? '克服 ' + mc.solved + '件' : '', '<b>' + mc.open + '</b>件') +
       '</div>');
@@ -1139,7 +1249,7 @@
   }
 
   /** ホームに並べる回の行：名前・覚え具合の線・学習した数 */
-  function roundRow(r) {
+  function roundRow(r, isFocus) {
     const st = store.state;
     const items = Q.roundItems(st.words, r);
     const lv = { new: 0, learning: 0, reviewing: 0, settled: 0 };
@@ -1148,7 +1258,7 @@
     const stats = Q.roundStats(st.tests, r.id);
     const studied = items.length - lv.new;
     const sub = r.wordIds.length + '語' + (stats.count ? '・最高 ' + stats.best + '点' : '');
-    return '<a class="row round-row" href="#round-' + esc(r.id) + '"><span class="r-main"><span class="r-title">' + esc(r.title) + '</span>' +
+    return '<a class="row round-row" href="#round-' + esc(r.id) + '"><span class="r-main"><span class="r-title">' + esc(r.title) + (isFocus ? '<span class="chip accent">学習中</span>' : '') + '</span>' +
       '<span class="r-sub">' + esc(sub) + '</span>' +
       '<span class="lv-bar" aria-hidden="true">' + seg('settled') + seg('reviewing') + seg('learning') + seg('new') + '</span></span>' +
       '<span class="r-detail"><b>' + studied + '</b>/' + items.length + '</span>' +
@@ -1512,7 +1622,10 @@
         toast('出題できるカードがありません。');
         return;
       }
-      const s = SS.build(st.words, st.progress, mode, Date.now(), { only, scope });
+      // ① の新しい単語は、学習中のシリーズから先に出す
+      const focus = scope.type === 'all' && mode === 'fwd' ? focusSeries() : null;
+      const prefer = focus ? Q.roundItems(st.words, focus).map((it) => it.sense.id) : null;
+      const s = SS.build(st.words, st.progress, mode, Date.now(), { only, scope, prefer });
       if (!s) {
         toast(mode === 'rev' ? '「英語 → 場面」で学習したカードがまだありません。' : '出題できるカードがありません。');
         return;
@@ -1534,9 +1647,15 @@
     doStart();
   }
 
+  /** 効果音を鳴らす（設定でオフのときは鳴らない） */
+  function fx(name) {
+    if (sfx) sfx.play(name);
+  }
+
   function flip() {
     const s = store.state.session;
     if (!s || s.finished || s.flipped) return;
+    fx('flip');
     s.flipped = true;
     store.set('session', s);
     render(true);
@@ -1567,6 +1686,12 @@
     ui.hint = false;
     speech.stop();
     if (next.finished) {
+      const sum = SS.summary(next);
+      fx(sum.again || sum.hard ? 'done' : 'perfect');
+    } else {
+      fx('tick');
+    }
+    if (next.finished) {
       go('result', true);
     } else {
       ui.autoplayNext = true;
@@ -1587,12 +1712,15 @@
     const streak = SS.streak(st.log, dnow(now));
     const pct = Math.min(100, Math.round((today.cards / goal) * 100));
     let html = '<main class="screen result" id="main">';
-    html += '<div class="result-hero">' + doneMark() +
-      '<p class="eyebrow">' + esc(scopeLabel(s.scope)) + '・' + esc(SS.MODES[s.mode].label) + '</p>' +
+    const acc = s.cards.length ? Math.round((100 * sum.good) / s.cards.length) : 0;
+    const secs = Math.round(((s.updatedAt || 0) - (s.createdAt || 0)) / 1000);
+    html += '<section class="result-hero">' + scoreRing(acc, '%', '思い出せた') +
+      gradeHtml(acc) +
       '<h1 id="result-title" tabindex="-1">セット完了</h1>' +
-      '<p class="earned">+' + s.points + ' pt</p>' +
-      (s.goalReached ? '<p class="goal-done">今日の目標を達成しました</p>' : '') +
-      '</div>';
+      '<p class="result-meta">' + esc(scopeLabel(s.scope)) + '・' + esc(SS.MODES[s.mode].label) + (secs > 0 && secs < 3600 ? '・' + durationText(secs) : '') + '</p>' +
+      '<p class="earned"><b data-count="' + s.points + '" data-prefix="+">+' + s.points + '</b> pt</p>' +
+      (s.goalReached ? '<p class="goal-done">' + icon('check') + '今日の目標を達成しました</p>' : '') +
+      '</section>';
     html += '<section class="group" aria-label="自己評価の内訳"><div class="stats">' +
       '<div class="stat"><span class="stat-num m-good">' + sum.good + '</span><span class="stat-label">思い出せた</span></div>' +
       '<div class="stat"><span class="stat-num m-hard">' + sum.hard + '</span><span class="stat-label">あいまい</span></div>' +
@@ -1605,7 +1733,7 @@
       '</dl><span class="meter" role="progressbar" aria-label="今日の目標の進み具合" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + Math.min(goal, today.cards) + '"><span style="width:' + pct + '%"></span></span>' +
       (sum.repeats ? '<p class="fine">セットの中で ' + sum.repeats + '回、もう一度練習しました。</p>' : '') +
       '</section>';
-    html += section('次の復習', '<ul class="list result-list">' +
+    html += '<details class="group fold result-fold"><summary>次の復習<span>' + s.cards.length + '枚</span></summary><ul class="result-list">' +
       s.cards.map((sid) => {
         const it = index.senses.get(sid);
         if (!it) return '';
@@ -1614,7 +1742,7 @@
         return '<li><span class="rl-word"><b lang="en">' + esc(it.word.headword) + '</b><span>' + esc(it.sense.meaning) + '</span></span>' +
           '<span class="rl-next"><span>' + (state ? esc(util.formatDue(state.due, now)) : '') + '</span>' +
           '<span class="rl-rate m-' + (r.first || 'none') + '">' + esc(r.first ? srs.RATING_LABEL[r.first] : '未回答') + '</span></span></li>';
-      }).join('') + '</ul><p class="section-note">思い出せたカードも、間隔をあけてまた出題します。</p>');
+      }).join('') + '</ul></details>';
     // 次の手順（今日の学習の順番）を案内する
     const info = stepsInfo(now);
     const nx = info.current >= 0 ? info.list[info.current] : null;
@@ -1654,12 +1782,12 @@
   }
 
   function scopeLabel(scope) {
-    if (!scope || scope.type === 'all') return 'すべての回';
-    if (scope.type === 'round') return roundTitle(scope.roundId) || '回';
+    if (!scope || scope.type === 'all') return 'すべてのシリーズ';
+    if (scope.type === 'round') return roundTitle(scope.roundId) || 'シリーズ';
     if (scope.type === 'misses') return '覚えていないリスト' + (scope.roundId ? '（' + roundTitle(scope.roundId) + '）' : '');
     if (scope.type === 'wrong') return 'テストで間違えた単語';
     if (scope.type === 'today') return '今日の単語';
-    return 'すべての回';
+    return 'すべてのシリーズ';
   }
 
   /** 'round:r1' などの文字列から、範囲と出題してよい用法IDを作る */
@@ -1688,7 +1816,7 @@
   }
 
   function roundOptions(withNone) {
-    return [['all', 'すべての回']].concat(store.state.rounds.map((r) => [r.id, r.title])).concat(withNone ? [['none', '回に入っていない単語']] : []);
+    return [['all', 'すべてのシリーズ']].concat(store.state.rounds.map((r) => [r.id, r.title])).concat(withNone ? [['none', 'シリーズに入っていない単語']] : []);
   }
 
   function attemptTitle(a) {
@@ -1700,7 +1828,7 @@
       case 'retest': return '再テスト' + md(a.period);
       case 'summary': return 'まとめテスト' + (a.no ? ' 第' + a.no + '回' : '');
       case 'monthly': return (/^\d{4}-\d{2}$/.test(a.period || '') ? Number(a.period.slice(5)) + '月の' : '月の') + 'まとめテスト';
-      default: return (roundTitle(a.roundId) || '回') + ' テスト ' + a.no + '回目';
+      default: return (roundTitle(a.roundId) || 'シリーズ') + ' テスト ' + a.no + '回目';
     }
   }
 
@@ -1708,12 +1836,32 @@
     return '<main class="screen" id="main">' + pageHead(title, { back: fallback }) + '</main>';
   }
 
-  /* ----- 回の画面 ----- */
+  /* ----- シリーズを追加 ----- */
+
+  function viewAddSeries() {
+    const st = store.state;
+    const next = st.rounds.length + 1;
+    let html = '<main class="screen install" id="main">' + pageHead('シリーズを追加', { back: 'home' });
+    html += '<p class="lead">新しい単語のリストを Claude に送ると、「シリーズ' + next + '」として、このアプリに入ります。</p>';
+    html += '<ol class="install-steps">' +
+      stepItem('単語のリストを送る', '<p class="fine">写真・PDF・テキストのどれでも大丈夫です（手書きのノートでも）。この会話のように、「シリーズ' + next + 'にして」と一緒に送ってください。</p>') +
+      stepItem('カードと音声ができる', '<p class="fine">辞書で確かめた意味と発音、頭に浮かべる場面、例文、テスト用の新しい文、AI音声（ふつう・ゆっくり）をそろえます。読めない字や意味が決められない単語は「要確認」にして、確かめるまで出題しません。</p>') +
+      stepItem('アプリを開き直す', '<p class="fine">「シリーズ」に シリーズ' + next + ' が並びます。学習の記録はそのまま残ります。毎日の ① の新しい単語は、いまのシリーズを覚え終わると シリーズ' + next + ' から出ます（シリーズの画面の「このシリーズを学習する」で、先に始めることもできます）。</p>') +
+      '</ol>';
+    html += section('いまのシリーズ', '<div class="list">' + st.rounds.map((r) => {
+      const items = Q.roundItems(st.words, r);
+      return rowLink('#round-' + r.id, r.title, r.wordIds.length + '語・カード ' + items.length + '枚' + (r.addedAt ? '・' + r.addedAt + ' 追加' : ''), '');
+    }).join('') + '</div>');
+    html += '</main>';
+    return html;
+  }
+
+  /* ----- シリーズの画面 ----- */
 
   function viewRound() {
     const st = store.state;
     const r = roundById(ui.param);
-    if (!r) return notFound('回が見つかりません', 'home');
+    if (!r) return notFound('シリーズが見つかりません', 'home');
     const now = Date.now();
     const items = Q.roundItems(st.words, r);
     const only = items.map((it) => it.sense.id);
@@ -1730,9 +1878,15 @@
     html += pageHead(r.title, { back: 'home' });
     html += '<p class="lead center">' + r.wordIds.length + '語・カード ' + items.length + '枚' + (r.addedAt ? '・' + esc(r.addedAt) + ' 追加' : '') + '</p>';
 
+    const focus = focusSeries();
+    const isFocus = focus && focus.id === r.id;
+    const chosen = store.state.settings.seriesFocus === r.id;
+    html += '<div class="list">' + (isFocus
+      ? '<div class="row static focus-row">' + icon('check', 'focus-ic') + rowInner('学習中のシリーズ', '毎日の ① の新しい単語は、このシリーズから出ます', chosen ? '<button type="button" class="btn text sm" data-action="focus-series" data-round="">自動に戻す</button>' : '', 'action') + '</div>'
+      : rowBtn('focus-series', ' data-round="' + esc(r.id) + '"', 'このシリーズを学習する', '毎日の ① の新しい単語を、このシリーズから出します', '', 'accent')) + '</div>';
     html += section('1　カードで覚える', studyGroup(c, 'round:' + r.id));
 
-    html += section('2　回のテスト', '<div class="group">' +
+    html += section('2　シリーズのテスト', '<div class="group">' +
       '<dl class="facts">' +
       '<div><dt>受験</dt><dd>' + stats.count + '<small>回</small></dd></div>' +
       '<div><dt>最高点</dt><dd>' + (stats.best == null ? '—' : stats.best + '<small>点</small>') + '</dd></div>' +
@@ -1754,7 +1908,7 @@
         '</div>');
     }
 
-    html += section('この回の単語', '<div class="list">' +
+    html += section('このシリーズの単語', '<div class="list">' +
       rowBtn('goto-misses', ' data-round="' + esc(r.id) + '"', '覚えていないリスト', '', '<b>' + openMiss + '</b>件') +
       rowBtn('goto-words', ' data-round="' + esc(r.id) + '"', '単語の一覧', '', r.wordIds.length + '語') +
       '</div>' +
@@ -1792,7 +1946,7 @@
     if (!r) return;
     const items = Q.roundItems(st.words, r);
     if (!items.length) {
-      toast('この回には出題できる単語がありません。');
+      toast('このシリーズには出題できる単語がありません。');
       return;
     }
     if (!testOpen(Date.now())) return;
@@ -2084,9 +2238,11 @@
     if (!q || q.part !== 'understand' || !q.choices[i]) return;
     const it = choiceItem(q, i);
     const said = it ? !!sayWord(it, () => {
-      // 正解のときは、単語の音が終わってから次の問題へ
+      // 単語の音が終わったら、正解・不正解の音。正解なら次の問題へ
       const fb = ui.testFeedback;
-      if (fb && fb.correct && fb.question.id === q.id) autoNext(q.id, 450);
+      if (!fb || fb.question.id !== q.id) return;
+      fx(fb.correct ? 'correct' : 'wrong');
+      if (fb.correct) autoNext(q.id, 650);
     }) : false;
     answerTest(i, said);
   }
@@ -2110,10 +2266,15 @@
     ui.testFeedback = { question: q, correct: out.result.correct, given: out.result.given, expected: out.result.expected, choice: q.part === 'understand' ? response : null };
     ui.order = [];
     render(false);
-    // 組み立てる問題（並べ替え・つづり）は、答え合わせのときに正しい英語（文・単語）を鳴らす
+    // 単語の音を鳴らさない問題は、すぐに正解・不正解の音
+    if (q.part === 'compose' || !said) fx(out.result.correct ? 'correct' : 'wrong');
+    // 組み立てる問題（並べ替え・つづり）は、そのあとに正しい英語（文・単語）を鳴らす
     if (q.part === 'compose') {
-      const btn = $app.querySelector('.feedback .audio button[data-slow="0"]:not([disabled])');
-      if (btn) playFrom(btn);
+      setTimeout(() => {
+        if (!ui.testFeedback || ui.testFeedback.question.id !== q.id) return;
+        const btn = $app.querySelector('.feedback .audio button[data-slow="0"]:not([disabled])');
+        if (btn) playFrom(btn);
+      }, 420);
     }
     // 正解の4択は自動で次へ（単語の音を鳴らしたときは、鳴り終わってから。鳴らないときの予備に少し長め）
     if (out.result.correct && q.part === 'understand') autoNext(q.id, said ? 2600 : 800);
@@ -2131,6 +2292,7 @@
     const st = store.state;
     const out = Q.finish(st.tests, st.tests.current, Date.now());
     store.set('tests', out.tests);
+    fx(out.summary.score === 100 ? 'perfect' : 'done');
     resetTestUi();
     go('score-' + out.summary.id, true);
   }
@@ -2151,9 +2313,11 @@
     const nWrong = a.wrongs.length;
     let html = '<main class="screen score" id="main">';
     html += pageHead(a.kind === 'practice' ? '練習の結果' : 'テストの結果', { back: isRound ? 'round-' + a.roundId : 'home' });
-    html += '<section class="score-hero">' + (a.score === 100 ? doneMark() : '') +
+    const secs = Math.round(((a.finishedAt || 0) - (a.startedAt || 0)) / 1000);
+    html += '<section class="score-hero">' + scoreRing(a.score, '点', '100点満点') +
+      gradeHtml(a.score) +
       '<p class="eyebrow">' + esc(attemptTitle(a)) + '・' + esc(util.formatDateTime(a.finishedAt)) + '</p>' +
-      '<p class="score-num"><b>' + a.score + '</b><span>点</span></p><p class="score-max">100点満点・' + correct + ' / ' + total + '問 正解</p>';
+      '<p class="score-max">' + correct + ' / ' + total + '問 正解' + (secs > 0 && secs < 3 * 3600 ? '・' + durationText(secs) : '') + '</p>';
     if (isRound) {
       if (a.score === 100) html += '<p class="perfect">満点です。' + (first && first.no === a.no ? a.no + '回目で満点を取りました。' : '満点は ' + first.no + '回目で達成しています。') + '</p>';
       else html += '<p class="to-perfect">満点まであと ' + (100 - a.score) + '点' + (first ? '（満点は ' + first.no + '回目で達成済み）' : '') + '。間違えた ' + nWrong + '問は、明日 ' + esc(tt) + ' に再テスト（必須）です。</p>';
@@ -2201,7 +2365,7 @@
       html += '<div class="btn-col"><button type="button" class="btn primary block" data-action="start" data-mode="fwd" data-scope="wrong:' + esc(a.id) + '">間違えた単語をカードで学習</button></div>';
     }
     html += '<div class="list">' + rowLink('#misses', '覚えていないリスト', 'すべての間違えた問題・再テストの予定') +
-      (isRound ? rowLink('#round-' + a.roundId, roundTitle(a.roundId) || '回', 'カード学習・テストの記録') : rowLink('#home', 'ホーム', '今日の学習・テスト')) +
+      (isRound ? rowLink('#round-' + a.roundId, roundTitle(a.roundId) || 'シリーズ', 'カード学習・テストの記録') : rowLink('#home', 'ホーム', '今日の学習・テスト')) +
       '</div>';
     html += '</main>';
     return html;
@@ -2272,9 +2436,9 @@
         : '') +
       '</section>';
     html += '<div class="filters">' + segButtons('miss-status', ui.missStatus, [['open', '覚えていない'], ['solved', '克服した'], ['all', 'すべて']], '状態') +
-      (st.rounds.length > 1 || ui.missRound !== 'all' ? selectBox('miss-round', ui.missRound, roundOptions(false), '回') : '') + '</div>';
+      (st.rounds.length > 1 || ui.missRound !== 'all' ? selectBox('miss-round', ui.missRound, roundOptions(false), 'シリーズ') : '') + '</div>';
     if (!list.length) {
-      html += '<div class="list"><p class="empty-note">' + (counts.all ? '当てはまる問題はありません。' : 'まだありません。回のテストで間違えた問題が、ここにたまっていきます。') + '</p></div>';
+      html += '<div class="list"><p class="empty-note">' + (counts.all ? '当てはまる問題はありません。' : 'まだありません。テストで間違えた問題が、ここにたまっていきます。') + '</p></div>';
     } else {
       html += '<ul class="list miss-list">' + list.map((e) => {
         const it = index.senses.get(e.senseId);
@@ -2357,7 +2521,7 @@
     return '<main class="screen words" id="main">' +
       pageHead('単語', { right: '<button type="button" class="btn text" data-action="new-word">' + icon('plus') + '追加</button>' }) +
       '<label class="search"><span class="sr-only">検索</span><input type="search" id="word-search" placeholder="英語・意味で検索" value="' + esc(ui.query) + '" autocomplete="off" autocapitalize="off" spellcheck="false"></label>' +
-      '<div class="filters two">' + selectBox('round-filter', ui.roundFilter, roundOptions(true), '回で絞り込み') + selectBox('status-filter', ui.filter, statusOpts, '状態で絞り込み') + '</div>' +
+      '<div class="filters two">' + selectBox('round-filter', ui.roundFilter, roundOptions(true), 'シリーズで絞り込み') + selectBox('status-filter', ui.filter, statusOpts, '状態で絞り込み') + '</div>' +
       '<ul class="list word-list" id="word-list">' + wordListItems() + '</ul>' +
       (cnt.review ? '<p class="section-note">「要確認」の単語・用法は通常の出題から外しています。内容を確かめて編集すると出題されます。</p>' : '') +
       '</main>';
@@ -2550,9 +2714,9 @@
     }
     html += '<fieldset class="ed-sec"><legend>単語</legend>' +
       field('英単語（見出し語）', 'headword', d.headword, { required: true, lang: 'en', en: true, placeholder: '例: pretty' }) +
-      '<label class="f" for="f-round"><span class="f-label">回</span><select id="f-round">' +
-      [['', '（回に入れない）']].concat(store.state.rounds.map((r) => [r.id, r.title])).map(([v, l]) => '<option value="' + esc(v) + '"' + (v === ui.editRound ? ' selected' : '') + '>' + esc(l) + '</option>').join('') +
-      '</select><span class="f-help">回に入れると、その回のカード学習とテストに出ます。</span></label>' +
+      '<label class="f" for="f-round"><span class="f-label">シリーズ</span><select id="f-round">' +
+      [['', '（シリーズに入れない）']].concat(store.state.rounds.map((r) => [r.id, r.title])).map(([v, l]) => '<option value="' + esc(v) + '"' + (v === ui.editRound ? ' selected' : '') + '>' + esc(l) + '</option>').join('') +
+      '</select><span class="f-help">シリーズに入れると、そのシリーズのカード学習とテストに出ます。</span></label>' +
       selectField('確認状況', 'status', d.status, statusOpts, { help: '確認済み＝辞書などで確かめた／未確認＝出題するが未確認／要確認＝読めない文字や不明な点があり、出題しない' }) +
       field('確認メモ（確かめた方法・辞書名など）', 'check.method', d.check.method, { textarea: true, rows: 2 }) +
       '<label class="f" for="f-sources"><span class="f-label">出典（1行に1つ「名前 | URL」）</span><textarea id="f-sources" data-field="_sources" rows="3" placeholder="Cambridge Dictionary | https://dictionary.cambridge.org/..." autocapitalize="off" spellcheck="false">' + esc(ui.editSourcesText) + '</textarea></label>' +
@@ -2789,6 +2953,7 @@
     return section('音声', '<div class="group">' + info +
       audioCtl({ text: SAMPLE_TEXT, what: 'テスト音声', cap: true, left: true }) +
       toggleRow('autoplay', 'カードを表示したら、単語を自動で再生', s.autoplay) +
+      toggleRow('sfx', '効果音', s.sfx !== false, 'タップ・正解・完了のときに、短い音を鳴らします') +
       '</div>' + deviceVoiceHtml(), { id: 'voice-section' });
   }
 
@@ -2872,6 +3037,7 @@
       '<p>初期の単語は、辞書の情報と照らし合わせて意味・品詞・発音記号を確かめ、出典と確認方法を単語ごとに記録しています。例文・ニュアンス・場面の説明は、このアプリ用に作った学習用の文章です。</p>' +
       '<p>毎日の順番：① 単語を覚える（英語 → 場面）→ ② 逆から思い出す（場面 → 英語）→ ③ ミスを確認 → ④ 間違えた問題を解く → ⑤ ' + esc(testTime()) + ' からテスト。テストで間違えた問題は、次の日に再テスト（必須）で、満点になるまで毎日続きます。5日ごとのまとめテストと、毎月1日の月のまとめテストで、長く覚えているかを確かめます。</p>' +
       '<p class="fine">AI音声：Kokoro-82M（Apache-2.0）と発音辞書 misaki（Apache-2.0）で作成。日本語は読み上げません。</p>' +
+      '<p class="fine version">' + APP_NAME + '　バージョン ' + APP_VERSION + '・単語データ 版' + ((C.seed && C.seed.version) || 0) + '・シリーズ ' + store.state.rounds.length + '</p>' +
       '</div>');
     html += '</main>';
     return html;
@@ -3009,12 +3175,24 @@
 
   /* ================= 操作 ================= */
 
+  /** ボタンの効果音（別の音が鳴る操作は、その音だけ） */
+  const OWN_SOUND = new Set(['speak', 'choose', 'choice-say', 'rate', 'flip', 'order-check', 'test-skip', 'enter', 'tile-pick', 'tile-unpick']);
+  function clickSound(a) {
+    if (a === 'enter') fx('open');
+    else if (a === 'tile-pick' || a === 'tile-unpick') fx('tick');
+    else if (!OWN_SOUND.has(a)) fx('tap');
+  }
+
   function onClick(e) {
     if (e.target.closest && e.target.closest('a[data-cal]')) markCalendar();
     const el = e.target.closest('[data-action]');
-    if (!el) return;
+    if (!el) {
+      if (e.target.closest && e.target.closest('a[href]')) fx('tap');
+      return;
+    }
     const a = el.dataset.action;
     if (el.disabled) return;
+    clickSound(a);
     switch (a) {
       case 'speak':
         e.stopPropagation();
@@ -3050,6 +3228,13 @@
       case 'add-calendar':
         addCalendar();
         return;
+      case 'focus-series': {
+        const id = el.dataset.round || '';
+        setSettings({ seriesFocus: id });
+        toast(id ? (roundTitle(id) + ' を学習します。毎日の ① の新しい単語は、このシリーズから出ます。') : '学習中のシリーズを自動にしました（覚え終わっていない最初のシリーズ）。');
+        render(false);
+        return;
+      }
       case 'copy-link':
         copyText(appLink(), 'リンクをコピーしました。Safari のアドレス欄に貼り付けて開いてください。', 'app-link');
         return;
@@ -3173,7 +3358,7 @@
       case 'reset-tests':
         openModal({
           title: 'テストの記録をリセットしますか？',
-          body: 'すべての回のテストの点数・受験回数と、覚えていないリストが消えます。カードの学習記録と単語は残ります。',
+          body: 'すべてのテストの点数・受験回数と、覚えていないリストが消えます。カードの学習記録と単語は残ります。',
           ok: 'リセットする',
           danger: true,
           onOk: () => {
@@ -3261,7 +3446,7 @@
       case 'reset-words':
         openModal({
           title: '単語を初期状態に戻しますか？',
-          body: '追加・編集した単語は消え、最初から入っている ' + C.seed.words.length + '語と回に戻ります。学習記録とテストの記録は残ります。',
+          body: '追加・編集した単語は消え、最初から入っている ' + C.seed.words.length + '語とシリーズに戻ります。学習記録とテストの記録は残ります。',
           ok: '初期状態に戻す',
           danger: true,
           onOk: () => {
@@ -3346,6 +3531,10 @@
       case 'autoplay':
         setSettings({ autoplay: t.checked });
         return;
+      case 'sfx':
+        setSettings({ sfx: t.checked });
+        if (t.checked) fx('correct');
+        return;
       case 'daily-goal':
         setSettings({ dailyGoal: Number(t.value) });
         toast('今日の目標を ' + t.value + '枚にしました。');
@@ -3398,6 +3587,7 @@
     }
     if (ui.route === 'title' && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
+      fx('open');
       go('home', true);
       return;
     }
