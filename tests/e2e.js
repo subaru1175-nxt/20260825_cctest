@@ -1473,6 +1473,9 @@ async function noHScroll(page, label) {
     await old.page.click('.move-tip-open');
     await old.page.waitForSelector('.install-steps');
     eq(await old.page.inputValue('#new-link'), 'https://example.github.io/app/');
+    eq(await old.page.$$eval('.install-steps .is-title', (els) => els.map((e) => e.textContent)), [
+      '新しいアプリを Safari で開く', 'ホーム画面に追加', 'ここに戻って、記録をコピー', 'ホーム画面の「暗記CARD」で記録を移す', '古いアイコンを消す',
+    ], '先にホーム画面に追加してから、記録をコピーして、ホーム画面のアプリで読み込む');
     await old.page.click('[data-action="copy-records"]');
     await old.page.waitForFunction(() => document.getElementById('toast').textContent.includes('記録をコピーしました'));
     const copied = await old.page.evaluate(() => navigator.clipboard.readText());
@@ -1507,6 +1510,43 @@ async function noHScroll(page, label) {
     ok(!(await neu.page.$('.movein-tip')), '移したあとは出さない');
     eq(neu.page.errors, []);
     await neu.ctx.close();
+  });
+
+  await test('iPhone：Safari とホーム画面のアプリは記録が別々なので、「記録を移す」はホーム画面から開いたときに出す', async () => {
+    const ctx = await browser.newContext({
+      viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, locale: 'ja-JP', timezoneId: 'Asia/Tokyo',
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
+    });
+    await ctx.addInitScript(speechMock('mock'));
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.clock.install({ time: new Date(T0) });
+    await page.goto(URL0);
+    await page.waitForSelector('.title-screen');
+    await page.click('.title-screen');
+    await page.waitForSelector('.home .install-tip');
+    ok(!(await page.$('.movein-tip')), 'Safari では「記録を移す」を出さない');
+    await page.click('.install-tip-open');
+    await page.waitForSelector('.install-steps');
+    ok((await page.textContent('.install-steps')).includes('ホーム画面から開いたあとに、ホームの上の「記録を移す」'), '手順の最後に、移すのはホーム画面から開いたあと');
+    // Safari で「記録を移す」の画面を開いても、ホーム画面のアプリで読み込むよう案内する
+    await page.goto(URL0 + '#move-in');
+    await page.waitForSelector('#move-text');
+    ok((await page.textContent('.move-note')).includes('ホーム画面のアプリには入りません'));
+    await page.click('.move-note [data-to="install"]');
+    await page.waitForSelector('.install-steps');
+    // ホーム画面から開いたとき：「記録を移す」が出て、注意は出さない
+    await page.addInitScript(() => Object.defineProperty(window.navigator, 'standalone', { get: () => true }));
+    await page.goto(URL0 + '#home');
+    await page.reload();
+    await page.waitForSelector('.home .movein-tip');
+    ok(!(await page.$('.install-tip')), 'ホーム画面から開いたら「ホーム画面に追加」は出さない');
+    await page.click('.movein-tip-open');
+    await page.waitForSelector('#move-text');
+    ok(!(await page.$('.move-note')), 'ホーム画面のアプリでは注意を出さない');
+    eq(errors, []);
+    await ctx.close();
   });
 
   await test('GitHub Pages のような場所（/20260825_cctest/）でも、そのまま開ける（アイコン・音声・オフライン）', async () => {

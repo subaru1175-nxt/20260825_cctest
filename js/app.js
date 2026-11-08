@@ -36,7 +36,7 @@
 
   const SAMPLE_TEXT = 'Hello! This is how I sound.';
   const APP_NAME = '暗記CARD';
-  const APP_VERSION = '1.0.0';
+  const APP_VERSION = '1.0.1';
   const DAILY_MAX = 20; // 今日のテストに出す単語の上限
   const SUMMARY_MIN = 3; // まとめテストに必要な単語の数
   const STEP_NO = ['①', '②', '③', '④', '⑤'];
@@ -1285,10 +1285,21 @@
     return tipCard('move-tip', 'move', 'share', '新しいアプリに移る', 'Claude を通さずに、ホーム画面からすぐ開けます', '');
   }
 
-  /** 新しいアプリのホームの上：まだ学習していないあいだだけ「記録を移す」を出す */
+  /** まだ学習していない（記録を移す前の）新しいアプリか */
+  function moveInReady() {
+    if (newAppLink() || store.state.meta.moveInHidden || !/^https?:$/.test(location.protocol)) return false;
+    return !Object.keys((store.state.log && store.state.log.days) || {}).length;
+  }
+
+  /** iPhone の Safari（ホーム画面から開いていない）か。ホーム画面のアプリと Safari では、記録が別々に保存される */
+  function iosSafari() {
+    return isIOS() && !isStandalone();
+  }
+
+  /** 新しいアプリのホームの上：まだ学習していないあいだだけ「記録を移す」を出す。
+   *  iPhone では、ホーム画面から開いたときだけ出す（Safari で読み込んでも、ホーム画面のアプリには入らないため） */
   function moveInTip() {
-    if (newAppLink() || store.state.meta.moveInHidden || !/^https?:$/.test(location.protocol)) return '';
-    if (Object.keys((store.state.log && store.state.log.days) || {}).length) return '';
+    if (!moveInReady() || iosSafari()) return '';
     return tipCard('movein-tip', 'move-in', 'list', '記録を移す', 'claude.ai 版の記録を、このアプリに入れます', 'hide-move-in');
   }
 
@@ -1322,13 +1333,13 @@
     if (!link) return html + '<p class="lead">このページは claude.ai 版で使います。</p></main>';
     html += '<p class="lead">Claude を通さずに、ホーム画面のアイコンからすぐ開ける「' + APP_NAME + '」です。ここまでの記録も、そのまま移せます。</p>';
     html += '<ol class="install-steps">' +
-      stepItem('記録をコピー', '<button type="button" class="btn primary block" data-action="copy-records">記録をコピー</button>' +
-        (ui.recordsText ? '<textarea id="records-text" rows="3" readonly spellcheck="false">' + esc(ui.recordsText) + '</textarea>' : '') +
-        '<p class="fine">単語・学習の記録・テストの記録・覚えていないリストを、まとめてコピーします。</p>') +
       stepItem('新しいアプリを Safari で開く', linkBox('new-link', link, 'copy-new-link', '新しいアプリのリンク') +
         '<p class="fine">リンクをコピーして、Safari のアドレス欄に貼り付けて開きます。<a href="' + esc(link) + '" target="_blank" rel="noopener">開く</a></p>') +
-      stepItem('新しいアプリで「記録を移す」', '<p class="fine">ホームの上の「記録を移す」をタップして、コピーした記録を貼り付け、「読み込む」をタップします。</p>') +
-      stepItem('新しいアプリをホーム画面に追加', '<p class="fine">共有ボタン ' + icon('share', 'share-ic') + ' →「ホーム画面に追加」→ 名前は「' + APP_NAME + '」→「追加」。</p>') +
+      stepItem('ホーム画面に追加', '<p class="fine">Safari の共有ボタン ' + icon('share', 'share-ic') + ' →「ホーム画面に追加」→ 名前は「' + APP_NAME + '」→「追加」。</p>') +
+      stepItem('ここに戻って、記録をコピー', '<button type="button" class="btn primary block" data-action="copy-records">記録をコピー</button>' +
+        (ui.recordsText ? '<textarea id="records-text" rows="3" readonly spellcheck="false">' + esc(ui.recordsText) + '</textarea>' : '') +
+        '<p class="fine">単語・学習の記録・テストの記録・覚えていないリストを、まとめてコピーします。</p>') +
+      stepItem('ホーム画面の「' + APP_NAME + '」で記録を移す', '<p class="fine">ホーム画面に追加した「' + APP_NAME + '」を開き、上の「記録を移す」→ 貼り付け →「読み込む」。iPhone では Safari とホーム画面のアプリの記録は別々なので、かならずホーム画面のアイコンから開いて読み込みます。</p>') +
       stepItem('古いアイコンを消す', '<p class="fine">ホーム画面にある claude.ai 版のアイコン（Claude の絵）は、長押しして削除できます。これからは新しい「' + APP_NAME + '」から開きます。</p>') +
       '</ol></main>';
     return html;
@@ -1337,6 +1348,10 @@
   function viewMoveIn() {
     let html = '<main class="screen install" id="main">' + pageHead('記録を移す', { back: 'home' });
     html += '<p class="lead">claude.ai 版の「新しいアプリに移る」でコピーした記録を、下に貼り付けて「読み込む」をタップしてください。</p>';
+    if (iosSafari()) {
+      html += '<div class="banner info move-note" role="note">Safari で読み込んだ記録は、ホーム画面のアプリには入りません（iPhone では別々に保存されます）。先にホーム画面に追加して、そのアイコンから開いた画面で読み込んでください。' +
+        '<div class="btn-col"><button type="button" class="btn secondary block" data-action="goto" data-to="install">ホーム画面に追加する</button></div></div>';
+    }
     html += '<div class="group"><label class="f" for="move-text"><span class="f-label">コピーした記録</span>' +
       '<textarea id="move-text" rows="5" placeholder="ここを長押しして「ペースト」" spellcheck="false" autocapitalize="off">' + esc(ui.moveText) + '</textarea></label>' +
       (ui.moveError ? '<div class="banner warn" role="alert">' + esc(ui.moveError) + '</div>' : '') +
@@ -1432,7 +1447,8 @@
       step('名前を「' + APP_NAME + '」にして「追加」', '<p class="fine">「Webアプリとして開く」はオンのままにします。' + (onClaude ? 'アイコンの絵は claude.ai のものになります。' : '') + '</p>') +
       step('ホーム画面の「' + APP_NAME + '」から開く', '<p class="fine">' + (onClaude
         ? 'はじめて開いたときに claude.ai のログイン画面が出たら、いつものアカウントでログインしてください。学習の記録はアカウントに保存されているので、続きから使えます。'
-        : '学習の記録は、この端末に保存されます。') + '</p>') +
+        : '学習の記録は、ホーム画面のアプリの中に保存されます（Safari で開いたときとは別々です）。' +
+          (moveInReady() ? 'claude.ai 版の記録は、ホーム画面から開いたあとに、ホームの上の「記録を移す」で入れます。' : '')) + '</p>') +
       '</ol>';
     html += '<p class="section-note">Android（Chrome）は、右上の「⋮」から「ホーム画面に追加」。</p>';
     html += '</main>';
@@ -3027,7 +3043,7 @@
     html += section('リセット', '<div class="list">' +
       rowBtn('reset-progress', '', 'カードの学習記録をリセット', '', '', 'danger') +
       rowBtn('reset-tests', '', 'テストの記録と覚えていないリストをリセット', '', '', 'danger') +
-      rowBtn('reset-words', '', '単語と回を初期状態に戻す', '', '', 'danger') +
+      rowBtn('reset-words', '', '単語とシリーズを初期状態に戻す', '', '', 'danger') +
       '</div><p class="section-note">' + esc(storageText) + '</p>');
 
     html += section('このアプリについて', '<div class="group about">' +
@@ -3244,7 +3260,7 @@
       case 'copy-records': {
         const text = JSON.stringify(ST.buildExport(store.state, { includeProgress: true }));
         ui.recordsText = text;
-        copyText(text, '記録をコピーしました。新しいアプリの「記録を移す」に貼り付けてください。', 'records-text');
+        copyText(text, '記録をコピーしました。ホーム画面の「' + APP_NAME + '」を開いて「記録を移す」に貼り付けてください。', 'records-text');
         if (!document.getElementById('records-text')) {
           // コピーできなかったときに選べるよう、欄を出しておく
           const btn = el.closest('.is-body');
@@ -3660,7 +3676,14 @@
 
   /* ================= オフライン用（対応ブラウザのみ） ================= */
 
+  function keepStorage() {
+    try {
+      if (isStandalone() && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+    } catch (e) { /* noop */ }
+  }
+
   function registerSW() {
+    keepStorage();
     if (!('serviceWorker' in navigator) || location.protocol !== 'https:' && location.hostname !== 'localhost') return;
     if (window.CIF_NO_SW) return;
     try {

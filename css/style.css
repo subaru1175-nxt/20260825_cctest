@@ -982,6 +982,7 @@ button.step-row:active { background: var(--surface-2); }
 .is-title .share-ic { width: 18px; height: 18px; color: var(--accent); }
 .link-box { display: flex; gap: 8px; }
 .link-box input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--ink); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.78rem; }
+.move-note .btn-col { margin-top: 12px; }
 .install-done { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 24px; text-align: center; }
 .install-done-t { font-weight: 700; font-size: 1.1rem; }
 
